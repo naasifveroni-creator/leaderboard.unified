@@ -1,16 +1,875 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Unified Dashboard</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Δ Unified Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    /* ===== SIS DARK THEME ===== */
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', 'Segoe UI', Roboto, sans-serif; }
+    html, body { width: 100%; height: 100%; background: #0b1a33; overflow: hidden; }
+    body { display: flex; justify-content: center; align-items: center; padding: 0; }
+    .slide-deck { width: 100vw; height: 100vh; background: #0b1a33; overflow: hidden; position: relative; border-radius: 0; }
+    .slides-wrapper { position: relative; width: 100%; height: 100%; overflow: hidden; }
+
+    /* Navigation */
+    .fullscreen-btn { position: absolute; bottom: 2vh; right: 1.5vw; z-index: 100; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); color: rgba(255,255,255,0.5); border-radius: 8px; padding: 0.5vh 0.8vw; font-size: 1.8vh; cursor: pointer; transition: all 0.3s ease; backdrop-filter: blur(8px); display: flex; align-items: center; gap: 0.4vw; font-weight: 500; letter-spacing: 0.05em; }
+    .fullscreen-btn:hover { background: rgba(255,255,255,0.12); color: #fff; border-color: rgba(255,255,255,0.2); transform: scale(1.05); }
+    #adminAccess { position: fixed; bottom: 2vh; right: 8vw; z-index: 100; }
+    #adminAccess a { color: rgba(255,255,255,0.4); text-decoration: none; font-size: 1.4vh; font-weight: 400; letter-spacing: 0.05em; padding: 0.3vh 0.6vw; border-radius: 4px; background: rgba(0,0,0,0.15); backdrop-filter: blur(4px); border: 1px solid rgba(255,255,255,0.04); }
+    #adminAccess a:hover { color: #fdb913; background: rgba(0,0,0,0.3); border-color: rgba(255,215,0,0.15); }
+
+    .slide { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; visibility: hidden; transition: opacity 0.8s ease, transform 0.8s ease, visibility 0.8s ease; display: flex; flex-direction: column; transform: scale(0.98); }
+    .slide.active { opacity: 1; visibility: visible; position: relative; transform: scale(1); transition: opacity 0.8s ease, transform 0.8s ease, visibility 0.8s ease; }
+
+    /* SIS Title & Data slides */
+    #slide0 { background: url('assets/slides/slide-title.webp.jpg') center/cover no-repeat, #0b1a33; }
+    #slide1 { background: url('assets/slides/slide-data.webp.jpg') center/cover no-repeat, #0b1a33; }
+
+    /* All other slides use dark background */
+    #slide2, #slide3, #slide4, #slide5, #slide6, #slide7 {
+      background: #0b1a33;
+      padding: 0;
+    }
+
+    /* SIS Table Header (reused) */
+    .slide-header { background: #0b1a33; backdrop-filter: blur(16px); padding: 0.3vh 2vw; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.2vh 1vw; flex-shrink: 0; min-height: 10vh; border-bottom: 2px solid rgba(211,47,47,0.3); position: relative; overflow: hidden; box-shadow: 0 4px 30px rgba(0,0,0,0.3); border-radius: 0 0 12px 12px; margin: 0 0.5vw; }
+    .slide-header .logo-area { display: flex; align-items: center; gap: 1vw; position: relative; z-index: 2; }
+    .slide-header .logo-area img { height: 8vh; width: auto; filter: drop-shadow(0 0 15px rgba(211,47,47,0.3)); animation: logoGlowRed 3s ease-in-out infinite; }
+    @keyframes logoGlowRed { 0%, 100% { filter: drop-shadow(0 0 15px rgba(211,47,47,0.3)); } 50% { filter: drop-shadow(0 0 30px rgba(211,47,47,0.5)); } }
+    .slide-header .logo-area h1 { font-weight: 300; font-size: 2.6vh; letter-spacing: 0.1em; color: #fff; text-shadow: 0 0 20px rgba(211,47,47,0.1); }
+    .slide-header .logo-area h1 span { font-weight: 800; color: #d32f2f; }
+
+    .behavior-tags { display: flex; flex-wrap: wrap; align-items: center; gap: 0.2vh 0.5vw; position: relative; z-index: 2; }
+    .behavior-tags .tag { color: #fff; font-size: 1.2vh; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; padding: 0.3vh 0.8vw; border-radius: 30px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.08); transition: all 0.4s ease; opacity: 0; transform: translateY(15px); white-space: nowrap; }
+    .behavior-tags .tag.visible { opacity: 1; transform: translateY(0); }
+    .behavior-tags .tag.red { color: #fff; background: linear-gradient(135deg, #d32f2f, #b71c1c); border-color: rgba(211,47,47,0.4); box-shadow: 0 0 15px rgba(211,47,47,0.2); font-weight: 700; animation: redPulse 2.5s ease-in-out infinite; }
+    @keyframes redPulse { 0%, 100% { box-shadow: 0 0 15px rgba(211,47,47,0.2); } 50% { box-shadow: 0 0 30px rgba(211,47,47,0.35); } }
+    .behavior-tags .tag.coach { color: #fff; background: linear-gradient(135deg, #2a4a7f, #1a3050); border-color: rgba(42,74,127,0.4); box-shadow: 0 0 15px rgba(42,74,127,0.15); }
+
+    .slide-counter { position: absolute; top: 1.5vh; right: 2vw; color: rgba(255,255,255,0.3); font-size: 1.4vh; font-weight: 600; letter-spacing: 0.1em; z-index: 5; }
+    .slide-counter .current { color: #fff; font-size: 2vh; }
+
+    .table-wrap { flex: 1; overflow: hidden; padding: 0.3vh 1.5vw 0.2vh 1.5vw; background: transparent; display: flex; flex-direction: column; min-height: 0; justify-content: center; height: 100%; position: relative; }
+    .slide-title { font-size: 3.5vh; font-weight: 800; color: #fff; text-align: center; padding-bottom: 0.3vh; flex-shrink: 0; letter-spacing: -0.02em; position: relative; z-index: 1; text-shadow: 0 2px 20px rgba(0,0,0,0.5); }
+    .slide-title::after { content: ''; display: block; width: 60px; height: 3px; background: linear-gradient(90deg, #d32f2f, #d32f2f); margin: 0.15vh auto 0; border-radius: 10px; }
+    .slide-title .week-date { font-weight: 800; font-size: 2.4vh; color: #fdb913; display: inline-block; margin-top: 0.1vh; letter-spacing: 0.05em; background: rgba(0,0,0,0.3); padding: 0.1vh 2vw; border-radius: 30px; backdrop-filter: blur(4px); }
+
+    .scroll-wrapper { flex: 1; overflow: hidden; position: relative; mask-image: linear-gradient(to bottom, transparent 0%, black 8%, black 92%, transparent 100%); z-index: 1; }
+    .scroll-inner { transition: none; will-change: transform; }
+    .table-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8vw 1.5vw; flex: 1; min-height: 0; height: 100%; }
+    .table-grid .scroll-wrapper { flex: 1; overflow: hidden; position: relative; mask-image: linear-gradient(to bottom, transparent 0%, black 8%, black 92%, transparent 100%); }
+
+    .table-wrap th { background: linear-gradient(135deg, #0b1a33 0%, #1a3050 100%); color: #fff; font-weight: 700; padding: 1vh 1vw; text-align: center; border-bottom: 3px solid #d32f2f; font-size: 2vh; text-transform: uppercase; letter-spacing: 0.08em; position: sticky; top: 0; z-index: 10; }
+    .table-wrap td { padding: 1.2vh 1vw; border-bottom: 1px solid rgba(237,240,246,0.15); vertical-align: middle; color: #fff; text-align: center; font-size: 2.6vh; font-weight: 500; transition: all 0.3s ease; }
+    .table-wrap tr:last-child td { border-bottom: none; }
+    .table-wrap .rank-col { width: 10%; color: #94a3b8; font-weight: 600; font-size: 2.4vh; }
+    .table-wrap .name-col { font-weight: 500; text-align: left; font-size: 2.4vh; color: #e2e8f0; }
+    .table-wrap .score-col { width: 45%; text-align: right; font-weight: 700; color: #fdb913; }
+    .table-wrap tr.top1 td { background: linear-gradient(90deg, rgba(27,138,78,0.15), rgba(211,47,47,0.05)); border-left: 4px solid #1b8a4e; }
+    .table-wrap tr.top1 .rank-col { color: #1b8a4e; font-weight: 900; font-size: 2.8vh; }
+    .table-wrap tr.top1 .score-col { color: #1b8a4e; font-size: 3vh; font-weight: 800; }
+    .table-wrap tr.amber td { background: linear-gradient(90deg, rgba(230,126,34,0.15), rgba(211,47,47,0.05)); border-left: 4px solid #e67e22; }
+    .table-wrap tr.amber .rank-col { color: #e67e22; font-weight: 900; font-size: 2.8vh; }
+    .table-wrap tr.amber .score-col { color: #e67e22; font-size: 3vh; font-weight: 800; }
+
+    .slide-footer { flex-shrink: 0; min-height: 14vh; background: transparent; border-top: 1px solid rgba(224,229,236,0.08); display: flex; align-items: center; justify-content: center; padding: 0.5vh 2vw 0.3vh; position: relative; overflow: hidden; width: 100%; }
+    .footer-animation { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
+    .spray-fill { position: absolute; left: 0; top: 0; width: 0%; height: 100%; background: linear-gradient(90deg, #d32f2f 0%, #0b1a33 50%, #d32f2f 100%); filter: blur(12px) brightness(1.2); opacity: 0.8; animation: sprayWidth 8s ease-in-out infinite; z-index: 1; border-radius: 4px; }
+    @keyframes sprayWidth { 0% { width: 0%; opacity: 0; } 10% { opacity: 0.8; } 100% { width: 100%; opacity: 0.8; } }
+    .spray-text { font-size: 8vh; font-weight: 900; letter-spacing: 1.2vw; color: #0b1a33; background: linear-gradient(90deg, #d32f2f 0%, #0b1a33 50%, #d32f2f 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; position: relative; z-index: 3; white-space: nowrap; clip-path: inset(0 100% 0 0); animation: textReveal 8s ease-in-out infinite; }
+    @keyframes textReveal { 0% { clip-path: inset(0 100% 0 0); } 100% { clip-path: inset(0 0% 0 0); } }
+    .plane { position: absolute; top: 50%; transform: translateY(-50%); left: -80px; width: 70px; height: 50px; z-index: 5; animation: flyPlane 8s ease-in-out infinite; filter: drop-shadow(0 0 15px rgba(211,47,47,0.6)); }
+    @keyframes flyPlane { 0% { left: -80px; } 50% { left: calc(100% - 40px); } 100% { left: calc(100% + 20px); } }
+
+    .progress-container { position: absolute; bottom: 0; left: 0; right: 0; height: 3px; background: rgba(255,255,255,0.05); z-index: 30; overflow: hidden; }
+    .progress-bar { height: 100%; width: 0%; background: #d32f2f; animation: progressPulse 1.5s ease-in-out infinite; border-radius: 0 4px 4px 0; transition: width 0.1s linear; }
+    @keyframes progressPulse { 0%, 100% { opacity: 0.6; } 50% { opacity: 1; } }
+
+    .nav-controls { position: absolute; bottom: 1%; left: 0; right: 0; display: flex; justify-content: center; align-items: center; gap: 1.5vw; z-index: 20; pointer-events: none; }
+    .nav-controls button, .nav-controls .dot { pointer-events: auto; }
+    .arrow { background: rgba(11,26,51,0.6); color: #fff; border: 1px solid rgba(255,255,255,0.08); border-radius: 50%; width: 3vh; height: 3vh; font-size: 2vh; cursor: pointer; transition: all 0.3s ease; backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; }
+    .arrow:hover { background: #d32f2f; border-color: #d32f2f; transform: scale(1.1); box-shadow: 0 0 30px rgba(211,47,47,0.4); }
+    .dots { display: flex; gap: 0.8vw; }
+    .dot { width: 1vh; height: 1vh; border-radius: 50%; background: rgba(255,255,255,0.15); border: none; cursor: pointer; transition: all 0.3s ease; padding: 0; }
+    .dot.active { background: #d32f2f; transform: scale(1.4); box-shadow: 0 0 20px rgba(211,47,47,0.5); }
+
+    /* ===== TP/WNS COMPARISON CARDS (dark theme adaptation) ===== */
+    :root {
+      --card-bg: rgba(255,255,255,0.08);
+      --card-border: rgba(255,255,255,0.12);
+      --text-primary: #f1f5f9;
+      --text-secondary: #cbd5e1;
+      --text-muted: #94a3b8;
+      --badge-bg: rgba(255,255,255,0.06);
+      --badge-border: rgba(255,255,255,0.08);
+      --shadow: 0 8px 32px rgba(0,0,0,0.3);
+    }
+
+    .comp-slide-wrapper {
+      flex: 1;
+      width: 100%;
+      padding: 1vh 3vw 2vh 3vw;
+      display: flex;
+      flex-direction: column;
+      gap: 2vh;
+      min-height: 0;
+      height: 100%;
+    }
+
+    .metric-header {
+      display: flex;
+      align-items: center;
+      gap: 1.2vw;
+      flex-shrink: 0;
+    }
+    .metric-header h2 {
+      font-size: 4.2vh;
+      font-weight: 600;
+      color: #fff;
+      letter-spacing: -0.02em;
+      margin: 0;
+    }
+    .metric-header .unit-badge {
+      font-size: 2vh;
+      font-weight: 500;
+      color: var(--text-secondary);
+      background: var(--badge-bg);
+      padding: 0.2vh 1.2vw;
+      border-radius: 40px;
+      border: 1px solid var(--badge-border);
+    }
+
+    .card-row {
+      flex: 1;
+      display: flex;
+      flex-direction: row;
+      gap: 2vw;
+      min-height: 0;
+      height: 70%;
+    }
+
+    .centre-card {
+      flex: 1;
+      background: var(--card-bg);
+      backdrop-filter: blur(12px);
+      border-radius: 2.8vh;
+      border: 1px solid var(--card-border);
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      padding: 1.5vh 2.5vw;
+      position: relative;
+      overflow: hidden;
+    }
+    .centre-card::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 15%;
+      height: 70%;
+      width: 0.6vh;
+      border-radius: 0 6px 6px 0;
+      background: var(--brand-colour);
+    }
+    .centre-card.tp { --brand-colour: #3b82f6; }
+    .centre-card.wns { --brand-colour: #f59e0b; }
+
+    .chart-area {
+      flex: 0 0 28%;
+      max-width: 28%;
+      aspect-ratio: 1/1;
+      max-height: 100%;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .chart-area canvas { width: 100% !important; height: 100% !important; }
+
+    .details-area {
+      flex: 1;
+      padding-left: 2vw;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 0.2vh;
+    }
+    .details-area .centre-name {
+      font-size: 2.4vh;
+      font-weight: 600;
+      color: var(--text-muted);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 0.6vw;
+    }
+    .details-area .main-value {
+      font-size: 7vh;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: -0.03em;
+      line-height: 1;
+      display: flex;
+      align-items: baseline;
+      gap: 1vw;
+    }
+    .details-area .main-value .trend { font-size: 3vh; font-weight: 600; }
+    .trend.up { color: #10b981; }
+    .trend.down { color: #ef4444; }
+    .trend.flat { color: var(--text-muted); }
+
+    .details-area .comparison-row {
+      display: flex;
+      align-items: center;
+      gap: 1.5vw;
+      font-size: 2vh;
+      color: var(--text-secondary);
+      flex-wrap: wrap;
+    }
+    .details-area .comparison-row .prev-label {
+      background: var(--badge-bg);
+      padding: 0.2vh 0.8vw;
+      border-radius: 30px;
+      border: 1px solid var(--badge-border);
+      font-size: 1.8vh;
+      color: var(--text-secondary);
+    }
+    .details-area .comparison-row .gap-label { font-weight: 500; }
+    .details-area .comparison-row .gap-label.above { color: #10b981; }
+    .details-area .comparison-row .gap-label.below { color: #f59e0b; }
+    .details-area .comparison-row .gap-label.well-below { color: #ef4444; }
+
+    /* Summary slide (vertical table) */
+    .summary-grid-vertical {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 2vh;
+      width: 100%;
+      height: 100%;
+    }
+    .summary-card-vertical {
+      flex: 1;
+      background: var(--card-bg);
+      backdrop-filter: blur(12px);
+      border-radius: 2.8vh;
+      border: 1px solid var(--card-border);
+      box-shadow: var(--shadow);
+      padding: 1.5vh 2vw;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .summary-card-vertical .metric-title {
+      font-size: 2.8vh;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: -0.01em;
+      margin-bottom: 0.8vh;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+    }
+    .summary-card-vertical .metric-title .unit {
+      font-size: 1.8vh;
+      font-weight: 500;
+      color: var(--text-muted);
+      background: var(--badge-bg);
+      padding: 0.1vh 1vw;
+      border-radius: 40px;
+      border: 1px solid var(--badge-border);
+    }
+    .summary-row-vertical {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.6vh 0;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      flex-shrink: 0;
+    }
+    .summary-row-vertical:last-child { border-bottom: none; }
+    .summary-row-vertical .centre-info {
+      display: flex;
+      align-items: center;
+      gap: 0.6vw;
+      font-weight: 600;
+      color: var(--text-secondary);
+      font-size: 2vh;
+      flex: 0 0 15%;
+    }
+    .summary-row-vertical .centre-info .dot {
+      width: 1.4vh;
+      height: 1.4vh;
+      border-radius: 50%;
+      display: inline-block;
+      flex-shrink: 0;
+    }
+    .summary-row-vertical .values {
+      display: flex;
+      align-items: center;
+      gap: 1.5vw;
+      flex: 1;
+      justify-content: flex-end;
+      flex-wrap: wrap;
+    }
+    .summary-row-vertical .values .current {
+      font-size: 2.8vh;
+      font-weight: 700;
+      color: #fff;
+    }
+    .summary-row-vertical .values .change {
+      font-size: 2vh;
+      font-weight: 500;
+      min-width: 4.5vw;
+    }
+    .summary-row-vertical .values .change.up { color: #10b981; }
+    .summary-row-vertical .values .change.down { color: #ef4444; }
+    .summary-row-vertical .values .change.flat { color: var(--text-muted); }
+    .summary-row-vertical .values .gap-badge {
+      font-size: 1.8vh;
+      padding: 0.2vh 1vw;
+      border-radius: 30px;
+      background: var(--badge-bg);
+      border: 1px solid var(--badge-border);
+      font-weight: 500;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.2vw;
+      white-space: nowrap;
+    }
+    .summary-row-vertical .values .gap-badge.above { color: #10b981; border-color: #10b981; background: rgba(16,185,129,0.08); }
+    .summary-row-vertical .values .gap-badge.below { color: #f59e0b; border-color: #f59e0b; background: rgba(245,158,11,0.08); }
+    .summary-row-vertical .values .gap-badge.well-below { color: #ef4444; border-color: #ef4444; background: rgba(239,68,68,0.08); }
+
+    /* Responsive */
+    @media (max-aspect-ratio: 16/9) {
+      .slide-header .logo-area h1 { font-size: 2vh; }
+      .slide-header .logo-area img { height: 6vh; }
+      .behavior-tags .tag { font-size: 1vh; }
+      .slide-title { font-size: 2.8vh; }
+      .slide-title .week-date { font-size: 2vh; }
+      .table-wrap td { font-size: 2.2vh; }
+      .table-wrap th { font-size: 1.6vh; }
+      .fullscreen-btn { font-size: 1.2vh; padding: 0.3vh 0.6vw; }
+      .spray-text { font-size: 6vh; letter-spacing: 1vw; }
+      .plane { width: 55px; height: 40px; }
+      .slide-footer { min-height: 12vh; }
+      .metric-header h2 { font-size: 3.2vh; }
+      .details-area .main-value { font-size: 5vh; }
+      .card-row { flex-direction: column; height: auto; }
+      .centre-card { flex-direction: column; padding: 1.5vh; }
+      .chart-area { flex: 0 0 30%; width: 30%; max-width: 30%; }
+      .details-area { padding-left: 0; align-items: center; text-align: center; }
+      .summary-row-vertical .values { gap: 0.8vw; }
+    }
+    @media (max-width: 768px) {
+      .slide-counter { display: none; }
+      .behavior-tags .divider { display: none; }
+      .behavior-tags .tag { font-size: 0.7vh; padding: 0.2vh 0.4vw; }
+      .slide-header .logo-area h1 { font-size: 1.4vh; }
+      .slide-header .logo-area img { height: 4vh; }
+      .slide-title .week-date { font-size: 1.6vh; }
+      .table-wrap td { font-size: 1.4vh; }
+      .table-wrap th { font-size: 1.2vh; }
+      .nav-controls { bottom: 0.5%; }
+      .arrow { width: 2vh; height: 2vh; font-size: 1.2vh; }
+      .dot { width: 0.6vh; height: 0.6vh; }
+      .fullscreen-btn { bottom: 1.5vh; right: 1vw; font-size: 1.2vh; padding: 0.3vh 0.5vw; }
+      #adminAccess { right: 10vw; bottom: 1.5vh; }
+      #adminAccess a { font-size: 1.2vh; padding: 0.2vh 0.5vw; }
+      .spray-text { font-size: 4vh; letter-spacing: 2vw; }
+      .plane { width: 30px; height: 22px; left: -40px; }
+      .slide-footer { min-height: 8vh; }
+      .comp-slide-wrapper { padding: 1vh 2vw; }
+      .centre-card { border-radius: 2vh; }
+      .metric-header h2 { font-size: 2.4vh; }
+      .details-area .main-value { font-size: 4vh; }
+      .summary-card-vertical .metric-title { font-size: 2vh; }
+      .summary-row-vertical .values .current { font-size: 2vh; }
+    }
+  </style>
 </head>
 <body>
-    <div id="slide-container">
-        <h1 id="slide-title">Loading...</h1>
-        <div id="slide-content"></div>
-        <button onclick="prevSlide()">◀</button>
-        <button onclick="nextSlide()">▶</button>
+
+<div class="slide-deck">
+  <div class="slides-wrapper" id="slidesWrapper">
+    <button class="fullscreen-btn" id="fullscreenBtn"><span class="icon">⛶</span> FULL</button>
+    <div id="adminAccess"><a href="admin.html" target="_blank">⚙ ADMIN</a></div>
+
+    <!-- Slides will be injected by JavaScript -->
+    <div id="slidesContainer"></div>
+
+    <!-- Navigation controls -->
+    <div class="nav-controls">
+      <button class="arrow" id="prevBtn">◀</button>
+      <div class="dots" id="dotsContainer"></div>
+      <button class="arrow" id="nextBtn">▶</button>
     </div>
-    <script src="js/app.js"></script>
+    <div class="progress-container"><div class="progress-bar" id="progressBar"></div></div>
+  </div>
+</div>
+
+<script>
+  // ===== COMBINED SLIDESHOW =====
+  (async function() {
+    const SLIDE_INTERVAL = 15000; // 15 seconds
+    let currentSlide = 0;
+    let slidesData = [];
+    let intervalId = null;
+    let isPaused = false;
+
+    // Load both JSON files
+    async function loadData() {
+      try {
+        const [lbRes, compRes] = await Promise.all([
+          fetch('data/leaderboard.json').then(r => r.json()),
+          fetch('data/comparison.json').then(r => r.json())
+        ]);
+        return { leaderboard: lbRes, comparison: compRes };
+      } catch (e) {
+        console.error('Failed to load data:', e);
+        return null;
+      }
+    }
+
+    // ---- SIS rendering functions (from SIS index) ----
+    function renderSISTable(data, type) {
+      // type: 'agents' or 'teams'
+      const items = type === 'agents' ? data.agents : data.teams;
+      if (!items || items.length === 0) return `<div class="empty-state">No data</div>`;
+
+      const maxRank = items.length;
+      const topTwo = items.slice(0, 2);
+      const rest = items.slice(2);
+
+      let html = '<div class="table-grid">';
+      // Two columns: left for top performers (1–2), right for the rest
+      html += '<div class="scroll-wrapper"><div class="scroll-inner"><table><thead><tr><th>Rank</th><th>Name</th><th>SIS%</th></tr></thead><tbody>';
+      topTwo.forEach((item, idx) => {
+        const rank = item.rank || idx + 1;
+        const rowClass = rank === 1 ? 'top1' : (rank === 2 ? 'amber' : '');
+        html += `<tr class="${rowClass}"><td class="rank-col">#${rank}</td><td class="name-col">${item.name}</td><td class="score-col">${item.score}</td></tr>`;
+      });
+      html += '</tbody></table></div></div>';
+
+      html += '<div class="scroll-wrapper"><div class="scroll-inner"><table><thead><tr><th>Rank</th><th>Name</th><th>SIS%</th></tr></thead><tbody>';
+      rest.forEach((item, idx) => {
+        const rank = item.rank || (idx + 3);
+        html += `<tr><td class="rank-col">#${rank}</td><td class="name-col">${item.name}</td><td class="score-col">${item.score}</td></tr>`;
+      });
+      html += '</tbody></table></div></div>';
+      html += '</div>';
+      return html;
+    }
+
+    function getWeekDate(data) {
+      return data.week || 'Week of ...';
+    }
+
+    // ---- TP/WNS rendering functions (from comparison index) ----
+    function getStatusClass(value, target, isHigher) {
+      if (isHigher) {
+        if (value >= target) return 'on-target';
+        if (value >= target * 0.9) return 'below-target';
+        return 'well-below';
+      } else {
+        if (value <= target) return 'on-target';
+        if (value <= target * 1.1) return 'below-target';
+        return 'well-below';
+      }
+    }
+
+    function getGapText(value, target, isHigher) {
+      const diff = isHigher ? value - target : target - value;
+      const gap = Math.abs(diff);
+      if (isHigher) {
+        if (diff >= 0) return `+${gap.toFixed(1)}`;
+        return `${gap.toFixed(1)}`;
+      } else {
+        if (diff >= 0) return `${gap.toFixed(1)}`;
+        return `+${gap.toFixed(1)}`;
+      }
+    }
+
+    function getGapClass(value, target, isHigher) {
+      if (isHigher) {
+        if (value >= target) return 'above';
+        if (value >= target * 0.9) return 'below';
+        return 'well-below';
+      } else {
+        if (value <= target) return 'above';
+        if (value <= target * 1.1) return 'below';
+        return 'well-below';
+      }
+    }
+
+    function getInsightText(current, previous, isHigher, unit) {
+      const diff = current - previous;
+      if (Math.abs(diff) < 0.01) {
+        return `→ Steady at ${current}${unit}`;
+      }
+      const pctChange = (diff / Math.abs(previous)) * 100;
+      const sign = diff > 0 ? '+' : '';
+      const direction = diff > 0 ? (isHigher ? 'improving' : 'declining') : (isHigher ? 'declining' : 'improving');
+      const emoji = diff > 0 ? '📈' : '📉';
+      return `${emoji} ${direction} (${sign}${pctChange.toFixed(1)}%)`;
+    }
+
+    function renderComparisonDetail(data, metric) {
+      const { targets, centres } = data;
+      const target = targets[metric];
+      const isHigher = metric !== 'CHT'; // SIS and IFSR higher is better; CHT lower is better
+
+      let html = `<div class="comp-slide-wrapper">`;
+      html += `<div class="metric-header">
+                <h2>${metric}</h2>
+                <span class="unit-badge">Target: ${target}${metric === 'CHT' ? 's' : '%'}</span>
+              </div>`;
+      html += `<div class="card-row">`;
+
+      centres.forEach(centre => {
+        const m = centre.metrics[metric];
+        const current = m.current;
+        const previous = m.previous;
+        const history = m.history || [];
+        const gap = isHigher ? current - target : target - current;
+        const gapText = getGapText(current, target, isHigher);
+        const gapClass = getGapClass(current, target, isHigher);
+        const statusClass = getStatusClass(current, target, isHigher);
+        const insight = getInsightText(current, previous, isHigher, metric === 'CHT' ? 's' : '%');
+        const trendClass = current > previous ? 'up' : (current < previous ? 'down' : 'flat');
+        const trendArrow = current > previous ? '↑' : (current < previous ? '↓' : '→');
+
+        html += `<div class="centre-card ${centre.name.toLowerCase()}">
+                  <div class="chart-area">
+                    <canvas id="chart-${metric}-${centre.name}"></canvas>
+                  </div>
+                  <div class="details-area">
+                    <div class="centre-name">
+                      <span class="dot" style="background:${centre.colour};"></span> ${centre.name}
+                    </div>
+                    <div class="main-value">
+                      ${current}${metric === 'CHT' ? 's' : '%'}
+                      <span class="trend ${trendClass}">${trendArrow}</span>
+                    </div>
+                    <div class="comparison-row">
+                      <span class="prev-label">Prev: ${previous}${metric === 'CHT' ? 's' : '%'}</span>
+                      <span class="gap-label ${gapClass}">${gapText} vs target</span>
+                    </div>
+                    <div class="insight-row">
+                      <span class="insight-badge ${statusClass}">${insight}</span>
+                    </div>
+                  </div>
+                </div>`;
+      });
+
+      html += `</div></div>`;
+      return html;
+    }
+
+    function renderSummary(data) {
+      const { targets, centres } = data;
+      const metrics = ['SIS', 'IFSR', 'CHT'];
+
+      let html = `<div class="comp-slide-wrapper">
+                  <div class="metric-header">
+                    <h2>📊 Summary Report</h2>
+                    <span class="unit-badge">All Metrics</span>
+                  </div>
+                  <div class="summary-grid-vertical">`;
+
+      metrics.forEach(metric => {
+        const target = targets[metric];
+        const isHigher = metric !== 'CHT';
+        const unit = metric === 'CHT' ? 's' : '%';
+
+        html += `<div class="summary-card-vertical">
+                  <div class="metric-title">
+                    ${metric}
+                    <span class="unit">Target: ${target}${unit}</span>
+                  </div>`;
+
+        centres.forEach(centre => {
+          const m = centre.metrics[metric];
+          const current = m.current;
+          const previous = m.previous;
+          const gap = isHigher ? current - target : target - current;
+          const gapText = getGapText(current, target, isHigher);
+          const gapClass = getGapClass(current, target, isHigher);
+          const change = current - previous;
+          const changeClass = change > 0 ? 'up' : (change < 0 ? 'down' : 'flat');
+          const changeSymbol = change > 0 ? '↑' : (change < 0 ? '↓' : '→');
+          const pctChange = previous !== 0 ? ((change / Math.abs(previous)) * 100) : 0;
+
+          html += `<div class="summary-row-vertical">
+                    <div class="centre-info">
+                      <span class="dot" style="background:${centre.colour};"></span> ${centre.name}
+                    </div>
+                    <div class="values">
+                      <span class="current">${current}${unit}</span>
+                      <span class="change ${changeClass}">${changeSymbol} ${Math.abs(pctChange).toFixed(1)}%</span>
+                      <span class="gap-badge ${gapClass}">${gapText}</span>
+                    </div>
+                  </div>`;
+        });
+
+        html += `</div>`;
+      });
+
+      html += `</div></div>`;
+      return html;
+    }
+
+    // ---- Build all slides ----
+    async function buildSlides() {
+      const data = await loadData();
+      if (!data) return;
+
+      const lb = data.leaderboard;
+      const comp = data.comparison;
+
+      // Slide definitions
+      const slides = [];
+
+      // 0: Title (SIS)
+      slides.push({ type: 'title' });
+
+      // 1: Data image (SIS)
+      slides.push({ type: 'data-image' });
+
+      // 2: Agents (SIS)
+      slides.push({ type: 'agents', data: lb });
+
+      // 3: Teams (SIS)
+      slides.push({ type: 'teams', data: lb });
+
+      // 4: Comparison Detail – SIS
+      slides.push({ type: 'comparison-detail', metric: 'SIS', data: comp });
+
+      // 5: Comparison Detail – IFSR
+      slides.push({ type: 'comparison-detail', metric: 'IFSR', data: comp });
+
+      // 6: Comparison Detail – CHT
+      slides.push({ type: 'comparison-detail', metric: 'CHT', data: comp });
+
+      // 7: Summary Report (TP/WNS) – last
+      slides.push({ type: 'summary', data: comp });
+
+      slidesData = slides;
+
+      // Build DOM
+      const container = document.getElementById('slidesContainer');
+      container.innerHTML = '';
+
+      slides.forEach((slide, idx) => {
+        const div = document.createElement('div');
+        div.className = 'slide' + (idx === 0 ? ' active' : '');
+        div.id = `slide${idx}`;
+        div.dataset.index = idx;
+
+        if (slide.type === 'title') {
+          // Title slide – just background, no content
+          div.innerHTML = `<div class="slide-counter"><span class="current">${idx+1}</span> / ${slides.length}</div>`;
+        } else if (slide.type === 'data-image') {
+          div.innerHTML = `<div class="slide-counter"><span class="current">${idx+1}</span> / ${slides.length}</div>`;
+        } else if (slide.type === 'agents' || slide.type === 'teams') {
+          const isAgents = slide.type === 'agents';
+          const titleText = isAgents ? 'Top Performing Agents – SIS' : 'Top Performing Teams – SIS';
+          const week = getWeekDate(slide.data);
+          const tableHtml = renderSISTable(slide.data, isAgents ? 'agents' : 'teams');
+          div.innerHTML = `
+            <div class="slide-counter"><span class="current">${idx+1}</span> / ${slides.length}</div>
+            <div class="slide-header">
+              <div class="logo-area"><img src="assets/logos/delta-logo-ribbon.png" alt="Delta" /><h1><span>DELTA</span> · SIS</h1></div>
+              <div class="behavior-tags">
+                <span class="tag visible">GREET ME</span><span class="divider">•</span>
+                <span class="tag visible">RECOGNIZE ME</span><span class="divider">•</span>
+                <span class="tag visible">BE KIND TO ME</span><span class="divider">•</span>
+                <span class="tag visible">INFORM ME</span><span class="divider">•</span>
+                <span class="tag red visible">CONSISTENTLY EXECUTED</span><span class="divider">•</span>
+                <span class="tag coach visible">LEADERS AS COACHES</span>
+              </div>
+            </div>
+            <div class="table-wrap">
+              <div class="slide-title">${titleText} <span class="week-date">${week}</span></div>
+              ${tableHtml}
+            </div>
+            <div class="slide-footer">
+              <div class="footer-animation">
+                <div class="spray-fill"></div>
+                <svg class="plane" viewBox="0 0 80 50" fill="none">
+                  <path d="M15 25 L70 20 L80 25 L70 30 L15 25Z" fill="#d32f2f" stroke="#b71c1c" stroke-width="1"/>
+                  <path d="M45 22 L60 10 L68 15 L52 25 L45 22Z" fill="#ffffff" stroke="#d32f2f" stroke-width="1.5"/>
+                  <path d="M45 28 L60 40 L68 35 L52 25 L45 28Z" fill="#ffffff" stroke="#d32f2f" stroke-width="1.5"/>
+                  <path d="M15 25 L5 15 L15 20 L15 25Z" fill="#d32f2f"/>
+                  <path d="M15 25 L5 35 L15 30 L15 25Z" fill="#d32f2f"/>
+                  <path d="M15 23 L8 18 L15 22 L15 23Z" fill="#ffffff" stroke="#d32f2f" stroke-width="1"/>
+                  <path d="M15 27 L8 32 L15 28 L15 27Z" fill="#ffffff" stroke="#d32f2f" stroke-width="1"/>
+                  <circle cx="78" cy="25" r="3" fill="#fdb913"/>
+                  <ellipse cx="82" cy="25" rx="8" ry="2" fill="#fdb913" opacity="0.8"/>
+                  <path d="M65 23 Q72 23 68 27 Q65 27 65 23Z" fill="#0b1a33" opacity="0.6"/>
+                </svg>
+                <div class="spray-text">DELTA</div>
+              </div>
+            </div>
+            <div class="progress-container"><div class="progress-bar" id="progressBar"></div></div>
+          `;
+        } else if (slide.type === 'comparison-detail') {
+          const metric = slide.metric;
+          const detailHtml = renderComparisonDetail(slide.data, metric);
+          div.innerHTML = `
+            <div class="slide-counter"><span class="current">${idx+1}</span> / ${slides.length}</div>
+            ${detailHtml}
+            <div class="progress-container"><div class="progress-bar" id="progressBar"></div></div>
+          `;
+        } else if (slide.type === 'summary') {
+          const summaryHtml = renderSummary(slide.data);
+          div.innerHTML = `
+            <div class="slide-counter"><span class="current">${idx+1}</span> / ${slides.length}</div>
+            ${summaryHtml}
+            <div class="progress-container"><div class="progress-bar" id="progressBar"></div></div>
+          `;
+        }
+
+        container.appendChild(div);
+      });
+
+      // Build dots
+      const dotsContainer = document.getElementById('dotsContainer');
+      dotsContainer.innerHTML = '';
+      slides.forEach((_, idx) => {
+        const dot = document.createElement('button');
+        dot.className = 'dot' + (idx === 0 ? ' active' : '');
+        dot.dataset.index = idx;
+        dot.addEventListener('click', () => goToSlide(idx));
+        dotsContainer.appendChild(dot);
+      });
+
+      // Initialize charts after DOM render
+      setTimeout(() => {
+        slides.forEach((slide, idx) => {
+          if (slide.type === 'comparison-detail') {
+            const metric = slide.metric;
+            const data = slide.data;
+            const centres = data.centres;
+            centres.forEach(centre => {
+              const canvas = document.getElementById(`chart-${metric}-${centre.name}`);
+              if (canvas) {
+                const ctx = canvas.getContext('2d');
+                const m = centre.metrics[metric];
+                const history = m.history || [];
+                const current = m.current;
+                // Prepare doughnut data: current vs target
+                const target = data.targets[metric];
+                const isHigher = metric !== 'CHT';
+                const remaining = isHigher ? Math.max(0, 100 - current) : Math.max(0, current);
+                new Chart(ctx, {
+                  type: 'doughnut',
+                  data: {
+                    labels: ['Current', 'Remaining'],
+                    datasets: [{
+                      data: [current, remaining],
+                      backgroundColor: [centre.colour, 'rgba(255,255,255,0.1)'],
+                      borderWidth: 0
+                    }]
+                  },
+                  options: {
+                    cutout: '75%',
+                    plugins: { legend: { display: false } },
+                    responsive: true,
+                    maintainAspectRatio: true
+                  }
+                });
+              }
+            });
+          }
+        });
+      }, 100);
+
+      // Update dots and counter on slide change
+      function updateUI() {
+        document.querySelectorAll('.slide').forEach((el, i) => {
+          el.classList.toggle('active', i === currentSlide);
+        });
+        document.querySelectorAll('.dot').forEach((el, i) => {
+          el.classList.toggle('active', i === currentSlide);
+        });
+        document.querySelectorAll('.slide-counter .current').forEach((el, i) => {
+          if (i === currentSlide) el.textContent = currentSlide + 1;
+        });
+        // Update progress bar
+        const progress = ((currentSlide + 1) / slides.length) * 100;
+        document.getElementById('progressBar').style.width = progress + '%';
+      }
+
+      function goToSlide(index) {
+        if (index < 0) index = slides.length - 1;
+        if (index >= slides.length) index = 0;
+        currentSlide = index;
+        updateUI();
+        resetAutoSlide();
+      }
+
+      function nextSlide() { goToSlide(currentSlide + 1); }
+      function prevSlide() { goToSlide(currentSlide - 1); }
+
+      // Auto-slide
+      function resetAutoSlide() {
+        if (intervalId) clearInterval(intervalId);
+        if (!isPaused) {
+          intervalId = setInterval(nextSlide, SLIDE_INTERVAL);
+        }
+      }
+
+      // Listen for remote commands (command.json)
+      async function checkRemote() {
+        try {
+          const res = await fetch('command.json?t=' + Date.now());
+          const cmd = await res.json();
+          if (cmd.command === 'next') {
+            nextSlide();
+          }
+        } catch (e) {}
+      }
+
+      // Event listeners
+      document.getElementById('prevBtn').addEventListener('click', prevSlide);
+      document.getElementById('nextBtn').addEventListener('click', nextSlide);
+
+      // Fullscreen
+      document.getElementById('fullscreenBtn').addEventListener('click', () => {
+        if (document.fullscreenElement) {
+          document.exitFullscreen();
+        } else {
+          document.documentElement.requestFullscreen();
+        }
+      });
+
+      // Start auto-slide
+      resetAutoSlide();
+
+      // Poll remote every 3 seconds
+      setInterval(checkRemote, 3000);
+
+      // Expose navigation to window for admin console
+      window.goToSlide = goToSlide;
+      window.nextSlide = nextSlide;
+      window.prevSlide = prevSlide;
+
+      // Initial UI update
+      updateUI();
+    }
+
+    buildSlides();
+  })();
+</script>
 </body>
 </html>
