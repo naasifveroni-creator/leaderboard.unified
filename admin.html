@@ -1,17 +1,791 @@
 <!DOCTYPE html>
-<html>
-<head><title>Admin Panel</title><link rel="stylesheet" href="style.css"></head>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Δ Unified Admin</title>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    /* ===== UNIFIED ADMIN STYLES ===== */
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, sans-serif; }
+    body { background: #f1f5f9; padding: 1.5rem; max-width: 1300px; margin: 0 auto; }
+    h1 { font-size: 2rem; color: #0f172a; margin-bottom: 0.2rem; display: flex; align-items: center; gap: 0.8rem; }
+    .sub { color: #475569; margin-bottom: 1.5rem; }
+
+    /* ===== TABS ===== */
+    .tabs { display: flex; gap: 0.5rem; border-bottom: 2px solid #e2e8f0; margin-bottom: 1.5rem; flex-wrap: wrap; }
+    .tab-btn { padding: 0.6rem 1.8rem; border: none; background: transparent; font-size: 1.1rem; font-weight: 600; color: #94a3b8; cursor: pointer; border-bottom: 3px solid transparent; transition: 0.2s; border-radius: 8px 8px 0 0; }
+    .tab-btn:hover { color: #0f172a; background: #f8fafc; }
+    .tab-btn.active { color: #0f172a; border-bottom-color: #d32f2f; background: #f8fafc; }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    /* ===== CARDS ===== */
+    .card { background: white; border-radius: 20px; padding: 1.5rem 2rem; margin-bottom: 1.5rem; box-shadow: 0 4px 16px rgba(0,0,0,0.05); }
+    .card h2 { font-size: 1.4rem; margin-bottom: 1rem; color: #1e293b; border-bottom: 2px solid #e2e8f0; padding-bottom: 0.5rem; display: flex; align-items: center; gap: 0.6rem; }
+
+    /* ===== LEADERBOARD (SIS) STYLES ===== */
+    .sis-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+    .sis-portal { background: #fafcff; border: 1px solid #e9edf4; border-radius: 14px; padding: 1.2rem; }
+    .sis-portal .portal-title { font-weight: 700; font-size: 1.1rem; color: #0b1a33; margin-bottom: 0.3rem; display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
+    .sis-portal .portal-title .badge { font-size: 0.65rem; background: #e9edf4; padding: 0.1rem 0.6rem; border-radius: 20px; color: #6b7f96; }
+    .sis-portal .portal-sub { font-size: 0.8rem; color: #6b7f96; margin-bottom: 0.6rem; }
+    .sis-portal textarea { width: 100%; height: 200px; padding: 0.8rem; border: 1px solid #d0d7e2; border-radius: 10px; font-family: 'Courier New', monospace; font-size: 0.8rem; resize: vertical; background: #fff; }
+    .sis-portal textarea:focus { border-color: #0b1a33; outline: none; box-shadow: 0 0 0 3px rgba(11,26,51,0.06); }
+    .sis-portal .file-upload-row { display: flex; gap: 0.6rem; margin-top: 0.4rem; align-items: center; flex-wrap: wrap; }
+    .sis-portal .file-upload-row input[type="file"] { font-size: 0.75rem; padding: 0.2rem 0.4rem; background: #fff; border: 1px solid #d0d7e2; border-radius: 6px; }
+    .sis-portal .portal-actions { display: flex; gap: 0.6rem; margin-top: 0.5rem; flex-wrap: wrap; }
+    .sis-portal .portal-actions .btn-sm { background: #e9edf4; color: #0b1a33; border: none; padding: 0.3rem 1.2rem; border-radius: 30px; font-weight: 600; font-size: 0.75rem; cursor: pointer; transition: 0.2s; }
+    .sis-portal .portal-actions .btn-sm:hover { background: #d5dce8; }
+    .sis-portal .portal-actions .btn-sm.green { background: #d32f2f; color: #fff; }
+    .sis-portal .portal-actions .btn-sm.green:hover { background: #b71c1c; }
+    .sis-portal .portal-status { font-size: 0.8rem; margin-top: 0.4rem; padding: 0.3rem 0.6rem; border-radius: 6px; display: none; }
+    .sis-portal .portal-status.success { background: #e1f5e8; color: #1a5a3a; display: block; }
+    .sis-portal .portal-status.error { background: #fde8e8; color: #a13a3a; display: block; }
+
+    .sis-date-section { display: flex; flex-wrap: wrap; gap: 1.5rem; align-items: center; padding: 0.8rem 1.2rem; background: #f5f8fe; border-radius: 12px; border: 1px solid #e9edf4; margin-bottom: 1rem; }
+    .sis-date-section label { font-weight: 600; color: #0b1a33; font-size: 0.9rem; display: flex; align-items: center; gap: 0.5rem; }
+    .sis-date-section input[type="date"] { padding: 0.3rem 0.8rem; border: 1px solid #d0d7e2; border-radius: 8px; font-size: 0.9rem; background: #fff; }
+
+    .sis-alert-section { display: flex; flex-wrap: wrap; gap: 1.5rem 2.5rem; align-items: center; padding: 0.8rem 1.2rem; background: #f5f8fe; border-radius: 12px; border: 1px solid #e9edf4; margin-bottom: 1rem; }
+    .sis-alert-section .alert-label { font-weight: 600; color: #0b1a33; font-size: 0.9rem; display: flex; align-items: center; gap: 0.5rem; }
+    .sis-alert-section input[type="checkbox"] { width: 1.2rem; height: 1.2rem; accent-color: #d32f2f; cursor: pointer; }
+
+    /* ===== COMPARISON (TP/WNS) STYLES ===== */
+    .comp-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
+    .comp-field-group { display: flex; flex-direction: column; gap: 0.3rem; }
+    .comp-field-group label { font-weight: 600; font-size: 0.9rem; color: #334155; }
+    .comp-field-group input { padding: 0.6rem 0.8rem; border: 1.5px solid #cbd5e1; border-radius: 10px; font-size: 1rem; width: 100%; transition: 0.2s; }
+    .comp-field-group input:focus { border-color: #3b82f6; outline: none; box-shadow: 0 0 0 3px rgba(59,130,246,0.2); }
+    .comp-centre-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
+    .comp-centre-box { background: #f8fafc; border-radius: 16px; padding: 1.2rem 1.5rem; border-left: 6px solid #3b82f6; }
+    .comp-centre-box.wns { border-left-color: #f59e0b; }
+    .comp-centre-box h3 { font-size: 1.2rem; margin-bottom: 0.8rem; display: flex; align-items: center; gap: 0.5rem; }
+    .comp-metric-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.8rem; margin-bottom: 0.6rem; background: white; padding: 0.5rem 0.8rem; border-radius: 10px; align-items: center; }
+    .comp-metric-row .mname { font-weight: 600; color: #0f172a; font-size: 0.9rem; }
+    .comp-metric-row input { width: 100%; padding: 0.3rem 0.5rem; border: 1px solid #d1d5db; border-radius: 6px; font-size: 0.9rem; }
+
+    .comp-upload-area { border: 2px dashed #cbd5e1; border-radius: 16px; padding: 1.5rem; text-align: center; margin-bottom: 1rem; background: #f8fafc; }
+    .comp-upload-area .upload-btn { display: inline-block; background: #3b82f6; color: white; padding: 0.5rem 1.5rem; border-radius: 40px; cursor: pointer; font-weight: 600; transition: 0.2s; }
+    .comp-upload-area .upload-btn:hover { background: #2563eb; }
+    .comp-upload-area input[type="file"] { display: none; }
+
+    /* ===== SHARED ===== */
+    .actions { display: flex; flex-wrap: wrap; gap: 0.8rem; margin-top: 1rem; align-items: center; }
+    .btn { padding: 0.7rem 2rem; border: none; border-radius: 40px; font-size: 1rem; font-weight: 700; cursor: pointer; transition: 0.2s; }
+    .btn-primary { background: #1e293b; color: white; }
+    .btn-primary:hover { background: #0f172a; transform: scale(1.02); }
+    .btn-success { background: #10b981; color: white; }
+    .btn-success:hover { background: #059669; transform: scale(1.02); }
+    .btn-danger { background: #d32f2f; color: white; }
+    .btn-danger:hover { background: #b71c1c; transform: scale(1.02); }
+    .btn-secondary { background: #64748b; color: white; }
+    .btn-secondary:hover { background: #475569; }
+    #status { padding: 0.6rem 1.2rem; border-radius: 12px; background: #f1f5f9; color: #0f172a; font-weight: 500; min-width: 150px; text-align: center; }
+    .token-hint { font-size: 0.85rem; color: #64748b; margin-top: 0.5rem; background: #f1f5f9; padding: 0.5rem 1rem; border-radius: 10px; }
+    .token-hint code { background: #e2e8f0; padding: 0.2rem 0.6rem; border-radius: 4px; }
+
+    /* ===== LOGIN OVERLAY ===== */
+    #loginOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15,23,42,0.85); backdrop-filter: blur(12px); display: none; align-items: center; justify-content: center; z-index: 9999; flex-direction: column; gap: 1.5rem; }
+    #loginOverlay.show { display: flex; }
+    #loginOverlay .login-box { background: white; padding: 2.5rem 3rem; border-radius: 30px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); max-width: 400px; width: 90%; text-align: center; }
+    #loginOverlay .login-box h2 { font-size: 1.8rem; color: #0f172a; margin-bottom: 0.5rem; }
+    #loginOverlay .login-box p { color: #64748b; margin-bottom: 1.5rem; font-size: 1rem; }
+    #loginOverlay .login-box input { width: 100%; padding: 0.8rem; font-size: 1.2rem; border: 2px solid #e2e8f0; border-radius: 12px; text-align: center; letter-spacing: 4px; font-weight: 600; margin-bottom: 1rem; transition: 0.2s; }
+    #loginOverlay .login-box input:focus { border-color: #3b82f6; outline: none; box-shadow: 0 0 0 3px rgba(59,130,246,0.2); }
+    #loginOverlay .login-box .login-error { color: #ef4444; font-size: 0.9rem; margin-bottom: 0.5rem; height: 1.5rem; }
+    #loginOverlay .login-box .btn-login { background: #1e293b; color: white; border: none; padding: 0.8rem 2.5rem; border-radius: 40px; font-size: 1.1rem; font-weight: 600; cursor: pointer; transition: 0.2s; width: 100%; }
+    #loginOverlay .login-box .btn-login:hover { background: #0f172a; transform: scale(1.02); }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 768px) {
+      body { padding: 1rem; }
+      .sis-grid { grid-template-columns: 1fr; }
+      .comp-grid-3 { grid-template-columns: 1fr; }
+      .comp-centre-grid { grid-template-columns: 1fr; }
+      .comp-metric-row { grid-template-columns: 1fr 1fr 1fr; gap: 0.3rem; }
+      .tab-btn { padding: 0.4rem 1rem; font-size: 0.9rem; }
+      .card { padding: 1rem; }
+      .sis-portal textarea { height: 120px; }
+    }
+  </style>
+</head>
 <body>
-    <h1>Unified Admin</h1>
-    
-    <h2>Leaderboard Data</h2>
-    <textarea id="leaderboard-input" rows="10" cols="50"></textarea>
-    <button onclick="saveLeaderboard()">Save Leaderboard</button>
 
-    <h2>Comparison Data</h2>
-    <textarea id="comparison-input" rows="10" cols="50"></textarea>
-    <button onclick="saveComparison()">Save Comparison</button>
+<!-- ===== LOGIN OVERLAY ===== -->
+<div id="loginOverlay" class="show">
+  <div class="login-box">
+    <h2>🔐 Unified Admin</h2>
+    <p>Enter the security PIN to continue</p>
+    <input type="password" id="pinInput" maxlength="10" placeholder="••••" autofocus />
+    <div class="login-error" id="loginError"></div>
+    <button class="btn-login" id="loginBtn">Unlock</button>
+  </div>
+</div>
 
-    <script src="js/app.js"></script>
+<!-- ===== MAIN ADMIN CONTENT ===== -->
+<div id="adminContent">
+  <h1>📊 Unified Admin</h1>
+  <p class="sub">Manage Leaderboard (SIS) &amp; Comparison (TP/WNS) data</p>
+
+  <!-- Tabs -->
+  <div class="tabs" id="tabHeaders">
+    <button class="tab-btn active" data-tab="tab-leaderboard">🏆 Leaderboard</button>
+    <button class="tab-btn" data-tab="tab-comparison">📊 Comparison</button>
+  </div>
+
+  <!-- ===== TAB 1: LEADERBOARD (SIS) ===== -->
+  <div class="tab-content active" id="tab-leaderboard">
+    <div class="card">
+      <h2>📋 Update SIS Data</h2>
+      <div class="sis-date-section">
+        <label>📅 Week Start <input type="date" id="sisWeekStart" /></label>
+        <label>📅 Week End <input type="date" id="sisWeekEnd" /></label>
+      </div>
+      <div class="sis-alert-section">
+        <span class="alert-label">🔔 Alerts</span>
+        <label><input type="checkbox" id="sisAlertFlash" checked /> 💡 100% Flash</label>
+        <label><input type="checkbox" id="sisAlertPopup" checked /> 🔥 New #1 Pop‑up</label>
+        <label><input type="checkbox" id="sisAlertBanner" checked /> 🎉 Milestone Banner</label>
+      </div>
+      <div class="sis-grid">
+        <div class="sis-portal">
+          <div class="portal-title">🏆 Top Performing Teams <span class="badge">Teams</span></div>
+          <div class="portal-sub">Paste team data: <code>Name, SIS%</code> (tab-separated OR alternating lines)</div>
+          <textarea id="sisTeamsInput" spellcheck="false"></textarea>
+          <div class="file-upload-row">
+            <input type="file" id="sisTeamsFileInput" accept=".txt,.csv,.tsv" />
+            <span class="file-hint">Upload .txt / .csv / .tsv</span>
+          </div>
+          <div class="portal-actions">
+            <button class="btn-sm" id="sisPreviewTeamsBtn">👁 Preview Teams</button>
+            <button class="btn-sm green" id="sisResetTeamsBtn">↺ Reset Teams</button>
+          </div>
+          <div class="portal-status" id="sisTeamsStatus"></div>
+        </div>
+        <div class="sis-portal">
+          <div class="portal-title">⭐ Top Performing Agents <span class="badge">Agents</span></div>
+          <div class="portal-sub">Paste agent data: <code>Name, SIS%</code> (tab-separated OR alternating lines)</div>
+          <textarea id="sisAgentsInput" spellcheck="false"></textarea>
+          <div class="file-upload-row">
+            <input type="file" id="sisAgentsFileInput" accept=".txt,.csv,.tsv" />
+            <span class="file-hint">Upload .txt / .csv / .tsv</span>
+          </div>
+          <div class="portal-actions">
+            <button class="btn-sm" id="sisPreviewAgentsBtn">👁 Preview Agents</button>
+            <button class="btn-sm green" id="sisResetAgentsBtn">↺ Reset Agents</button>
+          </div>
+          <div class="portal-status" id="sisAgentsStatus"></div>
+        </div>
+      </div>
+      <div class="actions">
+        <button class="btn btn-success" id="sisPublishBtn">🚀 Publish Leaderboard</button>
+        <button class="btn btn-secondary" id="sisLoadBtn">📥 Load from data/leaderboard.json</button>
+        <span id="sisStatus">Ready</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== TAB 2: COMPARISON (TP/WNS) ===== -->
+  <div class="tab-content" id="tab-comparison">
+    <div class="card">
+      <h2>📂 Upload Excel / CSV</h2>
+      <div class="comp-upload-area" id="compUploadArea">
+        <p style="margin-bottom:0.8rem;font-weight:500;">Drag &amp; drop your file here, or click to browse</p>
+        <label class="upload-btn" for="compFileInput">📎 Choose File</label>
+        <input type="file" id="compFileInput" accept=".xlsx,.xls,.csv" />
+        <div class="file-name" id="compFileName">No file selected</div>
+        <div class="preview-table" id="compPreviewTable" style="display:none;margin-top:1rem;overflow-x:auto;"></div>
+        <button class="btn btn-secondary" id="compApplyFileBtn" style="margin-top:1rem;display:none;">📥 Apply Data</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>🎯 Global Targets</h2>
+      <div class="comp-grid-3" id="compTargetsContainer"></div>
+    </div>
+
+    <div class="card">
+      <h2>🏢 Centre Data</h2>
+      <div class="comp-centre-grid" id="compCentresContainer"></div>
+    </div>
+
+    <div class="card">
+      <h2>👁️ Preview &amp; Export</h2>
+      <div style="display:flex;gap:1rem;flex-wrap:wrap;">
+        <button class="btn btn-secondary" id="compPreviewBtn">📊 Preview Dashboard</button>
+        <button class="btn btn-secondary" id="compExportBtn">📥 Export as Excel</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="actions">
+        <button class="btn btn-success" id="compPublishBtn">🚀 Publish Comparison</button>
+        <button class="btn btn-secondary" id="compLoadBtn">📥 Load from data/comparison.json</button>
+        <span id="compStatus">Ready</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Shared Token Section ===== -->
+  <div class="card">
+    <div class="token-hint">
+      🔑 <strong>GitHub Token</strong> – store it below. Needs <code>repo</code> scope.
+      <div style="margin-top:0.5rem;display:flex;flex-wrap:wrap;gap:0.8rem;align-items:center;">
+        <input type="password" id="globalToken" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" style="flex:1;min-width:200px;padding:0.5rem 1rem;border:1px solid #cbd5e1;border-radius:30px;font-size:0.9rem;" />
+        <span style="font-size:0.8rem;color:#64748b;">(stored in browser)</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ============================================================
+  // UNIFIED ADMIN – LOGIN + TABS + BOTH SECTIONS
+  // ============================================================
+
+  const ADMIN_PIN = '1234'; // Change this to your own PIN
+
+  // ---- Auto-detect repo ----
+  let REPO_OWNER = 'YOUR_USERNAME';
+  let REPO_NAME = 'YOUR_REPO_NAME';
+  try {
+    const hostParts = window.location.hostname.split('.');
+    const pathParts = window.location.pathname.split('/').filter(p => p);
+    if (hostParts.length >= 3 && hostParts[1] === 'github' && hostParts[2] === 'io') {
+      REPO_OWNER = hostParts[0];
+      if (pathParts.length > 0) REPO_NAME = pathParts[0];
+    }
+  } catch(e) {}
+
+  // ============================================================
+  // LOGIN
+  // ============================================================
+  function checkLogin() {
+    if (sessionStorage.getItem('unified_admin_logged_in') === 'true') {
+      document.getElementById('loginOverlay').classList.remove('show');
+      document.getElementById('adminContent').style.display = 'block';
+      return true;
+    }
+    return false;
+  }
+
+  function attemptLogin() {
+    const input = document.getElementById('pinInput');
+    const error = document.getElementById('loginError');
+    if (input.value === ADMIN_PIN) {
+      sessionStorage.setItem('unified_admin_logged_in', 'true');
+      error.textContent = '';
+      document.getElementById('loginOverlay').classList.remove('show');
+      document.getElementById('adminContent').style.display = 'block';
+      // Load both sections
+      loadLeaderboard();
+      loadComparison();
+    } else {
+      error.textContent = '❌ Incorrect PIN. Try again.';
+      input.value = '';
+      input.focus();
+    }
+  }
+
+  document.getElementById('loginBtn').addEventListener('click', attemptLogin);
+  document.getElementById('pinInput').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') attemptLogin();
+  });
+
+  if (!checkLogin()) {
+    document.getElementById('loginOverlay').classList.add('show');
+    document.getElementById('adminContent').style.display = 'none';
+  } else {
+    document.getElementById('adminContent').style.display = 'block';
+  }
+
+  // ============================================================
+  // TABS
+  // ============================================================
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      this.classList.add('active');
+      document.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active'));
+      document.getElementById(this.dataset.tab).classList.add('active');
+    });
+  });
+
+  // ============================================================
+  // GLOBAL TOKEN
+  // ============================================================
+  function getToken() {
+    const el = document.getElementById('globalToken');
+    return el.value.trim() || localStorage.getItem('unified_github_token') || '';
+  }
+  document.getElementById('globalToken').addEventListener('change', function() {
+    if (this.value.trim()) localStorage.setItem('unified_github_token', this.value.trim());
+  });
+  // Load saved token
+  const savedToken = localStorage.getItem('unified_github_token');
+  if (savedToken) document.getElementById('globalToken').value = savedToken;
+
+  // ============================================================
+  // HELPERS
+  // ============================================================
+  function setStatus(id, msg, isError = false) {
+    const el = document.getElementById(id);
+    el.textContent = msg;
+    el.style.color = isError ? '#dc2626' : '#0f172a';
+  }
+
+  function showPortalStatus(id, msg, type) {
+    const el = document.getElementById(id);
+    el.textContent = msg;
+    el.className = 'portal-status ' + type;
+  }
+
+  // ============================================================
+  // SECTION 1: LEADERBOARD (SIS)
+  // ============================================================
+
+  // ---- SIS helpers ----
+  function sisSetCurrentWeek() {
+    const now = new Date();
+    const day = now.getDay();
+    const diffToMonday = (day === 0 ? 6 : day - 1);
+    const monday = new Date(now);
+    monday.setDate(now.getDate() - diffToMonday);
+    const sunday = new Date(monday);
+    sunday.setDate(monday.getDate() + 6);
+    const fmt = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    document.getElementById('sisWeekStart').value = fmt(monday);
+    document.getElementById('sisWeekEnd').value = fmt(sunday);
+  }
+  sisSetCurrentWeek();
+
+  // ---- SIS smart parser ----
+  function sisParseData(text) {
+    const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+    if (lines.length === 0) return [];
+    const isScoreLike = (str) => /%$/.test(str) || (!isNaN(parseFloat(str)) && !/[a-zA-Z]/.test(str));
+    const hasTab = lines[0].includes('\t');
+    const hasMultiSpace = / {2,}/.test(lines[0]);
+
+    if (hasTab || hasMultiSpace) {
+      const rows = [];
+      for (const line of lines) {
+        const parts = line.split(/\t| {2,}/).filter(s => s.length > 0);
+        if (parts.length < 2) continue;
+        const last = parts[parts.length - 1];
+        if (!isScoreLike(last)) continue;
+        const score = last;
+        let name = '';
+        let rank = null;
+        if (parts.length >= 3) {
+          const first = parts[0];
+          if (!isNaN(parseFloat(first)) && parts.length >= 3) {
+            rank = parseInt(first);
+            name = parts.slice(1, -1).join(' ');
+          } else {
+            name = parts.slice(0, -1).join(' ');
+          }
+        } else {
+          name = parts[0];
+        }
+        rows.push({ name, score, rank });
+      }
+      const hasAnyRank = rows.some(r => r.rank !== null);
+      if (hasAnyRank) rows.sort((a,b) => (a.rank||9999) - (b.rank||9999));
+      else rows.sort((a,b) => parseFloat(b.score) - parseFloat(a.score));
+      rows.forEach((r,i) => r.rank = i + 1);
+      return rows;
+    }
+
+    // Alternating
+    const pairs = [];
+    let i = 0;
+    while (i < lines.length) {
+      const current = lines[i];
+      if (isScoreLike(current)) { i++; continue; }
+      let score = null;
+      let j = i + 1;
+      while (j < lines.length) {
+        if (isScoreLike(lines[j])) { score = lines[j]; break; }
+        j++;
+      }
+      if (score) { pairs.push({ name: current, score, rank: null }); i = j + 1; }
+      else i++;
+    }
+    if (pairs.length === 0) return [];
+    pairs.sort((a,b) => parseFloat(b.score) - parseFloat(a.score));
+    pairs.forEach((r,i) => r.rank = i + 1);
+    return pairs;
+  }
+
+  // ---- SIS load ----
+  async function loadLeaderboard() {
+    try {
+      const res = await fetch('data/leaderboard.json');
+      const data = await res.json();
+      document.getElementById('sisTeamsInput').value = data.teams.map(t => `${t.name}\t${t.score}`).join('\n');
+      document.getElementById('sisAgentsInput').value = data.agents.map(a => `${a.name}\t${a.score}`).join('\n');
+      setStatus('sisStatus', '✅ Loaded leaderboard.json');
+    } catch(e) {
+      setStatus('sisStatus', '⚠️ Could not load leaderboard.json, using samples.', true);
+      // Set sample data
+      document.getElementById('sisTeamsInput').value = 'Sinazo Nogaga\t88.18%\nZintle Daba\t87.14%';
+      document.getElementById('sisAgentsInput').value = 'Abdul Abrahams\t100.00%\nStone Jade\t100.00%';
+    }
+  }
+
+  // ---- SIS publish ----
+  async function sisPublish() {
+    const token = getToken();
+    if (!token) { setStatus('sisStatus', '❌ Please enter a GitHub token.', true); return; }
+
+    const teamsRaw = document.getElementById('sisTeamsInput').value;
+    const agentsRaw = document.getElementById('sisAgentsInput').value;
+    const teams = sisParseData(teamsRaw);
+    const agents = sisParseData(agentsRaw);
+    if (teams.length === 0 && agents.length === 0) {
+      setStatus('sisStatus', '❌ No valid data to publish.', true);
+      return;
+    }
+
+    const weekStart = document.getElementById('sisWeekStart').value;
+    const weekEnd = document.getElementById('sisWeekEnd').value;
+    const weekLabel = `Week of ${new Date(weekStart).toLocaleDateString('en-US', {month:'short',day:'numeric'})} – ${new Date(weekEnd).toLocaleDateString('en-US', {month:'short',day:'numeric',year:'numeric'})}`;
+
+    const payload = {
+      week: weekLabel,
+      teams: teams,
+      agents: agents,
+      alerts: {
+        flash: document.getElementById('sisAlertFlash').checked,
+        popup: document.getElementById('sisAlertPopup').checked,
+        banner: document.getElementById('sisAlertBanner').checked,
+      },
+      lastUpdated: new Date().toISOString()
+    };
+
+    const url = `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/data/leaderboard.json`;
+    try {
+      // Get current SHA
+      let sha = '';
+      try {
+        const getRes = await fetch(url);
+        if (getRes.ok) {
+          const existing = await getRes.json();
+          sha = existing.sha;
+        }
+      } catch(e) {}
+
+      const body = {
+        message: 'Update leaderboard data via admin',
+        content: btoa(unescape(encodeURIComponent(JSON.stringify(payload, null, 2)))),
+        branch: 'main'
+      };
+      if (sha) body.sha = sha;
+
+      const res = await fetch(url, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `token ${token}`,
+          'Accept': 'application/vnd.github.v3+json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(body)
+      });
+
+      if (res.ok) {
+        setStatus('sisStatus', '✅ Leaderboard published successfully!');
+        showPortalStatus('sisTeamsStatus', '✅ Published!', 'success');
+        showPortalStatus('sisAgentsStatus', '✅ Published!', 'success');
+      } else {
+        const err = await res.json();
+        setStatus('sisStatus', `❌ Publish failed: ${err.message}`, true);
+      }
+    } catch(e) {
+      setStatus('sisStatus', `❌ Error: ${e.message}`, true);
+    }
+  }
+
+  // ---- SIS UI events ----
+  document.getElementById('sisLoadBtn').addEventListener('click', loadLeaderboard);
+  document.getElementById('sisPublishBtn').addEventListener('click', sisPublish);
+
+  document.getElementById('sisResetTeamsBtn').addEventListener('click', () => {
+    document.getElementById('sisTeamsInput').value = 'Sinazo Nogaga\t88.18%\nZintle Daba\t87.14%';
+    showPortalStatus('sisTeamsStatus', '↺ Reset to sample', 'success');
+  });
+  document.getElementById('sisResetAgentsBtn').addEventListener('click', () => {
+    document.getElementById('sisAgentsInput').value = 'Abdul Abrahams\t100.00%\nStone Jade\t100.00%';
+    showPortalStatus('sisAgentsStatus', '↺ Reset to sample', 'success');
+  });
+
+  // File upload for SIS
+  document.getElementById('sisTeamsFileInput').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(ev) {
+      document.getElementById('sisTeamsInput').value = ev.target.result;
+      showPortalStatus('sisTeamsStatus', '📎 File loaded!', 'success');
+    };
+    reader.readAsText(file);
+  });
+  document.getElementById('sisAgentsFileInput').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(ev) {
+      document.getElementById('sisAgentsInput').value = ev.target.result;
+      showPortalStatus('sisAgentsStatus', '📎 File loaded!', 'success');
+    };
+    reader.readAsText(file);
+  });
+
+  // Preview buttons (just show count)
+  document.getElementById('sisPreviewTeamsBtn').addEventListener('click', () => {
+    const data = sisParseData(document.getElementById('sisTeamsInput').value);
+    showPortalStatus('sisTeamsStatus', `👁 ${data.length} teams parsed`, data.length > 0 ? 'success' : 'error');
+  });
+  document.getElementById('sisPreviewAgentsBtn').addEventListener('click', () => {
+    const data = sisParseData(document.getElementById('sisAgentsInput').value);
+    showPortalStatus('sisAgentsStatus', `👁 ${data.length} agents parsed`, data.length > 0 ? 'success' : 'error');
+  });
+
+  // ============================================================
+  // SECTION 2: COMPARISON (TP/WNS)
+  // ============================================================
+
+  let compCurrentData = null;
+
+  // ---- Build comparison forms ----
+  function compBuildForms(data) {
+    compCurrentData = data;
+    const targets = data.targets;
+    const container = document.getElementById('compTargetsContainer');
+    container.innerHTML = '';
+    ['SIS', 'IFSR', 'CHT'].forEach(key => {
+      const div = document.createElement('div');
+      div.className = 'comp-field-group';
+      div.innerHTML = `<label for="comp-target-${key}">${key} Target</label><input type="number" step="0.01" id="comp-target-${key}" value="${targets[key]}" />`;
+      container.appendChild(div);
+    });
+
+    const centresContainer = document.getElementById('compCentresContainer');
+    centresContainer.innerHTML = '';
+    data.centres.forEach(centre => {
+      const box = document.createElement('div');
+      box.className = `comp-centre-box ${centre.name.toLowerCase() === 'wns' ? 'wns' : ''}`;
+      const colourDot = `<span style="display:inline-block;width:14px;height:14px;border-radius:50%;background:${centre.colour};margin-right:6px;"></span>`;
+      box.innerHTML = `<h3>${colourDot} ${centre.name}</h3>`;
+      ['SIS', 'IFSR', 'CHT'].forEach(metric => {
+        const row = document.createElement('div');
+        row.className = 'comp-metric-row';
+        const val = centre.metrics[metric];
+        row.innerHTML = `
+          <span class="mname">${metric}</span>
+          <input type="number" step="0.01" id="comp-${centre.name}-${metric}-current" value="${val.current}" placeholder="Current" />
+          <input type="number" step="0.01" id="comp-${centre.name}-${metric}-previous" value="${val.previous}" placeholder="Previous" />
+        `;
+        box.appendChild(row);
+      });
+      centresContainer.appendChild(box);
+    });
+  }
+
+  // ---- Collect comparison data ----
+  function compCollectData() {
+    const targets = {};
+    ['SIS', 'IFSR', 'CHT'].forEach(key => {
+      const el = document.getElementById(`comp-target-${key}`);
+      targets[key] = parseFloat(el.value) || 0;
+    });
+    const centres = [];
+    ['TP', 'WNS'].forEach(name => {
+      const metrics = {};
+      ['SIS', 'IFSR', 'CHT'].forEach(metric => {
+        const cur = document.getElementById(`comp-${name}-${metric}-current`);
+        const prev = document.getElementById(`comp-${name}-${metric}-previous`);
+        metrics[metric] = {
+          current: parseFloat(cur.value) || 0,
+          previous: parseFloat(prev.value) || 0,
+          history: []
+        };
+      });
+      let colour = name === 'TP' ? '#3b82f6' : '#f59e0b';
+      if (compCurrentData) {
+        const found = compCurrentData.centres.find(c => c.name === name);
+        if (found) colour = found.colour;
+      }
+      centres.push({ name, colour, metrics });
+    });
+    if (compCurrentData) {
+      centres.forEach((c, idx) => {
+        const orig = compCurrentData.centres.find(oc => oc.name === c.name);
+        if (orig) {
+          ['SIS','IFSR','CHT'].forEach(m => {
+            if (orig.metrics[m].history) c.metrics[m].history = orig.metrics[m].history;
+          });
+        }
+      });
+    }
+    return { targets, centres, lastUpdated: new Date().toISOString(), lastUpdatedBy: 'admin' };
+  }
+
+  // ---- Load comparison ----
+  async function loadComparison() {
+    try {
+      const res = await fetch('data/comparison.json');
+      const data = await res.json();
+      compBuildForms(data);
+      setStatus('compStatus', '✅ Loaded comparison.json');
+    } catch(e) {
+      setStatus('compStatus', '⚠️ Could not load comparison.json, using defaults.', true);
+      const defaultData = {
+        targets: { SIS: 86.3, IFSR: 87, CHT: 580 },
+        centres: [
+          { name: 'TP', colour: '#3b82f6', metrics: { SIS: { current: 77, previous: 77, history: [] }, IFSR: { current: 85, previous: 85, history: [] }, CHT: { current: 847, previous: 847, history: [] } } },
+          { name: 'WNS', colour: '#f59e0b', metrics: { SIS: { current: 83, previous: 83, history: [] }, IFSR: { current: 79, previous: 79, history: [] }, CHT: { current: 924, previous: 924, history: [] } } }
+        ]
+      };
+      compBuildForms(defaultData);
+    }
+  }
+
+  // ---- Publish comparison ----
+  async function compPublish() {
+    const token = getToken();
+    if (!token) { setStatus('compStatus', '❌ Please enter a GitHub token.', true); return; }
+
+    const payload = compCollectData();
+    const url = `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/data/comparison.json`;
+
+    try {
+      let sha = '';
+      try {
+        const getRes = await fetch(url);
+        if (getRes.ok) {
+          const existing = await getRes.json();
+          sha = existing.sha;
+        }
+      } catch(e) {}
+
+      const body = {
+        message: 'Update comparison data via admin',
+        content: btoa(unescape(encodeURIComponent(JSON.stringify(payload, null, 2)))),
+        branch: 'main'
+      };
+      if (sha) body.sha = sha;
+
+      const res = await fetch(url, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `token ${token}`,
+          'Accept': 'application/vnd.github.v3+json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(body)
+      });
+
+      if (res.ok) {
+        setStatus('compStatus', '✅ Comparison published successfully!');
+      } else {
+        const err = await res.json();
+        setStatus('compStatus', `❌ Publish failed: ${err.message}`, true);
+      }
+    } catch(e) {
+      setStatus('compStatus', `❌ Error: ${e.message}`, true);
+    }
+  }
+
+  // ---- Comparison UI events ----
+  document.getElementById('compLoadBtn').addEventListener('click', loadComparison);
+  document.getElementById('compPublishBtn').addEventListener('click', compPublish);
+
+  // ---- Comparison file upload ----
+  document.getElementById('compFileInput').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    document.getElementById('compFileName').textContent = file.name;
+    const reader = new FileReader();
+    reader.onload = function(ev) {
+      try {
+        const workbook = XLSX.read(ev.target.result, { type: 'array' });
+        const sheet = workbook.Sheets[workbook.SheetNames[0]];
+        const json = XLSX.utils.sheet_to_json(sheet);
+        document.getElementById('compPreviewTable').style.display = 'block';
+        let html = '<table><thead><tr>';
+        if (json.length > 0) {
+          Object.keys(json[0]).forEach(k => html += `<th>${k}</th>`);
+          html += '</tr></thead><tbody>';
+          json.slice(0, 5).forEach(row => {
+            html += '<tr>';
+            Object.values(row).forEach(v => html += `<td>${v}</td>`);
+            html += '</tr>';
+          });
+          html += '</tbody></table>';
+          document.getElementById('compPreviewTable').innerHTML = html;
+          document.getElementById('compApplyFileBtn').style.display = 'inline-block';
+          // Store for apply
+          window._compUploadedData = json;
+        }
+      } catch(e) {
+        document.getElementById('compPreviewTable').innerHTML = '<p style="color:red;">Error reading file</p>';
+      }
+    };
+    reader.readAsArrayBuffer(file);
+  });
+
+  document.getElementById('compApplyFileBtn').addEventListener('click', function() {
+    const data = window._compUploadedData;
+    if (!data || data.length === 0) return;
+    // Try to map columns to centres/metrics
+    const headers = Object.keys(data[0]);
+    // Simple heuristic: find columns with TP, WNS, SIS, IFSR, CHT
+    const centres = ['TP', 'WNS'];
+    const metrics = ['SIS', 'IFSR', 'CHT'];
+    let found = 0;
+    centres.forEach(c => {
+      metrics.forEach(m => {
+        const col = headers.find(h => h.toUpperCase().includes(c) && h.toUpperCase().includes(m));
+        if (col) {
+          const val = parseFloat(data[0][col]);
+          if (!isNaN(val)) {
+            const el = document.getElementById(`comp-${c}-${m}-current`);
+            if (el) { el.value = val; found++; }
+          }
+        }
+      });
+    });
+    if (found > 0) {
+      setStatus('compStatus', `✅ Applied ${found} values from file.`);
+      document.getElementById('compApplyFileBtn').style.display = 'none';
+    } else {
+      setStatus('compStatus', '⚠️ Could not auto-map columns. Check headers.', true);
+    }
+  });
+
+  // ---- Preview & Export (stubs) ----
+  document.getElementById('compPreviewBtn').addEventListener('click', function() {
+    const data = compCollectData();
+    alert('📊 Preview:\n' + JSON.stringify(data, null, 2));
+  });
+  document.getElementById('compExportBtn').addEventListener('click', function() {
+    const data = compCollectData();
+    const ws = XLSX.utils.json_to_sheet([data]);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Comparison');
+    XLSX.writeFile(wb, 'comparison_export.xlsx');
+  });
+
+  // ============================================================
+  // INIT
+  // ============================================================
+  if (checkLogin()) {
+    loadLeaderboard();
+    loadComparison();
+  }
+</script>
 </body>
 </html>
