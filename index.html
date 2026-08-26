@@ -510,28 +510,32 @@
     }
   }
 
-  // --- SIS render functions ---
+  // --- CORRECTED SIS render function – continuous flow (half/half) ---
   function renderSISTable(data, type) {
     const items = type === 'agents' ? data.agents : data.teams;
     if (!items || items.length === 0) return '<div class="empty-state">No data available</div>';
 
-    const maxRank = items.length;
-    const topTwo = items.slice(0, 2);
-    const rest = items.slice(2);
+    // Split the array in half for two columns (continuous flow)
+    const half = Math.ceil(items.length / 2);
+    const leftCol = items.slice(0, half);
+    const rightCol = items.slice(half);
 
     let html = '';
+    // Left column
     html += '<div class="scroll-wrapper"><div class="scroll-inner"><table><thead><tr><th>Rank</th><th>Name</th><th>SIS%</th></tr></thead><tbody>';
-    topTwo.forEach((item, idx) => {
+    leftCol.forEach((item, idx) => {
       const rank = item.rank || idx + 1;
       const rowClass = rank === 1 ? 'top1' : (rank === 2 ? 'amber' : '');
       html += `<tr class="${rowClass}"><td class="rank-col">${rank}</td><td class="name-col">${item.name}</td><td class="score-col">${item.score}</td></tr>`;
     });
     html += '</tbody></table></div></div>';
 
+    // Right column
     html += '<div class="scroll-wrapper"><div class="scroll-inner"><table><thead><tr><th>Rank</th><th>Name</th><th>SIS%</th></tr></thead><tbody>';
-    rest.forEach((item, idx) => {
-      const rank = item.rank || (idx + 3);
-      html += `<tr><td class="rank-col">${rank}</td><td class="name-col">${item.name}</td><td class="score-col">${item.score}</td></tr>`;
+    rightCol.forEach((item, idx) => {
+      const rank = item.rank || (idx + half + 1);
+      const rowClass = rank === 1 ? 'top1' : (rank === 2 ? 'amber' : '');
+      html += `<tr class="${rowClass}"><td class="rank-col">${rank}</td><td class="name-col">${item.name}</td><td class="score-col">${item.score}</td></tr>`;
     });
     html += '</tbody></table></div></div>';
 
