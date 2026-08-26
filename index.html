@@ -77,7 +77,7 @@
     .trend-arrow.down { color: #d32f2f; }
     .trend-arrow.neutral { visibility: hidden; transform: translateX(0); }
 
-    /* ---- Score-based row coloring (NEW) ---- */
+    /* ---- Score-based row coloring ---- */
     .table-wrap tr.green td {
       background: linear-gradient(90deg, rgba(27,138,78,0.12), rgba(211,47,47,0.03));
       border-left: 4px solid #1b8a4e;
@@ -111,7 +111,7 @@
     .dot { width: 1vh; height: 1vh; border-radius: 50%; background: rgba(255,255,255,0.2); border: none; cursor: pointer; transition: all 0.3s ease; padding: 0; }
     .dot.active { background: #d32f2f; transform: scale(1.4); box-shadow: 0 0 20px rgba(211,47,47,0.5); }
 
-    /* ===== ORIGINAL TP/WNS CSS – UNCHANGED ===== */
+    /* ===== COMPARISON CSS (WITH LOGOS) ===== */
     #slide4, #slide5, #slide6, #slide7 {
       background: #f2f5f9;
       padding: 0;
@@ -132,6 +132,23 @@
       align-items: center;
       gap: 1.2vw;
       flex-shrink: 0;
+      flex-wrap: wrap;
+    }
+    .comp-brand {
+      display: flex;
+      align-items: center;
+      gap: 0.6vw;
+      flex-shrink: 0;
+    }
+    .comp-logo {
+      height: 4.5vh;
+      width: auto;
+      object-fit: contain;
+    }
+    .comp-vs {
+      color: #94a3b8;
+      font-size: 2vh;
+      font-weight: 300;
     }
     .comp-slide-wrapper .metric-header h2 {
       font-size: 4.2vh;
@@ -393,6 +410,8 @@
       .comp-slide-wrapper .centre-card { flex-direction: column; padding: 1.5vh; }
       .comp-slide-wrapper .chart-area { flex: 0 0 30%; width: 30%; max-width: 30%; }
       .comp-slide-wrapper .details-area { padding-left: 0; align-items: center; text-align: center; }
+      .comp-logo { height: 3.5vh; }
+      .comp-brand { gap: 0.4vw; }
     }
     @media (max-width: 768px) {
       .slide-counter { display: none; }
@@ -419,6 +438,8 @@
       .comp-slide-wrapper .details-area .main-value { font-size: 4vh; }
       .comp-slide-wrapper .summary-card-vertical .metric-title { font-size: 2vh; }
       .comp-slide-wrapper .summary-row-vertical .values .current { font-size: 2vh; }
+      .comp-logo { height: 2.5vh; }
+      .comp-brand { gap: 0.3vw; }
     }
   </style>
 </head>
@@ -500,7 +521,7 @@
 
 <script>
   // ============================================================
-  // ORIGINAL SIS JAVASCRIPT – WITH SCORE-BASED RULE ADDED
+  // ORIGINAL SIS JAVASCRIPT – WITH SCORE-BASED RULE
   // ============================================================
 
   async function loadSISData() {
@@ -514,19 +535,15 @@
     }
   }
 
-  // --- renderSISTable – now with score-based coloring ---
   function renderSISTable(data, type) {
     const items = type === 'agents' ? data.agents : data.teams;
     if (!items || items.length === 0) return '<div class="empty-state">No data available</div>';
 
-    // Split into two columns (continuous flow)
     const half = Math.ceil(items.length / 2);
     const leftCol = items.slice(0, half);
     const rightCol = items.slice(half);
 
-    // Helper to determine row class based on score
     function getRowClass(scoreStr) {
-      // Remove '%' and parse as number
       const num = parseFloat(scoreStr.replace('%', ''));
       if (isNaN(num)) return '';
       return num >= 86.30 ? 'green' : 'amber';
@@ -543,12 +560,10 @@
     }
 
     let html = '';
-    // Left column
     html += '<div class="scroll-wrapper"><div class="scroll-inner"><table><thead><tr><th>Rank</th><th>Name</th><th>SIS%</th></tr></thead><tbody>';
     html += buildTableRows(leftCol, 1);
     html += '</tbody></table></div></div>';
 
-    // Right column
     html += '<div class="scroll-wrapper"><div class="scroll-inner"><table><thead><tr><th>Rank</th><th>Name</th><th>SIS%</th></tr></thead><tbody>';
     html += buildTableRows(rightCol, half + 1);
     html += '</tbody></table></div></div>';
@@ -556,7 +571,6 @@
     return html;
   }
 
-  // --- SIS initialize ---
   async function initSIS() {
     const data = await loadSISData();
     if (!data) {
@@ -596,7 +610,7 @@
   }
 
   // ============================================================
-  // ORIGINAL TP/WNS JAVASCRIPT – UNCHANGED
+  // ORIGINAL TP/WNS JAVASCRIPT – WITH LOGOS ADDED
   // ============================================================
 
   function getStatusClass(value, target, isHigher) {
@@ -647,13 +661,18 @@
     return `${emoji} ${direction} (${sign}${pctChange.toFixed(1)}%)`;
   }
 
-  function renderComparisonDetail(data, metric, slideId) {
+  function renderComparisonSlide(data, metric, slideId) {
     const { targets, centres } = data;
     const target = targets[metric];
     const isHigher = metric !== 'CHT';
 
     let html = `<div class="comp-slide-wrapper">
       <div class="metric-header">
+        <div class="comp-brand">
+          <img src="assets/logos/TP-logo.png" alt="TP" class="comp-logo" onerror="this.style.display='none'" />
+          <span class="comp-vs">vs</span>
+          <img src="assets/logos/wns-logo.png" alt="WNS" class="comp-logo" onerror="this.style.display='none'" />
+        </div>
         <h2>${metric}</h2>
         <span class="unit-badge">Target: ${target}${metric === 'CHT' ? 's' : '%'}</span>
       </div>
@@ -697,12 +716,17 @@
     return html;
   }
 
-  function renderSummary(data, slideId) {
+  function renderSummarySlide(data, slideId) {
     const { targets, centres } = data;
     const metrics = ['SIS', 'IFSR', 'CHT'];
 
     let html = `<div class="comp-slide-wrapper">
       <div class="metric-header">
+        <div class="comp-brand">
+          <img src="assets/logos/TP-logo.png" alt="TP" class="comp-logo" onerror="this.style.display='none'" />
+          <span class="comp-vs">vs</span>
+          <img src="assets/logos/wns-logo.png" alt="WNS" class="comp-logo" onerror="this.style.display='none'" />
+        </div>
         <h2>📊 Summary Report</h2>
         <span class="unit-badge">All Metrics</span>
       </div>
@@ -770,10 +794,10 @@
       return;
     }
 
-    document.getElementById('slide4').innerHTML = renderComparisonDetail(data, 'SIS', 'slide4');
-    document.getElementById('slide5').innerHTML = renderComparisonDetail(data, 'IFSR', 'slide5');
-    document.getElementById('slide6').innerHTML = renderComparisonDetail(data, 'CHT', 'slide6');
-    document.getElementById('slide7').innerHTML = renderSummary(data, 'slide7');
+    document.getElementById('slide4').innerHTML = renderComparisonSlide(data, 'SIS', 'slide4');
+    document.getElementById('slide5').innerHTML = renderComparisonSlide(data, 'IFSR', 'slide5');
+    document.getElementById('slide6').innerHTML = renderComparisonSlide(data, 'CHT', 'slide6');
+    document.getElementById('slide7').innerHTML = renderSummarySlide(data, 'slide7');
 
     setTimeout(() => {
       const slides = ['slide4', 'slide5', 'slide6'];
