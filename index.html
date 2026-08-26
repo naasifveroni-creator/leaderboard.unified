@@ -111,7 +111,7 @@
     .dot { width: 1vh; height: 1vh; border-radius: 50%; background: rgba(255,255,255,0.2); border: none; cursor: pointer; transition: all 0.3s ease; padding: 0; }
     .dot.active { background: #d32f2f; transform: scale(1.4); box-shadow: 0 0 20px rgba(211,47,47,0.5); }
 
-    /* ===== COMPARISON CSS (WITH LOGOS) ===== */
+    /* ===== COMPARISON CSS (WITH DELTA LOGO + CENTRE LOGOS) ===== */
     #slide4, #slide5, #slide6, #slide7 {
       background: #f2f5f9;
       padding: 0;
@@ -134,21 +134,11 @@
       flex-shrink: 0;
       flex-wrap: wrap;
     }
-    .comp-brand {
-      display: flex;
-      align-items: center;
-      gap: 0.6vw;
-      flex-shrink: 0;
-    }
-    .comp-logo {
+    .comp-delta-logo {
       height: 4.5vh;
       width: auto;
       object-fit: contain;
-    }
-    .comp-vs {
-      color: #94a3b8;
-      font-size: 2vh;
-      font-weight: 300;
+      margin-right: 0.2vw;
     }
     .comp-slide-wrapper .metric-header h2 {
       font-size: 4.2vh;
@@ -223,14 +213,16 @@
       gap: 0.2vh;
     }
     .comp-slide-wrapper .details-area .centre-name {
-      font-size: 2.4vh;
-      font-weight: 600;
-      color: #94a3b8;
-      letter-spacing: 1px;
-      text-transform: uppercase;
       display: flex;
       align-items: center;
-      gap: 0.6vw;
+      justify-content: flex-start;
+      margin-bottom: 0.2vh;
+    }
+    .centre-logo {
+      height: 4.5vh;
+      width: auto;
+      object-fit: contain;
+      max-width: 100%;
     }
     .comp-slide-wrapper .details-area .main-value {
       font-size: 7vh;
@@ -410,8 +402,8 @@
       .comp-slide-wrapper .centre-card { flex-direction: column; padding: 1.5vh; }
       .comp-slide-wrapper .chart-area { flex: 0 0 30%; width: 30%; max-width: 30%; }
       .comp-slide-wrapper .details-area { padding-left: 0; align-items: center; text-align: center; }
-      .comp-logo { height: 3.5vh; }
-      .comp-brand { gap: 0.4vw; }
+      .centre-logo { height: 3.5vh; }
+      .comp-delta-logo { height: 3.5vh; }
     }
     @media (max-width: 768px) {
       .slide-counter { display: none; }
@@ -438,8 +430,8 @@
       .comp-slide-wrapper .details-area .main-value { font-size: 4vh; }
       .comp-slide-wrapper .summary-card-vertical .metric-title { font-size: 2vh; }
       .comp-slide-wrapper .summary-row-vertical .values .current { font-size: 2vh; }
-      .comp-logo { height: 2.5vh; }
-      .comp-brand { gap: 0.3vw; }
+      .centre-logo { height: 2.5vh; }
+      .comp-delta-logo { height: 2.5vh; }
     }
   </style>
 </head>
@@ -610,7 +602,7 @@
   }
 
   // ============================================================
-  // ORIGINAL TP/WNS JAVASCRIPT – WITH LOGOS ADDED
+  // ORIGINAL TP/WNS JAVASCRIPT – WITH DELTA LOGO IN HEADER + CENTRE LOGOS
   // ============================================================
 
   function getStatusClass(value, target, isHigher) {
@@ -668,11 +660,7 @@
 
     let html = `<div class="comp-slide-wrapper">
       <div class="metric-header">
-        <div class="comp-brand">
-          <img src="assets/logos/TP-logo.png" alt="TP" class="comp-logo" onerror="this.style.display='none'" />
-          <span class="comp-vs">vs</span>
-          <img src="assets/logos/wns-logo.png" alt="WNS" class="comp-logo" onerror="this.style.display='none'" />
-        </div>
+        <img src="assets/logos/delta-logo.png" alt="Delta" class="comp-delta-logo" onerror="this.style.display='none'" />
         <h2>${metric}</h2>
         <span class="unit-badge">Target: ${target}${metric === 'CHT' ? 's' : '%'}</span>
       </div>
@@ -689,13 +677,15 @@
       const trendClass = current > previous ? 'up' : (current < previous ? 'down' : 'flat');
       const trendArrow = current > previous ? '↑' : (current < previous ? '↓' : '→');
 
+      const logoFile = centre.name.toLowerCase() === 'tp' ? 'TP-logo.png' : 'wns-logo.png';
+
       html += `<div class="centre-card ${centre.name.toLowerCase()}">
         <div class="chart-area">
           <canvas id="chart-${metric}-${centre.name}-${slideId}"></canvas>
         </div>
         <div class="details-area">
           <div class="centre-name">
-            <span class="dot" style="background:${centre.colour};"></span> ${centre.name}
+            <img src="assets/logos/${logoFile}" alt="${centre.name}" class="centre-logo" onerror="this.style.display='none'" />
           </div>
           <div class="main-value">
             ${current}${metric === 'CHT' ? 's' : '%'}
@@ -722,11 +712,7 @@
 
     let html = `<div class="comp-slide-wrapper">
       <div class="metric-header">
-        <div class="comp-brand">
-          <img src="assets/logos/TP-logo.png" alt="TP" class="comp-logo" onerror="this.style.display='none'" />
-          <span class="comp-vs">vs</span>
-          <img src="assets/logos/wns-logo.png" alt="WNS" class="comp-logo" onerror="this.style.display='none'" />
-        </div>
+        <img src="assets/logos/delta-logo.png" alt="Delta" class="comp-delta-logo" onerror="this.style.display='none'" />
         <h2>📊 Summary Report</h2>
         <span class="unit-badge">All Metrics</span>
       </div>
