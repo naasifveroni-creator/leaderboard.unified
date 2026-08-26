@@ -76,16 +76,21 @@
     .trend-arrow.up { color: #2ecc71; }
     .trend-arrow.down { color: #d32f2f; }
     .trend-arrow.neutral { visibility: hidden; transform: translateX(0); }
-    .table-wrap tr.top1 td { background: linear-gradient(90deg, rgba(27,138,78,0.12), rgba(211,47,47,0.06)); position: relative; border-left: 4px solid #1b8a4e; }
-    .table-wrap tr.top1 .rank-col { color: #1b8a4e; font-weight: 900; font-size: 2.8vh; }
-    .table-wrap tr.top1 .score-col { color: #1b8a4e; font-size: 3vh; font-weight: 800; }
-    .table-wrap tr.top1 td::before { content: ''; position: absolute; top: -2px; left: -2px; right: -2px; bottom: -2px; background: radial-gradient(ellipse at center, rgba(27,138,78,0.2), transparent 70%); z-index: -1; border-radius: 4px; animation: pulseGlowGreen 2.5s ease-in-out infinite; pointer-events: none; }
-    @keyframes pulseGlowGreen { 0%, 100% { opacity: 0.4; transform: scale(1); } 50% { opacity: 1; transform: scale(1.02); } }
-    .table-wrap tr.amber td { background: linear-gradient(90deg, rgba(230,126,34,0.12), rgba(211,47,47,0.06)); position: relative; border-left: 4px solid #e67e22; }
-    .table-wrap tr.amber .rank-col { color: #e67e22; font-weight: 900; font-size: 2.8vh; }
-    .table-wrap tr.amber .score-col { color: #e67e22; font-size: 3vh; font-weight: 800; }
-    .table-wrap tr.amber td::before { content: ''; position: absolute; top: -2px; left: -2px; right: -2px; bottom: -2px; background: radial-gradient(ellipse at center, rgba(230,126,34,0.2), transparent 70%); z-index: -1; border-radius: 4px; animation: pulseAmber 2.5s ease-in-out infinite; pointer-events: none; }
-    @keyframes pulseAmber { 0%, 100% { opacity: 0.4; transform: scale(1); } 50% { opacity: 1; transform: scale(1.02); } }
+
+    /* ---- Score-based row coloring (NEW) ---- */
+    .table-wrap tr.green td {
+      background: linear-gradient(90deg, rgba(27,138,78,0.12), rgba(211,47,47,0.03));
+      border-left: 4px solid #1b8a4e;
+    }
+    .table-wrap tr.green .rank-col { color: #1b8a4e; font-weight: 700; }
+    .table-wrap tr.green .score-col { color: #1b8a4e; font-weight: 700; }
+    .table-wrap tr.amber td {
+      background: linear-gradient(90deg, rgba(230,126,34,0.12), rgba(211,47,47,0.03));
+      border-left: 4px solid #e67e22;
+    }
+    .table-wrap tr.amber .rank-col { color: #e67e22; font-weight: 700; }
+    .table-wrap tr.amber .score-col { color: #e67e22; font-weight: 700; }
+
     .table-wrap .empty-state { padding: 2vh; text-align: center; color: #8a9bb0; background: rgba(255,255,255,0.8); border-radius: 12px; width: 100%; font-size: 2vh; }
     .slide-footer { flex-shrink: 0; min-height: 14vh; background: transparent; border-top: 1px solid rgba(224,229,236,0.15); display: flex; align-items: center; justify-content: center; padding: 0.5vh 2vw 0.3vh; position: relative; overflow: hidden; width: 100%; }
     .footer-animation { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
@@ -495,10 +500,9 @@
 
 <script>
   // ============================================================
-  // ORIGINAL SIS JAVASCRIPT – UNCHANGED
+  // ORIGINAL SIS JAVASCRIPT – WITH SCORE-BASED RULE ADDED
   // ============================================================
 
-  // --- SIS data loading ---
   async function loadSISData() {
     try {
       const res = await fetch('data/leaderboard.json?t=' + Date.now());
@@ -510,33 +514,43 @@
     }
   }
 
-  // --- CORRECTED SIS render function – continuous flow (half/half) ---
+  // --- renderSISTable – now with score-based coloring ---
   function renderSISTable(data, type) {
     const items = type === 'agents' ? data.agents : data.teams;
     if (!items || items.length === 0) return '<div class="empty-state">No data available</div>';
 
-    // Split the array in half for two columns (continuous flow)
+    // Split into two columns (continuous flow)
     const half = Math.ceil(items.length / 2);
     const leftCol = items.slice(0, half);
     const rightCol = items.slice(half);
 
+    // Helper to determine row class based on score
+    function getRowClass(scoreStr) {
+      // Remove '%' and parse as number
+      const num = parseFloat(scoreStr.replace('%', ''));
+      if (isNaN(num)) return '';
+      return num >= 86.30 ? 'green' : 'amber';
+    }
+
+    function buildTableRows(columnItems, startRank) {
+      let html = '';
+      columnItems.forEach((item, idx) => {
+        const rank = item.rank || (startRank + idx);
+        const rowClass = getRowClass(item.score);
+        html += `<tr class="${rowClass}"><td class="rank-col">${rank}</td><td class="name-col">${item.name}</td><td class="score-col">${item.score}</td></tr>`;
+      });
+      return html;
+    }
+
     let html = '';
     // Left column
     html += '<div class="scroll-wrapper"><div class="scroll-inner"><table><thead><tr><th>Rank</th><th>Name</th><th>SIS%</th></tr></thead><tbody>';
-    leftCol.forEach((item, idx) => {
-      const rank = item.rank || idx + 1;
-      const rowClass = rank === 1 ? 'top1' : (rank === 2 ? 'amber' : '');
-      html += `<tr class="${rowClass}"><td class="rank-col">${rank}</td><td class="name-col">${item.name}</td><td class="score-col">${item.score}</td></tr>`;
-    });
+    html += buildTableRows(leftCol, 1);
     html += '</tbody></table></div></div>';
 
     // Right column
     html += '<div class="scroll-wrapper"><div class="scroll-inner"><table><thead><tr><th>Rank</th><th>Name</th><th>SIS%</th></tr></thead><tbody>';
-    rightCol.forEach((item, idx) => {
-      const rank = item.rank || (idx + half + 1);
-      const rowClass = rank === 1 ? 'top1' : (rank === 2 ? 'amber' : '');
-      html += `<tr class="${rowClass}"><td class="rank-col">${rank}</td><td class="name-col">${item.name}</td><td class="score-col">${item.score}</td></tr>`;
-    });
+    html += buildTableRows(rightCol, half + 1);
     html += '</tbody></table></div></div>';
 
     return html;
@@ -551,13 +565,11 @@
       return;
     }
 
-    // Agents week
     if (data.week) {
       document.getElementById('agentsWeek').textContent = data.week;
       document.getElementById('teamsWeek').textContent = data.week;
     }
 
-    // Agents table
     const agentTableWrap = document.getElementById('agentTableWrap');
     if (data.agents && data.agents.length > 0) {
       agentTableWrap.innerHTML = renderSISTable(data, 'agents');
@@ -565,7 +577,6 @@
       agentTableWrap.innerHTML = '<div class="empty-state">No agent data available</div>';
     }
 
-    // Teams table
     const teamTableWrap = document.getElementById('teamTableWrap');
     if (data.teams && data.teams.length > 0) {
       teamTableWrap.innerHTML = renderSISTable(data, 'teams');
@@ -573,7 +584,6 @@
       teamTableWrap.innerHTML = '<div class="empty-state">No team data available</div>';
     }
 
-    // Behaviour tags animation
     document.querySelectorAll('.behavior-tags').forEach(container => {
       const tags = container.querySelectorAll('.tag');
       tags.forEach((tag, index) => {
@@ -589,7 +599,6 @@
   // ORIGINAL TP/WNS JAVASCRIPT – UNCHANGED
   // ============================================================
 
-  // --- TP/WNS helper functions ---
   function getStatusClass(value, target, isHigher) {
     if (isHigher) {
       if (value >= target) return 'on-target';
@@ -638,7 +647,6 @@
     return `${emoji} ${direction} (${sign}${pctChange.toFixed(1)}%)`;
   }
 
-  // --- TP/WNS render functions ---
   function renderComparisonDetail(data, metric, slideId) {
     const { targets, centres } = data;
     const target = targets[metric];
@@ -655,8 +663,6 @@
       const m = centre.metrics[metric];
       const current = m.current;
       const previous = m.previous;
-      const history = m.history || [];
-      const gap = isHigher ? current - target : target - current;
       const gapText = getGapText(current, target, isHigher);
       const gapClass = getGapClass(current, target, isHigher);
       const statusClass = getStatusClass(current, target, isHigher);
@@ -717,7 +723,6 @@
         const m = centre.metrics[metric];
         const current = m.current;
         const previous = m.previous;
-        const gap = isHigher ? current - target : target - current;
         const gapText = getGapText(current, target, isHigher);
         const gapClass = getGapClass(current, target, isHigher);
         const change = current - previous;
@@ -744,7 +749,6 @@
     return html;
   }
 
-  // --- TP/WNS load and render ---
   async function loadComparisonData() {
     try {
       const res = await fetch('data/comparison.json?t=' + Date.now());
@@ -766,13 +770,11 @@
       return;
     }
 
-    // Render slides 4-7
     document.getElementById('slide4').innerHTML = renderComparisonDetail(data, 'SIS', 'slide4');
     document.getElementById('slide5').innerHTML = renderComparisonDetail(data, 'IFSR', 'slide5');
     document.getElementById('slide6').innerHTML = renderComparisonDetail(data, 'CHT', 'slide6');
     document.getElementById('slide7').innerHTML = renderSummary(data, 'slide7');
 
-    // Initialize charts after DOM render
     setTimeout(() => {
       const slides = ['slide4', 'slide5', 'slide6'];
       const metrics = ['SIS', 'IFSR', 'CHT'];
@@ -811,7 +813,7 @@
   }
 
   // ============================================================
-  // COMBINED NAVIGATION (SIS + TP/WNS merged)
+  // COMBINED NAVIGATION
   // ============================================================
 
   let currentSlide = 0;
@@ -853,7 +855,6 @@
     startAutoSlide();
   }
 
-  // ---- Remote control (command.json) ----
   async function checkRemote() {
     try {
       const res = await fetch('command.json?t=' + Date.now());
@@ -861,12 +862,9 @@
       if (cmd.command === 'next') {
         nextSlide();
       }
-    } catch (e) {
-      // Silently fail – remote control not available
-    }
+    } catch (e) {}
   }
 
-  // ---- Build dots ----
   function buildDots() {
     const dotsContainer = document.getElementById('dotsContainer');
     dotsContainer.innerHTML = '';
@@ -879,7 +877,6 @@
     }
   }
 
-  // ---- Event listeners ----
   document.getElementById('prevBtn').addEventListener('click', prevSlide);
   document.getElementById('nextBtn').addEventListener('click', nextSlide);
 
@@ -891,10 +888,6 @@
     }
   });
 
-  // ============================================================
-  // INIT
-  // ============================================================
-
   async function init() {
     buildDots();
     await Promise.all([initSIS(), initComparison()]);
@@ -903,7 +896,6 @@
     setInterval(checkRemote, 3000);
   }
 
-  // Expose navigation globally
   window.goToSlide = goToSlide;
   window.nextSlide = nextSlide;
   window.prevSlide = prevSlide;
