@@ -53,7 +53,14 @@
     .slide-title::after { content: ''; display: block; width: 60px; height: 3px; background: linear-gradient(90deg, #d32f2f, #d32f2f); margin: 0.15vh auto 0; border-radius: 10px; }
     .slide-title .week-date { font-weight: 800; font-size: 2.4vh; color: #0b1a33; display: inline-block; margin-top: 0.1vh; letter-spacing: 0.05em; background: rgba(255,255,255,0.2); padding: 0.1vh 2vw; border-radius: 30px; margin-left: auto; margin-right: auto; backdrop-filter: blur(4px); }
     .scroll-wrapper { flex: 1; overflow: hidden; position: relative; mask-image: linear-gradient(to bottom, transparent 0%, black 8%, black 92%, transparent 100%); -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 8%, black 92%, transparent 100%); z-index: 1; }
-    .scroll-inner { transition: none; will-change: transform; }
+    .scroll-inner { 
+      animation: scrollUp 60s linear infinite;
+      will-change: transform;
+    }
+    @keyframes scrollUp {
+      0% { transform: translateY(0); }
+      100% { transform: translateY(-50%); }
+    }
     .table-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8vw 1.5vw; flex: 1; min-height: 0; height: 100%; }
     .table-grid .scroll-wrapper { flex: 1; overflow: hidden; position: relative; mask-image: linear-gradient(to bottom, transparent 0%, black 8%, black 92%, transparent 100%); -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 8%, black 92%, transparent 100%); }
     .table-grid .scroll-inner { animation: none; }
@@ -470,7 +477,7 @@
       <div class="progress-container"><div class="progress-bar" id="progressBar"></div></div>
     </div>
 
-    <!-- ===== TP/WNS SLIDES (4-7) – POPULATED BY JAVASCRIPT ===== -->
+    <!-- ===== TP/WNS SLIDES (4-7) ===== -->
     <div class="slide" id="slide4" data-index="4" data-slide="5"></div>
     <div class="slide" id="slide5" data-index="5" data-slide="6"></div>
     <div class="slide" id="slide6" data-index="6" data-slide="7"></div>
@@ -517,14 +524,14 @@
     topTwo.forEach((item, idx) => {
       const rank = item.rank || idx + 1;
       const rowClass = rank === 1 ? 'top1' : (rank === 2 ? 'amber' : '');
-      html += `<tr class="${rowClass}"><td class="rank-col">#${rank}</td><td class="name-col">${item.name}</td><td class="score-col">${item.score}</td></tr>`;
+      html += `<tr class="${rowClass}"><td class="rank-col">${rank}</td><td class="name-col">${item.name}</td><td class="score-col">${item.score}</td></tr>`;
     });
     html += '</tbody></table></div></div>';
 
     html += '<div class="scroll-wrapper"><div class="scroll-inner"><table><thead><tr><th>Rank</th><th>Name</th><th>SIS%</th></tr></thead><tbody>';
     rest.forEach((item, idx) => {
       const rank = item.rank || (idx + 3);
-      html += `<tr><td class="rank-col">#${rank}</td><td class="name-col">${item.name}</td><td class="score-col">${item.score}</td></tr>`;
+      html += `<tr><td class="rank-col">${rank}</td><td class="name-col">${item.name}</td><td class="score-col">${item.score}</td></tr>`;
     });
     html += '</tbody></table></div></div>';
 
