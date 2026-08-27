@@ -427,63 +427,31 @@
     }
 
     /* ===== FULLSCREEN FIX – FORCE COMPARISON CARDS SIDE-BY-SIDE ===== */
-    .slide-deck:fullscreen .comp-slide-wrapper .card-row {
-      display: flex !important;
+    body.is-fullscreen .comp-slide-wrapper .card-row {
       flex-direction: row !important;
       flex-wrap: nowrap !important;
-      gap: 2vw !important;
       height: 70% !important;
-      min-height: 0 !important;
     }
-
-    .slide-deck:fullscreen .comp-slide-wrapper .centre-card {
-      flex: 1 1 0 !important;
-      min-width: 0 !important;
-      max-width: 100% !important;
+    body.is-fullscreen .comp-slide-wrapper .centre-card {
       flex-direction: row !important;
-      align-items: center !important;
       padding: 1.5vh 2.5vw !important;
     }
-
-    .slide-deck:fullscreen .comp-slide-wrapper .chart-area {
+    body.is-fullscreen .comp-slide-wrapper .chart-area {
       flex: 0 0 28% !important;
       max-width: 28% !important;
-      aspect-ratio: 1/1 !important;
     }
-
-    .slide-deck:fullscreen .comp-slide-wrapper .details-area {
+    body.is-fullscreen .comp-slide-wrapper .details-area {
       flex: 1 !important;
       padding-left: 2vw !important;
     }
-
-    .slide-deck:fullscreen .comp-slide-wrapper {
-      width: 100% !important;
-      height: 100% !important;
-      max-width: 100% !important;
-      max-height: 100% !important;
-      padding: 1vh 3vw 2vh 3vw !important;
-    }
-
-    /* Force fullscreen deck to stay normal */
-    .slide-deck:fullscreen {
+    body.is-fullscreen .slide-deck {
       width: 100vw !important;
       height: 100vh !important;
       background: #0b1a33 !important;
-      border-radius: 0 !important;
-      overflow: hidden !important;
     }
-
-    .slide-deck:fullscreen .slides-wrapper {
+    body.is-fullscreen .slides-wrapper {
       width: 100% !important;
       height: 100% !important;
-      overflow: hidden !important;
-    }
-
-    .slide-deck:fullscreen .slide {
-      width: 100% !important;
-      height: 100% !important;
-      max-width: 100% !important;
-      max-height: 100% !important;
     }
   </style>
 </head>
@@ -938,14 +906,22 @@
     }
   }
 
-  document.getElementById('prevBtn').addEventListener('click', prevSlide);
-  document.getElementById('nextBtn').addEventListener('click', nextSlide);
-
-  document.getElementById('fullscreenBtn').addEventListener('click', () => {
-    if (document.fullscreenElement) {
-      document.exitFullscreen();
-    } else {
+  // ---- Fullscreen handler with body class toggle ----
+  function toggleFullscreen() {
+    if (!document.fullscreenElement) {
       document.documentElement.requestFullscreen();
+      document.body.classList.add('is-fullscreen');
+    } else {
+      document.exitFullscreen();
+      document.body.classList.remove('is-fullscreen');
+    }
+  }
+
+  document.getElementById('fullscreenBtn').addEventListener('click', toggleFullscreen);
+
+  document.addEventListener('fullscreenchange', function() {
+    if (!document.fullscreenElement) {
+      document.body.classList.remove('is-fullscreen');
     }
   });
 
