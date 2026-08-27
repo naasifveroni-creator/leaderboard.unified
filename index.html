@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Δ SIS Performance · Delta</title>
+  <title>Δ Unified Dashboard</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <style>
@@ -13,19 +13,6 @@
     body { display: flex; justify-content: center; align-items: center; padding: 0; }
     .slide-deck { width: 100vw; height: 100vh; background: #0b1a33; overflow: hidden; position: relative; border-radius: 0; }
     .slides-wrapper { position: relative; width: 100%; height: 100%; overflow: hidden; }
-
-    /* ===== FULLSCREEN FIX – MATCH NORMAL VIEW ===== */
-    .slide-deck:fullscreen {
-      width: 100vw !important;
-      height: 100vh !important;
-      background: #0b1a33 !important;
-      border-radius: 0 !important;
-    }
-    .slide-deck:fullscreen .slides-wrapper {
-      width: 100% !important;
-      height: 100% !important;
-    }
-
     .fullscreen-btn { position: absolute; bottom: 2vh; right: 1.5vw; z-index: 100; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); color: rgba(255,255,255,0.5); border-radius: 8px; padding: 0.5vh 0.8vw; font-size: 1.8vh; cursor: pointer; transition: all 0.3s ease; backdrop-filter: blur(8px); display: flex; align-items: center; gap: 0.4vw; font-weight: 500; letter-spacing: 0.05em; }
     .fullscreen-btn:hover { background: rgba(255,255,255,0.12); color: #fff; border-color: rgba(255,255,255,0.2); transform: scale(1.05); }
     .fullscreen-btn .icon { font-size: 2vh; line-height: 1; }
@@ -49,7 +36,6 @@
     .slide-header .logo-area h1 { font-weight: 300; font-size: 2.6vh; letter-spacing: 0.1em; color: #fff; text-shadow: 0 0 20px rgba(211,47,47,0.1); }
     .slide-header .logo-area h1 span { font-weight: 800; color: #d32f2f; }
 
-    /* ===== BIGGER BEHAVIOUR TAGS ===== */
     .behavior-tags { display: flex; flex-wrap: wrap; align-items: center; gap: 0.4vh 0.8vw; position: relative; z-index: 2; }
     .behavior-tags .tag { color: #fff; font-size: 1.6vh; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; padding: 0.5vh 1.2vw; border-radius: 30px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12); transition: all 0.4s cubic-bezier(0.25,0.46,0.45,0.94); opacity: 0; transform: translateY(15px); white-space: nowrap; }
     .behavior-tags .tag.visible { opacity: 1; transform: translateY(0); }
@@ -69,16 +55,9 @@
     .slide-title::after { content: ''; display: block; width: 60px; height: 3px; background: linear-gradient(90deg, #d32f2f, #d32f2f); margin: 0.15vh auto 0; border-radius: 10px; }
     .slide-title .week-date { font-weight: 800; font-size: 2.4vh; color: #0b1a33; display: inline-block; margin-top: 0.1vh; letter-spacing: 0.05em; background: rgba(255,255,255,0.2); padding: 0.1vh 2vw; border-radius: 30px; margin-left: auto; margin-right: auto; backdrop-filter: blur(4px); }
 
-    /* ===== SCROLLING – EXACTLY AS ORIGINAL ===== */
     .scroll-wrapper { flex: 1; overflow: hidden; position: relative; mask-image: linear-gradient(to bottom, transparent 0%, black 8%, black 92%, transparent 100%); -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 8%, black 92%, transparent 100%); z-index: 1; }
-    .scroll-inner { 
-      animation: scrollUp 60s linear infinite;
-      will-change: transform;
-    }
-    @keyframes scrollUp {
-      0% { transform: translateY(0); }
-      100% { transform: translateY(-50%); }
-    }
+    .scroll-inner { animation: scrollUp 60s linear infinite; will-change: transform; }
+    @keyframes scrollUp { 0% { transform: translateY(0); } 100% { transform: translateY(-50%); } }
 
     .table-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8vw 1.5vw; flex: 1; min-height: 0; height: 100%; }
     .table-grid .scroll-wrapper { flex: 1; overflow: hidden; position: relative; mask-image: linear-gradient(to bottom, transparent 0%, black 8%, black 92%, transparent 100%); -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 8%, black 92%, transparent 100%); }
@@ -122,7 +101,7 @@
     .dot { width: 1vh; height: 1vh; border-radius: 50%; background: rgba(255,255,255,0.2); border: none; cursor: pointer; transition: all 0.3s ease; padding: 0; }
     .dot.active { background: #d32f2f; transform: scale(1.4); box-shadow: 0 0 20px rgba(211,47,47,0.5); }
 
-    /* ===== COMPARISON CSS (BIGGER DELTA LOGO) ===== */
+    /* ===== COMPARISON CSS ===== */
     #slide4, #slide5, #slide6, #slide7 {
       background: #f2f5f9;
       padding: 0;
@@ -446,6 +425,66 @@
       .centre-logo { height: 3vh; }
       .comp-delta-logo { height: 6vh; }
     }
+
+    /* ===== FULLSCREEN FIX – FORCE COMPARISON CARDS SIDE-BY-SIDE ===== */
+    .slide-deck:fullscreen .comp-slide-wrapper .card-row {
+      display: flex !important;
+      flex-direction: row !important;
+      flex-wrap: nowrap !important;
+      gap: 2vw !important;
+      height: 70% !important;
+      min-height: 0 !important;
+    }
+
+    .slide-deck:fullscreen .comp-slide-wrapper .centre-card {
+      flex: 1 1 0 !important;
+      min-width: 0 !important;
+      max-width: 100% !important;
+      flex-direction: row !important;
+      align-items: center !important;
+      padding: 1.5vh 2.5vw !important;
+    }
+
+    .slide-deck:fullscreen .comp-slide-wrapper .chart-area {
+      flex: 0 0 28% !important;
+      max-width: 28% !important;
+      aspect-ratio: 1/1 !important;
+    }
+
+    .slide-deck:fullscreen .comp-slide-wrapper .details-area {
+      flex: 1 !important;
+      padding-left: 2vw !important;
+    }
+
+    .slide-deck:fullscreen .comp-slide-wrapper {
+      width: 100% !important;
+      height: 100% !important;
+      max-width: 100% !important;
+      max-height: 100% !important;
+      padding: 1vh 3vw 2vh 3vw !important;
+    }
+
+    /* Force fullscreen deck to stay normal */
+    .slide-deck:fullscreen {
+      width: 100vw !important;
+      height: 100vh !important;
+      background: #0b1a33 !important;
+      border-radius: 0 !important;
+      overflow: hidden !important;
+    }
+
+    .slide-deck:fullscreen .slides-wrapper {
+      width: 100% !important;
+      height: 100% !important;
+      overflow: hidden !important;
+    }
+
+    .slide-deck:fullscreen .slide {
+      width: 100% !important;
+      height: 100% !important;
+      max-width: 100% !important;
+      max-height: 100% !important;
+    }
   </style>
 </head>
 <body>
@@ -526,7 +565,7 @@
 
 <script>
   // ============================================================
-  // ORIGINAL SIS JAVASCRIPT – WITH SCORE-BASED RULE
+  // COMBINED JAVASCRIPT – SIS + TP/WNS
   // ============================================================
 
   const SLIDE_INTERVAL = 15000;
@@ -536,6 +575,7 @@
   let leaderboardData = null;
   let comparisonData = null;
 
+  // ---- Load data ----
   async function loadSISData() {
     try {
       const res = await fetch('data/leaderboard.json?t=' + Date.now());
@@ -547,6 +587,18 @@
     }
   }
 
+  async function loadComparisonData() {
+    try {
+      const res = await fetch('data/comparison.json?t=' + Date.now());
+      if (!res.ok) throw new Error('Failed to fetch comparison data');
+      return await res.json();
+    } catch (e) {
+      console.error('Error loading comparison data:', e);
+      return null;
+    }
+  }
+
+  // ---- SIS render ----
   function renderSISTable(data, type) {
     const items = type === 'agents' ? data.agents : data.teams;
     if (!items || items.length === 0) return '<div class="empty-state">No data available</div>';
@@ -621,10 +673,7 @@
     });
   }
 
-  // ============================================================
-  // ORIGINAL TP/WNS JAVASCRIPT
-  // ============================================================
-
+  // ---- TP/WNS helpers ----
   function getStatusClass(value, target, isHigher) {
     if (isHigher) {
       if (value >= target) return 'on-target';
@@ -779,17 +828,6 @@
     return html;
   }
 
-  async function loadComparisonData() {
-    try {
-      const res = await fetch('data/comparison.json?t=' + Date.now());
-      if (!res.ok) throw new Error('Failed to fetch comparison data');
-      return await res.json();
-    } catch (e) {
-      console.error('Error loading comparison data:', e);
-      return null;
-    }
-  }
-
   async function initComparison() {
     const data = await loadComparisonData();
     if (!data) {
@@ -842,10 +880,7 @@
     }, 300);
   }
 
-  // ============================================================
-  // COMBINED NAVIGATION
-  // ============================================================
-
+  // ---- Navigation ----
   function updateUI() {
     document.querySelectorAll('.slide').forEach((el, i) => {
       el.classList.toggle('active', i === currentSlide);
@@ -914,9 +949,7 @@
     }
   });
 
-  // ============================================================
-  // PAUSE ON HOVER – EXACTLY AS YOUR ORIGINAL
-  // ============================================================
+  // ---- Pause on hover (EXACTLY as your original) ----
   const slideDeck = document.querySelector('.slide-deck');
 
   slideDeck.addEventListener('mouseenter', function() {
@@ -932,10 +965,7 @@
     }
   });
 
-  // ============================================================
-  // INIT
-  // ============================================================
-
+  // ---- Init ----
   async function init() {
     buildDots();
     await Promise.all([initSIS(), initComparison()]);
