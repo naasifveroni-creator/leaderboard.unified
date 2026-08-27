@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Δ SIS Performance · Delta</title>
+  <title>Δ Unified Dashboard</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <style>
@@ -56,7 +56,7 @@
     .slide-title::after { content: ''; display: block; width: 60px; height: 3px; background: linear-gradient(90deg, #d32f2f, #d32f2f); margin: 0.15vh auto 0; border-radius: 10px; }
     .slide-title .week-date { font-weight: 800; font-size: 2.4vh; color: #0b1a33; display: inline-block; margin-top: 0.1vh; letter-spacing: 0.05em; background: rgba(255,255,255,0.2); padding: 0.1vh 2vw; border-radius: 30px; margin-left: auto; margin-right: auto; backdrop-filter: blur(4px); }
 
-    /* ===== SCROLLING FIX (RESTORED FROM ORIGINAL) ===== */
+    /* ===== SCROLLING FIX – RESTORED ===== */
     .scroll-wrapper { flex: 1; overflow: hidden; position: relative; mask-image: linear-gradient(to bottom, transparent 0%, black 8%, black 92%, transparent 100%); -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 8%, black 92%, transparent 100%); z-index: 1; }
     .scroll-inner { 
       animation: scrollUp 60s linear infinite;
@@ -68,8 +68,11 @@
     }
 
     .table-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8vw 1.5vw; flex: 1; min-height: 0; height: 100%; }
+    /* Each column gets a scroll wrapper */
     .table-grid .scroll-wrapper { flex: 1; overflow: hidden; position: relative; mask-image: linear-gradient(to bottom, transparent 0%, black 8%, black 92%, transparent 100%); -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 8%, black 92%, transparent 100%); }
-    .table-grid .scroll-inner { animation: none; }  /* Individual tables inside grid should NOT auto-scroll */
+    /* The inner scroll-inner inside the column should animate – we keep the global animation */
+    .table-grid .scroll-inner { animation: scrollUp 60s linear infinite; } /* NO OVERRIDE */
+
     .table-wrap th { background: linear-gradient(135deg, #0b1a33 0%, #1a3050 100%); color: #fff; font-weight: 700; padding: 1vh 1vw; text-align: center; border-bottom: 3px solid #d32f2f; font-size: 2vh; text-transform: uppercase; letter-spacing: 0.08em; position: sticky; top: 0; z-index: 10; }
     .table-wrap td { padding: 1.2vh 1vw; border-bottom: 1px solid rgba(237,240,246,0.6); vertical-align: middle; color: #0b1a33; text-align: center; font-size: 2.6vh; font-weight: 500; transition: all 0.3s ease; }
     .table-wrap tr:last-child td { border-bottom: none; }
@@ -108,7 +111,7 @@
     .dot { width: 1vh; height: 1vh; border-radius: 50%; background: rgba(255,255,255,0.2); border: none; cursor: pointer; transition: all 0.3s ease; padding: 0; }
     .dot.active { background: #d32f2f; transform: scale(1.4); box-shadow: 0 0 20px rgba(211,47,47,0.5); }
 
-    /* ===== COMPARISON CSS (BIGGER LOGOS, NO DARK CIRCLE) ===== */
+    /* ===== COMPARISON CSS (BIGGER DELTA LOGO) ===== */
     #slide4, #slide5, #slide6, #slide7 {
       background: #f2f5f9;
       padding: 0;
@@ -131,8 +134,9 @@
       flex-shrink: 0;
       flex-wrap: wrap;
     }
+    /* BIGGER DELTA LOGO */
     .comp-delta-logo {
-      height: 9vh;
+      height: 12vh;
       width: auto;
       object-fit: contain;
       margin-right: 0.5vw;
@@ -402,7 +406,7 @@
       .comp-slide-wrapper .chart-area { flex: 0 0 30%; width: 30%; max-width: 30%; }
       .comp-slide-wrapper .details-area { padding-left: 0; align-items: center; text-align: center; }
       .centre-logo { height: 4vh; }
-      .comp-delta-logo { height: 7vh; }
+      .comp-delta-logo { height: 9vh; }
     }
     @media (max-width: 768px) {
       .slide-counter { display: none; }
@@ -430,7 +434,7 @@
       .comp-slide-wrapper .summary-card-vertical .metric-title { font-size: 2vh; }
       .comp-slide-wrapper .summary-row-vertical .values .current { font-size: 2vh; }
       .centre-logo { height: 3vh; }
-      .comp-delta-logo { height: 5vh; }
+      .comp-delta-logo { height: 6vh; }
     }
   </style>
 </head>
