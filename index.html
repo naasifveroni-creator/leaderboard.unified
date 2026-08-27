@@ -53,14 +53,8 @@
     .slide-title::after { content: ''; display: block; width: 60px; height: 3px; background: linear-gradient(90deg, #d32f2f, #d32f2f); margin: 0.15vh auto 0; border-radius: 10px; }
     .slide-title .week-date { font-weight: 800; font-size: 2.4vh; color: #0b1a33; display: inline-block; margin-top: 0.1vh; letter-spacing: 0.05em; background: rgba(255,255,255,0.2); padding: 0.1vh 2vw; border-radius: 30px; margin-left: auto; margin-right: auto; backdrop-filter: blur(4px); }
     .scroll-wrapper { flex: 1; overflow: hidden; position: relative; mask-image: linear-gradient(to bottom, transparent 0%, black 8%, black 92%, transparent 100%); -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 8%, black 92%, transparent 100%); z-index: 1; }
-    .scroll-inner { 
-      animation: scrollUp 60s linear infinite;
-      will-change: transform;
-    }
-    @keyframes scrollUp {
-      0% { transform: translateY(0); }
-      100% { transform: translateY(-50%); }
-    }
+    .scroll-inner { animation: scrollUp 60s linear infinite; will-change: transform; }
+    @keyframes scrollUp { 0% { transform: translateY(0); } 100% { transform: translateY(-50%); } }
     .table-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8vw 1.5vw; flex: 1; min-height: 0; height: 100%; }
     .table-grid .scroll-wrapper { flex: 1; overflow: hidden; position: relative; mask-image: linear-gradient(to bottom, transparent 0%, black 8%, black 92%, transparent 100%); -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 8%, black 92%, transparent 100%); }
     .table-grid .scroll-inner { animation: none; }
@@ -76,21 +70,12 @@
     .trend-arrow.up { color: #2ecc71; }
     .trend-arrow.down { color: #d32f2f; }
     .trend-arrow.neutral { visibility: hidden; transform: translateX(0); }
-
-    /* ---- Score-based row coloring ---- */
-    .table-wrap tr.green td {
-      background: linear-gradient(90deg, rgba(27,138,78,0.12), rgba(211,47,47,0.03));
-      border-left: 4px solid #1b8a4e;
-    }
+    .table-wrap tr.green td { background: linear-gradient(90deg, rgba(27,138,78,0.12), rgba(211,47,47,0.03)); border-left: 4px solid #1b8a4e; }
     .table-wrap tr.green .rank-col { color: #1b8a4e; font-weight: 700; }
     .table-wrap tr.green .score-col { color: #1b8a4e; font-weight: 700; }
-    .table-wrap tr.amber td {
-      background: linear-gradient(90deg, rgba(230,126,34,0.12), rgba(211,47,47,0.03));
-      border-left: 4px solid #e67e22;
-    }
+    .table-wrap tr.amber td { background: linear-gradient(90deg, rgba(230,126,34,0.12), rgba(211,47,47,0.03)); border-left: 4px solid #e67e22; }
     .table-wrap tr.amber .rank-col { color: #e67e22; font-weight: 700; }
     .table-wrap tr.amber .score-col { color: #e67e22; font-weight: 700; }
-
     .table-wrap .empty-state { padding: 2vh; text-align: center; color: #8a9bb0; background: rgba(255,255,255,0.8); border-radius: 12px; width: 100%; font-size: 2vh; }
     .slide-footer { flex-shrink: 0; min-height: 14vh; background: transparent; border-top: 1px solid rgba(224,229,236,0.15); display: flex; align-items: center; justify-content: center; padding: 0.5vh 2vw 0.3vh; position: relative; overflow: hidden; width: 100%; }
     .footer-animation { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
@@ -111,7 +96,7 @@
     .dot { width: 1vh; height: 1vh; border-radius: 50%; background: rgba(255,255,255,0.2); border: none; cursor: pointer; transition: all 0.3s ease; padding: 0; }
     .dot.active { background: #d32f2f; transform: scale(1.4); box-shadow: 0 0 20px rgba(211,47,47,0.5); }
 
-    /* ===== COMPARISON CSS (WITH DELTA LOGO + CENTRE LOGOS) ===== */
+    /* ===== COMPARISON CSS (WITH BIGGER LOGOS) ===== */
     #slide4, #slide5, #slide6, #slide7 {
       background: #f2f5f9;
       padding: 0;
@@ -135,10 +120,15 @@
       flex-wrap: wrap;
     }
     .comp-delta-logo {
-      height: 4.5vh;
+      height: 7vh;
       width: auto;
       object-fit: contain;
-      margin-right: 0.2vw;
+      margin-right: 0.5vw;
+      filter: drop-shadow(0 0 15px rgba(211,47,47,0.25));
+      border-radius: 50%;
+      background: #0b1a33;
+      padding: 0.3vh;
+      border: 2px solid rgba(255,255,255,0.1);
     }
     .comp-slide-wrapper .metric-header h2 {
       font-size: 4.2vh;
@@ -219,10 +209,15 @@
       margin-bottom: 0.2vh;
     }
     .centre-logo {
-      height: 4.5vh;
+      height: 6vh;
       width: auto;
       object-fit: contain;
       max-width: 100%;
+      filter: drop-shadow(0 2px 8px rgba(0,0,0,0.08));
+    }
+    /* Hide the coloured dot on summary slide */
+    .centre-info .dot {
+      display: none;
     }
     .comp-slide-wrapper .details-area .main-value {
       font-size: 7vh;
@@ -278,6 +273,7 @@
       align-items: center;
       gap: 0.3vw;
     }
+
     .comp-slide-wrapper .summary-grid-vertical {
       flex: 1;
       display: flex;
@@ -338,12 +334,11 @@
       font-size: 2vh;
       flex: 0 0 15%;
     }
-    .comp-slide-wrapper .summary-row-vertical .centre-info .dot {
-      width: 1.4vh;
-      height: 1.4vh;
-      border-radius: 50%;
-      display: inline-block;
-      flex-shrink: 0;
+    .comp-slide-wrapper .summary-row-vertical .centre-info .centre-logo {
+      height: 3.5vh !important;
+      width: auto;
+      object-fit: contain;
+      filter: drop-shadow(0 2px 6px rgba(0,0,0,0.06));
     }
     .comp-slide-wrapper .summary-row-vertical .values {
       display: flex;
@@ -402,8 +397,8 @@
       .comp-slide-wrapper .centre-card { flex-direction: column; padding: 1.5vh; }
       .comp-slide-wrapper .chart-area { flex: 0 0 30%; width: 30%; max-width: 30%; }
       .comp-slide-wrapper .details-area { padding-left: 0; align-items: center; text-align: center; }
-      .centre-logo { height: 3.5vh; }
-      .comp-delta-logo { height: 3.5vh; }
+      .centre-logo { height: 4vh; }
+      .comp-delta-logo { height: 5vh; }
     }
     @media (max-width: 768px) {
       .slide-counter { display: none; }
@@ -430,8 +425,8 @@
       .comp-slide-wrapper .details-area .main-value { font-size: 4vh; }
       .comp-slide-wrapper .summary-card-vertical .metric-title { font-size: 2vh; }
       .comp-slide-wrapper .summary-row-vertical .values .current { font-size: 2vh; }
-      .centre-logo { height: 2.5vh; }
-      .comp-delta-logo { height: 2.5vh; }
+      .centre-logo { height: 3vh; }
+      .comp-delta-logo { height: 4vh; }
     }
   </style>
 </head>
@@ -602,7 +597,7 @@
   }
 
   // ============================================================
-  // ORIGINAL TP/WNS JAVASCRIPT – WITH DELTA LOGO IN HEADER + CENTRE LOGOS
+  // ORIGINAL TP/WNS JAVASCRIPT – WITH BIGGER LOGOS
   // ============================================================
 
   function getStatusClass(value, target, isHigher) {
@@ -670,14 +665,13 @@
       const m = centre.metrics[metric];
       const current = m.current;
       const previous = m.previous;
+      const logoFile = centre.name.toLowerCase() === 'tp' ? 'TP-logo.png' : 'wns-logo.png';
       const gapText = getGapText(current, target, isHigher);
       const gapClass = getGapClass(current, target, isHigher);
       const statusClass = getStatusClass(current, target, isHigher);
       const insight = getInsightText(current, previous, isHigher, metric === 'CHT' ? 's' : '%');
       const trendClass = current > previous ? 'up' : (current < previous ? 'down' : 'flat');
       const trendArrow = current > previous ? '↑' : (current < previous ? '↓' : '→');
-
-      const logoFile = centre.name.toLowerCase() === 'tp' ? 'TP-logo.png' : 'wns-logo.png';
 
       html += `<div class="centre-card ${centre.name.toLowerCase()}">
         <div class="chart-area">
@@ -732,21 +726,22 @@
       centres.forEach(centre => {
         const m = centre.metrics[metric];
         const current = m.current;
-        const previous = m.previous;
+        const prev = m.previous;
+        const logoFile = centre.name.toLowerCase() === 'tp' ? 'TP-logo.png' : 'wns-logo.png';
         const gapText = getGapText(current, target, isHigher);
         const gapClass = getGapClass(current, target, isHigher);
-        const change = current - previous;
+        const change = current - prev;
         const changeClass = change > 0 ? 'up' : (change < 0 ? 'down' : 'flat');
-        const changeSymbol = change > 0 ? '↑' : (change < 0 ? '↓' : '→');
-        const pctChange = previous !== 0 ? ((change / Math.abs(previous)) * 100) : 0;
+        const sym = change > 0 ? '↑' : (change < 0 ? '↓' : '→');
+        const pct = prev !== 0 ? (change / Math.abs(prev)) * 100 : 0;
 
         html += `<div class="summary-row-vertical">
           <div class="centre-info">
-            <span class="dot" style="background:${centre.colour};"></span> ${centre.name}
+            <img src="assets/logos/${logoFile}" alt="${centre.name}" class="centre-logo" onerror="this.style.display='none'" />
           </div>
           <div class="values">
             <span class="current">${current}${unit}</span>
-            <span class="change ${changeClass}">${changeSymbol} ${Math.abs(pctChange).toFixed(1)}%</span>
+            <span class="change ${changeClass}">${sym} ${Math.abs(pct).toFixed(1)}%</span>
             <span class="gap-badge ${gapClass}">${gapText}</span>
           </div>
         </div>`;
