@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Δ Unified Dashboard</title>
+  <title>Δ SIS Performance · Delta</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <style>
@@ -13,6 +13,19 @@
     body { display: flex; justify-content: center; align-items: center; padding: 0; }
     .slide-deck { width: 100vw; height: 100vh; background: #0b1a33; overflow: hidden; position: relative; border-radius: 0; }
     .slides-wrapper { position: relative; width: 100%; height: 100%; overflow: hidden; }
+
+    /* ===== FULLSCREEN FIX – MATCH NORMAL VIEW ===== */
+    .slide-deck:fullscreen {
+      width: 100vw !important;
+      height: 100vh !important;
+      background: #0b1a33 !important;
+      border-radius: 0 !important;
+    }
+    .slide-deck:fullscreen .slides-wrapper {
+      width: 100% !important;
+      height: 100% !important;
+    }
+
     .fullscreen-btn { position: absolute; bottom: 2vh; right: 1.5vw; z-index: 100; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); color: rgba(255,255,255,0.5); border-radius: 8px; padding: 0.5vh 0.8vw; font-size: 1.8vh; cursor: pointer; transition: all 0.3s ease; backdrop-filter: blur(8px); display: flex; align-items: center; gap: 0.4vw; font-weight: 500; letter-spacing: 0.05em; }
     .fullscreen-btn:hover { background: rgba(255,255,255,0.12); color: #fff; border-color: rgba(255,255,255,0.2); transform: scale(1.05); }
     .fullscreen-btn .icon { font-size: 2vh; line-height: 1; }
@@ -56,7 +69,7 @@
     .slide-title::after { content: ''; display: block; width: 60px; height: 3px; background: linear-gradient(90deg, #d32f2f, #d32f2f); margin: 0.15vh auto 0; border-radius: 10px; }
     .slide-title .week-date { font-weight: 800; font-size: 2.4vh; color: #0b1a33; display: inline-block; margin-top: 0.1vh; letter-spacing: 0.05em; background: rgba(255,255,255,0.2); padding: 0.1vh 2vw; border-radius: 30px; margin-left: auto; margin-right: auto; backdrop-filter: blur(4px); }
 
-    /* ===== SCROLLING FIX – RESTORED ===== */
+    /* ===== SCROLLING – EXACTLY AS ORIGINAL ===== */
     .scroll-wrapper { flex: 1; overflow: hidden; position: relative; mask-image: linear-gradient(to bottom, transparent 0%, black 8%, black 92%, transparent 100%); -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 8%, black 92%, transparent 100%); z-index: 1; }
     .scroll-inner { 
       animation: scrollUp 60s linear infinite;
@@ -68,10 +81,8 @@
     }
 
     .table-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8vw 1.5vw; flex: 1; min-height: 0; height: 100%; }
-    /* Each column gets a scroll wrapper */
     .table-grid .scroll-wrapper { flex: 1; overflow: hidden; position: relative; mask-image: linear-gradient(to bottom, transparent 0%, black 8%, black 92%, transparent 100%); -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 8%, black 92%, transparent 100%); }
-    /* The inner scroll-inner inside the column should animate – we keep the global animation */
-    .table-grid .scroll-inner { animation: scrollUp 60s linear infinite; } /* NO OVERRIDE */
+    .table-grid .scroll-inner { animation: scrollUp 60s linear infinite; }
 
     .table-wrap th { background: linear-gradient(135deg, #0b1a33 0%, #1a3050 100%); color: #fff; font-weight: 700; padding: 1vh 1vw; text-align: center; border-bottom: 3px solid #d32f2f; font-size: 2vh; text-transform: uppercase; letter-spacing: 0.08em; position: sticky; top: 0; z-index: 10; }
     .table-wrap td { padding: 1.2vh 1vw; border-bottom: 1px solid rgba(237,240,246,0.6); vertical-align: middle; color: #0b1a33; text-align: center; font-size: 2.6vh; font-weight: 500; transition: all 0.3s ease; }
@@ -134,7 +145,6 @@
       flex-shrink: 0;
       flex-wrap: wrap;
     }
-    /* BIGGER DELTA LOGO */
     .comp-delta-logo {
       height: 12vh;
       width: auto;
@@ -519,6 +529,13 @@
   // ORIGINAL SIS JAVASCRIPT – WITH SCORE-BASED RULE
   // ============================================================
 
+  const SLIDE_INTERVAL = 15000;
+  let currentSlide = 0;
+  let totalSlides = 8;
+  let intervalId = null;
+  let leaderboardData = null;
+  let comparisonData = null;
+
   async function loadSISData() {
     try {
       const res = await fetch('data/leaderboard.json?t=' + Date.now());
@@ -605,7 +622,7 @@
   }
 
   // ============================================================
-  // ORIGINAL TP/WNS JAVASCRIPT – WITH BIGGER LOGOS
+  // ORIGINAL TP/WNS JAVASCRIPT
   // ============================================================
 
   function getStatusClass(value, target, isHigher) {
@@ -829,10 +846,6 @@
   // COMBINED NAVIGATION
   // ============================================================
 
-  let currentSlide = 0;
-  let totalSlides = 8;
-  let intervalId = null;
-
   function updateUI() {
     document.querySelectorAll('.slide').forEach((el, i) => {
       el.classList.toggle('active', i === currentSlide);
@@ -860,7 +873,7 @@
 
   function startAutoSlide() {
     if (intervalId) clearInterval(intervalId);
-    intervalId = setInterval(nextSlide, 15000);
+    intervalId = setInterval(nextSlide, SLIDE_INTERVAL);
   }
 
   function resetAutoSlide() {
@@ -900,6 +913,28 @@
       document.documentElement.requestFullscreen();
     }
   });
+
+  // ============================================================
+  // PAUSE ON HOVER – EXACTLY AS YOUR ORIGINAL
+  // ============================================================
+  const slideDeck = document.querySelector('.slide-deck');
+
+  slideDeck.addEventListener('mouseenter', function() {
+    if (intervalId) {
+      clearInterval(intervalId);
+      intervalId = null;
+    }
+  });
+
+  slideDeck.addEventListener('mouseleave', function() {
+    if (!intervalId) {
+      startAutoSlide();
+    }
+  });
+
+  // ============================================================
+  // INIT
+  // ============================================================
 
   async function init() {
     buildDots();
