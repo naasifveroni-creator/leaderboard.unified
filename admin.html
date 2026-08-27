@@ -25,69 +25,60 @@
     .card { background: white; border-radius: 20px; padding: 1.5rem 2rem; margin-bottom: 1.5rem; box-shadow: 0 4px 16px rgba(0,0,0,0.05); }
     .card h2 { font-size: 1.4rem; margin-bottom: 1rem; color: #1e293b; border-bottom: 2px solid #e2e8f0; padding-bottom: 0.5rem; display: flex; align-items: center; gap: 0.6rem; }
 
-    /* ===== LEADERBOARD (SIS) STYLES ===== */
-    .sis-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
-    .sis-portal { background: #fafcff; border: 1px solid #e9edf4; border-radius: 14px; padding: 1.2rem; }
-    .sis-portal .portal-title { font-weight: 700; font-size: 1.1rem; color: #0b1a33; margin-bottom: 0.3rem; display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
-    .sis-portal .portal-title .badge { font-size: 0.65rem; background: #e9edf4; padding: 0.1rem 0.6rem; border-radius: 20px; color: #6b7f96; }
-    .sis-portal .portal-sub { font-size: 0.8rem; color: #6b7f96; margin-bottom: 0.6rem; }
-    .sis-portal textarea { width: 100%; height: 200px; padding: 0.8rem; border: 1px solid #d0d7e2; border-radius: 10px; font-family: 'Courier New', monospace; font-size: 0.8rem; resize: vertical; background: #fff; }
-    .sis-portal textarea:focus { border-color: #0b1a33; outline: none; box-shadow: 0 0 0 3px rgba(11,26,51,0.06); }
-    .sis-portal .file-upload-row { display: flex; gap: 0.6rem; margin-top: 0.4rem; align-items: center; flex-wrap: wrap; }
-    .sis-portal .file-upload-row input[type="file"] { font-size: 0.75rem; padding: 0.2rem 0.4rem; background: #fff; border: 1px solid #d0d7e2; border-radius: 6px; }
-    .sis-portal .portal-actions { display: flex; gap: 0.6rem; margin-top: 0.5rem; flex-wrap: wrap; }
-    .sis-portal .portal-actions .btn-sm { background: #e9edf4; color: #0b1a33; border: none; padding: 0.3rem 1.2rem; border-radius: 30px; font-weight: 600; font-size: 0.75rem; cursor: pointer; transition: 0.2s; }
-    .sis-portal .portal-actions .btn-sm:hover { background: #d5dce8; }
-    .sis-portal .portal-actions .btn-sm.green { background: #d32f2f; color: #fff; }
-    .sis-portal .portal-actions .btn-sm.green:hover { background: #b71c1c; }
-    .sis-portal .portal-status { font-size: 0.8rem; margin-top: 0.4rem; padding: 0.3rem 0.6rem; border-radius: 6px; display: none; }
-    .sis-portal .portal-status.success { background: #e1f5e8; color: #1a5a3a; display: block; }
-    .sis-portal .portal-status.error { background: #fde8e8; color: #a13a3a; display: block; }
+    /* ===== SLIDE MANAGER ===== */
+    .slide-list { display: flex; flex-direction: column; gap: 0.5rem; }
+    .slide-item { display: flex; align-items: center; gap: 0.8rem; padding: 0.6rem 1rem; background: #f8fafc; border-radius: 10px; border: 1px solid #e2e8f0; transition: 0.2s; }
+    .slide-item:hover { background: #f1f5f9; border-color: #cbd5e1; }
+    .slide-item .slide-index { font-weight: 700; color: #94a3b8; font-size: 0.9rem; min-width: 2rem; }
+    .slide-item .slide-type { font-size: 0.7rem; font-weight: 600; text-transform: uppercase; color: #fff; background: #64748b; padding: 0.2rem 0.6rem; border-radius: 20px; }
+    .slide-item .slide-type.table { background: #3b82f6; }
+    .slide-item .slide-type.comparison-detail { background: #8b5cf6; }
+    .slide-item .slide-type.summary { background: #f59e0b; }
+    .slide-item .slide-type.title { background: #10b981; }
+    .slide-item .slide-type.data-image { background: #ef4444; }
+    .slide-item .slide-name { flex: 1; font-weight: 500; color: #0f172a; }
+    .slide-item .slide-actions { display: flex; gap: 0.3rem; }
+    .slide-item .slide-actions button { background: none; border: 1px solid #e2e8f0; border-radius: 6px; padding: 0.2rem 0.5rem; cursor: pointer; font-size: 0.9rem; transition: 0.2s; color: #64748b; }
+    .slide-item .slide-actions button:hover { background: #e2e8f0; }
+    .slide-item .slide-actions button.delete:hover { background: #fee2e2; color: #ef4444; border-color: #ef4444; }
+    .slide-item .slide-actions button.edit:hover { background: #dbeafe; color: #3b82f6; border-color: #3b82f6; }
 
-    .sis-date-section { display: flex; flex-wrap: wrap; gap: 1.5rem; align-items: center; padding: 0.8rem 1.2rem; background: #f5f8fe; border-radius: 12px; border: 1px solid #e9edf4; margin-bottom: 1rem; }
-    .sis-date-section label { font-weight: 600; color: #0b1a33; font-size: 0.9rem; display: flex; align-items: center; gap: 0.5rem; }
-    .sis-date-section input[type="date"] { padding: 0.3rem 0.8rem; border: 1px solid #d0d7e2; border-radius: 8px; font-size: 0.9rem; background: #fff; }
-
-    .sis-alert-section { display: flex; flex-wrap: wrap; gap: 1.5rem 2.5rem; align-items: center; padding: 0.8rem 1.2rem; background: #f5f8fe; border-radius: 12px; border: 1px solid #e9edf4; margin-bottom: 1rem; }
-    .sis-alert-section .alert-label { font-weight: 600; color: #0b1a33; font-size: 0.9rem; display: flex; align-items: center; gap: 0.5rem; }
-    .sis-alert-section input[type="checkbox"] { width: 1.2rem; height: 1.2rem; accent-color: #d32f2f; cursor: pointer; }
-
-    /* ===== COMPARISON (TP/WNS) STYLES ===== */
-    .comp-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
-    .comp-field-group { display: flex; flex-direction: column; gap: 0.3rem; }
-    .comp-field-group label { font-weight: 600; font-size: 0.9rem; color: #334155; }
-    .comp-field-group input { padding: 0.6rem 0.8rem; border: 1.5px solid #cbd5e1; border-radius: 10px; font-size: 1rem; width: 100%; transition: 0.2s; }
-    .comp-field-group input:focus { border-color: #3b82f6; outline: none; box-shadow: 0 0 0 3px rgba(59,130,246,0.2); }
-    .comp-centre-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
-    .comp-centre-box { background: #f8fafc; border-radius: 16px; padding: 1.2rem 1.5rem; border-left: 6px solid #3b82f6; }
-    .comp-centre-box.wns { border-left-color: #f59e0b; }
-    .comp-centre-box h3 { font-size: 1.2rem; margin-bottom: 0.8rem; display: flex; align-items: center; gap: 0.5rem; }
-    .comp-metric-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.8rem; margin-bottom: 0.6rem; background: white; padding: 0.5rem 0.8rem; border-radius: 10px; align-items: center; }
-    .comp-metric-row .mname { font-weight: 600; color: #0f172a; font-size: 0.9rem; }
-    .comp-metric-row input { width: 100%; padding: 0.3rem 0.5rem; border: 1px solid #d1d5db; border-radius: 6px; font-size: 0.9rem; }
-
-    .comp-upload-area { border: 2px dashed #cbd5e1; border-radius: 16px; padding: 1.5rem; text-align: center; margin-bottom: 1rem; background: #f8fafc; }
-    .comp-upload-area .upload-btn { display: inline-block; background: #3b82f6; color: white; padding: 0.5rem 1.5rem; border-radius: 40px; cursor: pointer; font-weight: 600; transition: 0.2s; }
-    .comp-upload-area .upload-btn:hover { background: #2563eb; }
-    .comp-upload-area input[type="file"] { display: none; }
-
-    /* ===== SHARED ===== */
-    .actions { display: flex; flex-wrap: wrap; gap: 0.8rem; margin-top: 1rem; align-items: center; }
-    .btn { padding: 0.7rem 2rem; border: none; border-radius: 40px; font-size: 1rem; font-weight: 700; cursor: pointer; transition: 0.2s; }
+    .slide-actions-bar { display: flex; gap: 1rem; margin-bottom: 1rem; flex-wrap: wrap; align-items: center; }
+    .btn { padding: 0.6rem 1.5rem; border: none; border-radius: 40px; font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: 0.2s; }
     .btn-primary { background: #1e293b; color: white; }
     .btn-primary:hover { background: #0f172a; transform: scale(1.02); }
     .btn-success { background: #10b981; color: white; }
     .btn-success:hover { background: #059669; transform: scale(1.02); }
-    .btn-danger { background: #d32f2f; color: white; }
-    .btn-danger:hover { background: #b71c1c; transform: scale(1.02); }
+    .btn-danger { background: #ef4444; color: white; }
+    .btn-danger:hover { background: #dc2626; transform: scale(1.02); }
     .btn-secondary { background: #64748b; color: white; }
     .btn-secondary:hover { background: #475569; }
-    #status { padding: 0.6rem 1.2rem; border-radius: 12px; background: #f1f5f9; color: #0f172a; font-weight: 500; min-width: 150px; text-align: center; }
+    .btn-warning { background: #f59e0b; color: white; }
+    .btn-warning:hover { background: #d97706; transform: scale(1.02); }
+
+    /* ===== MODAL ===== */
+    .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); z-index: 9999; align-items: center; justify-content: center; }
+    .modal-overlay.open { display: flex; }
+    .modal { background: white; border-radius: 30px; padding: 2rem; max-width: 600px; width: 90%; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+    .modal h2 { margin-bottom: 1.5rem; color: #0f172a; }
+    .modal .close-btn { float: right; background: none; border: none; font-size: 2rem; cursor: pointer; color: #94a3b8; transition: 0.2s; }
+    .modal .close-btn:hover { color: #0f172a; }
+    .modal .form-group { margin-bottom: 1rem; }
+    .modal .form-group label { display: block; font-weight: 600; color: #334155; margin-bottom: 0.3rem; font-size: 0.9rem; }
+    .modal .form-group input, .modal .form-group select { width: 100%; padding: 0.6rem 0.8rem; border: 1.5px solid #cbd5e1; border-radius: 10px; font-size: 1rem; transition: 0.2s; }
+    .modal .form-group input:focus, .modal .form-group select:focus { border-color: #3b82f6; outline: none; box-shadow: 0 0 0 3px rgba(59,130,246,0.2); }
+    .modal .form-group .hint { font-size: 0.8rem; color: #94a3b8; margin-top: 0.2rem; }
+    .modal .form-actions { display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1.5rem; }
+
+    #status { padding: 0.6rem 1.2rem; border-radius: 12px; background: #f1f5f9; color: #0f172a; font-weight: 500; min-width: 150px; text-align: center; margin-top: 1rem; }
+    #status.success { background: #d1fae5; color: #065f46; }
+    #status.error { background: #fee2e2; color: #991b1b; }
+
     .token-hint { font-size: 0.85rem; color: #64748b; margin-top: 0.5rem; background: #f1f5f9; padding: 0.5rem 1rem; border-radius: 10px; }
     .token-hint code { background: #e2e8f0; padding: 0.2rem 0.6rem; border-radius: 4px; }
 
     /* ===== LOGIN OVERLAY ===== */
-    #loginOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15,23,42,0.85); backdrop-filter: blur(12px); display: none; align-items: center; justify-content: center; z-index: 9999; flex-direction: column; gap: 1.5rem; }
+    #loginOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15,23,42,0.85); backdrop-filter: blur(12px); display: none; align-items: center; justify-content: center; z-index: 99999; flex-direction: column; gap: 1.5rem; }
     #loginOverlay.show { display: flex; }
     #loginOverlay .login-box { background: white; padding: 2.5rem 3rem; border-radius: 30px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); max-width: 400px; width: 90%; text-align: center; }
     #loginOverlay .login-box h2 { font-size: 1.8rem; color: #0f172a; margin-bottom: 0.5rem; }
@@ -98,16 +89,14 @@
     #loginOverlay .login-box .btn-login { background: #1e293b; color: white; border: none; padding: 0.8rem 2.5rem; border-radius: 40px; font-size: 1.1rem; font-weight: 600; cursor: pointer; transition: 0.2s; width: 100%; }
     #loginOverlay .login-box .btn-login:hover { background: #0f172a; transform: scale(1.02); }
 
-    /* ===== RESPONSIVE ===== */
     @media (max-width: 768px) {
       body { padding: 1rem; }
-      .sis-grid { grid-template-columns: 1fr; }
-      .comp-grid-3 { grid-template-columns: 1fr; }
-      .comp-centre-grid { grid-template-columns: 1fr; }
-      .comp-metric-row { grid-template-columns: 1fr 1fr 1fr; gap: 0.3rem; }
       .tab-btn { padding: 0.4rem 1rem; font-size: 0.9rem; }
       .card { padding: 1rem; }
-      .sis-portal textarea { height: 120px; }
+      .modal { padding: 1.5rem; }
+      .slide-item { flex-wrap: wrap; }
+      .slide-item .slide-actions { margin-left: auto; }
+      .slide-actions-bar { flex-direction: column; align-items: stretch; }
     }
   </style>
 </head>
@@ -127,88 +116,89 @@
 <!-- ===== MAIN ADMIN CONTENT ===== -->
 <div id="adminContent">
   <h1>📊 Unified Admin</h1>
-  <p class="sub">Manage Leaderboard (SIS) &amp; Comparison (TP/WNS) data</p>
+  <p class="sub">Manage Leaderboard, Comparison, and Slides</p>
 
   <!-- Tabs -->
   <div class="tabs" id="tabHeaders">
     <button class="tab-btn active" data-tab="tab-leaderboard">🏆 Leaderboard</button>
     <button class="tab-btn" data-tab="tab-comparison">📊 Comparison</button>
+    <button class="tab-btn" data-tab="tab-slides">📋 Slides</button>
   </div>
 
   <!-- ===== TAB 1: LEADERBOARD (SIS) ===== -->
   <div class="tab-content active" id="tab-leaderboard">
+    <!-- Same as before – full SIS admin -->
     <div class="card">
       <h2>📋 Update SIS Data</h2>
-      <div class="sis-date-section">
-        <label>📅 Week Start <input type="date" id="sisWeekStart" /></label>
-        <label>📅 Week End <input type="date" id="sisWeekEnd" /></label>
+      <div class="sis-date-section" style="display:flex;flex-wrap:wrap;gap:1.5rem;align-items:center;padding:0.8rem 1.2rem;background:#f5f8fe;border-radius:12px;border:1px solid #e9edf4;margin-bottom:1rem;">
+        <label>📅 Week Start <input type="date" id="sisWeekStart" style="padding:0.3rem 0.8rem;border:1px solid #d0d7e2;border-radius:8px;font-size:0.9rem;background:#fff;" /></label>
+        <label>📅 Week End <input type="date" id="sisWeekEnd" style="padding:0.3rem 0.8rem;border:1px solid #d0d7e2;border-radius:8px;font-size:0.9rem;background:#fff;" /></label>
       </div>
-      <div class="sis-alert-section">
-        <span class="alert-label">🔔 Alerts</span>
+      <div style="display:flex;flex-wrap:wrap;gap:1.5rem 2.5rem;align-items:center;padding:0.8rem 1.2rem;background:#f5f8fe;border-radius:12px;border:1px solid #e9edf4;margin-bottom:1rem;">
+        <span style="font-weight:600;color:#0b1a33;font-size:0.9rem;">🔔 Alerts</span>
         <label><input type="checkbox" id="sisAlertFlash" checked /> 💡 100% Flash</label>
         <label><input type="checkbox" id="sisAlertPopup" checked /> 🔥 New #1 Pop‑up</label>
         <label><input type="checkbox" id="sisAlertBanner" checked /> 🎉 Milestone Banner</label>
       </div>
-      <div class="sis-grid">
-        <div class="sis-portal">
-          <div class="portal-title">🏆 Top Performing Teams <span class="badge">Teams</span></div>
-          <div class="portal-sub">Paste team data: <code>Name, SIS%</code> (tab-separated OR alternating lines)</div>
-          <textarea id="sisTeamsInput" spellcheck="false"></textarea>
-          <div class="file-upload-row">
-            <input type="file" id="sisTeamsFileInput" accept=".txt,.csv,.tsv" />
-            <span class="file-hint">Upload .txt / .csv / .tsv</span>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;">
+        <div style="background:#fafcff;border:1px solid #e9edf4;border-radius:14px;padding:1.2rem;">
+          <div style="font-weight:700;font-size:1.1rem;color:#0b1a33;margin-bottom:0.3rem;display:flex;align-items:center;gap:0.5rem;">🏆 Top Performing Teams <span style="font-size:0.65rem;background:#e9edf4;padding:0.1rem 0.6rem;border-radius:20px;color:#6b7f96;">Teams</span></div>
+          <div style="font-size:0.8rem;color:#6b7f96;margin-bottom:0.6rem;">Paste team data: <code>Name, SIS%</code> (tab-separated OR alternating lines)</div>
+          <textarea id="sisTeamsInput" spellcheck="false" style="width:100%;height:200px;padding:0.8rem;border:1px solid #d0d7e2;border-radius:10px;font-family:'Courier New',monospace;font-size:0.8rem;resize:vertical;background:#fff;"></textarea>
+          <div style="display:flex;gap:0.6rem;margin-top:0.4rem;align-items:center;flex-wrap:wrap;">
+            <input type="file" id="sisTeamsFileInput" accept=".txt,.csv,.tsv" style="font-size:0.75rem;padding:0.2rem 0.4rem;background:#fff;border:1px solid #d0d7e2;border-radius:6px;" />
           </div>
-          <div class="portal-actions">
-            <button class="btn-sm" id="sisPreviewTeamsBtn">👁 Preview Teams</button>
-            <button class="btn-sm green" id="sisResetTeamsBtn">↺ Reset Teams</button>
+          <div style="display:flex;gap:0.6rem;margin-top:0.5rem;flex-wrap:wrap;">
+            <button class="btn btn-secondary" id="sisPreviewTeamsBtn" style="padding:0.3rem 1.2rem;font-size:0.75rem;">👁 Preview Teams</button>
+            <button class="btn btn-warning" id="sisResetTeamsBtn" style="padding:0.3rem 1.2rem;font-size:0.75rem;">↺ Reset Teams</button>
           </div>
-          <div class="portal-status" id="sisTeamsStatus"></div>
+          <div id="sisTeamsStatus" style="font-size:0.8rem;margin-top:0.4rem;padding:0.3rem 0.6rem;border-radius:6px;display:none;"></div>
         </div>
-        <div class="sis-portal">
-          <div class="portal-title">⭐ Top Performing Agents <span class="badge">Agents</span></div>
-          <div class="portal-sub">Paste agent data: <code>Name, SIS%</code> (tab-separated OR alternating lines)</div>
-          <textarea id="sisAgentsInput" spellcheck="false"></textarea>
-          <div class="file-upload-row">
-            <input type="file" id="sisAgentsFileInput" accept=".txt,.csv,.tsv" />
-            <span class="file-hint">Upload .txt / .csv / .tsv</span>
+        <div style="background:#fafcff;border:1px solid #e9edf4;border-radius:14px;padding:1.2rem;">
+          <div style="font-weight:700;font-size:1.1rem;color:#0b1a33;margin-bottom:0.3rem;display:flex;align-items:center;gap:0.5rem;">⭐ Top Performing Agents <span style="font-size:0.65rem;background:#e9edf4;padding:0.1rem 0.6rem;border-radius:20px;color:#6b7f96;">Agents</span></div>
+          <div style="font-size:0.8rem;color:#6b7f96;margin-bottom:0.6rem;">Paste agent data: <code>Name, SIS%</code> (tab-separated OR alternating lines)</div>
+          <textarea id="sisAgentsInput" spellcheck="false" style="width:100%;height:200px;padding:0.8rem;border:1px solid #d0d7e2;border-radius:10px;font-family:'Courier New',monospace;font-size:0.8rem;resize:vertical;background:#fff;"></textarea>
+          <div style="display:flex;gap:0.6rem;margin-top:0.4rem;align-items:center;flex-wrap:wrap;">
+            <input type="file" id="sisAgentsFileInput" accept=".txt,.csv,.tsv" style="font-size:0.75rem;padding:0.2rem 0.4rem;background:#fff;border:1px solid #d0d7e2;border-radius:6px;" />
           </div>
-          <div class="portal-actions">
-            <button class="btn-sm" id="sisPreviewAgentsBtn">👁 Preview Agents</button>
-            <button class="btn-sm green" id="sisResetAgentsBtn">↺ Reset Agents</button>
+          <div style="display:flex;gap:0.6rem;margin-top:0.5rem;flex-wrap:wrap;">
+            <button class="btn btn-secondary" id="sisPreviewAgentsBtn" style="padding:0.3rem 1.2rem;font-size:0.75rem;">👁 Preview Agents</button>
+            <button class="btn btn-warning" id="sisResetAgentsBtn" style="padding:0.3rem 1.2rem;font-size:0.75rem;">↺ Reset Agents</button>
           </div>
-          <div class="portal-status" id="sisAgentsStatus"></div>
+          <div id="sisAgentsStatus" style="font-size:0.8rem;margin-top:0.4rem;padding:0.3rem 0.6rem;border-radius:6px;display:none;"></div>
         </div>
       </div>
-      <div class="actions">
+      <div style="display:flex;flex-wrap:wrap;gap:0.8rem;margin-top:1rem;align-items:center;">
         <button class="btn btn-success" id="sisPublishBtn">🚀 Publish Leaderboard</button>
         <button class="btn btn-secondary" id="sisLoadBtn">📥 Load from data/leaderboard.json</button>
-        <span id="sisStatus">Ready</span>
+        <span id="sisStatus" style="padding:0.6rem 1.2rem;border-radius:12px;background:#f1f5f9;color:#0f172a;font-weight:500;min-width:150px;text-align:center;">Ready</span>
       </div>
     </div>
   </div>
 
   <!-- ===== TAB 2: COMPARISON (TP/WNS) ===== -->
   <div class="tab-content" id="tab-comparison">
+    <!-- Same as before – full TP/WNS admin -->
     <div class="card">
       <h2>📂 Upload Excel / CSV</h2>
-      <div class="comp-upload-area" id="compUploadArea">
+      <div style="border:2px dashed #cbd5e1;border-radius:16px;padding:1.5rem;text-align:center;margin-bottom:1rem;background:#f8fafc;">
         <p style="margin-bottom:0.8rem;font-weight:500;">Drag &amp; drop your file here, or click to browse</p>
-        <label class="upload-btn" for="compFileInput">📎 Choose File</label>
-        <input type="file" id="compFileInput" accept=".xlsx,.xls,.csv" />
-        <div class="file-name" id="compFileName">No file selected</div>
-        <div class="preview-table" id="compPreviewTable" style="display:none;margin-top:1rem;overflow-x:auto;"></div>
+        <label style="display:inline-block;background:#3b82f6;color:white;padding:0.5rem 1.5rem;border-radius:40px;cursor:pointer;font-weight:600;transition:0.2s;">📎 Choose File</label>
+        <input type="file" id="compFileInput" accept=".xlsx,.xls,.csv" style="display:none;" />
+        <div id="compFileName" style="margin-top:0.5rem;color:#475569;">No file selected</div>
+        <div id="compPreviewTable" style="display:none;margin-top:1rem;overflow-x:auto;"></div>
         <button class="btn btn-secondary" id="compApplyFileBtn" style="margin-top:1rem;display:none;">📥 Apply Data</button>
       </div>
     </div>
 
     <div class="card">
       <h2>🎯 Global Targets</h2>
-      <div class="comp-grid-3" id="compTargetsContainer"></div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;" id="compTargetsContainer"></div>
     </div>
 
     <div class="card">
       <h2>🏢 Centre Data</h2>
-      <div class="comp-centre-grid" id="compCentresContainer"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:2rem;" id="compCentresContainer"></div>
     </div>
 
     <div class="card">
@@ -220,10 +210,29 @@
     </div>
 
     <div class="card">
-      <div class="actions">
+      <div style="display:flex;flex-wrap:wrap;gap:0.8rem;margin-top:1rem;align-items:center;">
         <button class="btn btn-success" id="compPublishBtn">🚀 Publish Comparison</button>
         <button class="btn btn-secondary" id="compLoadBtn">📥 Load from data/comparison.json</button>
-        <span id="compStatus">Ready</span>
+        <span id="compStatus" style="padding:0.6rem 1.2rem;border-radius:12px;background:#f1f5f9;color:#0f172a;font-weight:500;min-width:150px;text-align:center;">Ready</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== TAB 3: SLIDES ===== -->
+  <div class="tab-content" id="tab-slides">
+    <div class="card">
+      <h2>📋 Slide Manager</h2>
+      <p style="color:#64748b;margin-bottom:1rem;">Add, edit, delete, or reorder slides. Changes are saved to <code>slides-config.json</code>.</p>
+
+      <div class="slide-actions-bar">
+        <button class="btn btn-primary" id="addSlideBtn">➕ Add Slide</button>
+        <button class="btn btn-success" id="saveSlidesBtn">💾 Save to GitHub</button>
+        <button class="btn btn-secondary" id="loadSlidesBtn">📥 Load Config</button>
+        <span id="slidesStatus" style="padding:0.3rem 1rem;border-radius:12px;background:#f1f5f9;color:#64748b;font-weight:500;font-size:0.9rem;">Ready</span>
+      </div>
+
+      <div class="slide-list" id="slideListContainer">
+        <p style="color:#94a3b8;text-align:center;padding:2rem;">Loading slides...</p>
       </div>
     </div>
   </div>
@@ -240,12 +249,80 @@
   </div>
 </div>
 
+<!-- ===== MODAL: Add/Edit Slide ===== -->
+<div class="modal-overlay" id="slideModal">
+  <div class="modal">
+    <button class="close-btn" id="modalCloseBtn">&times;</button>
+    <h2 id="modalTitle">Add Slide</h2>
+    <input type="hidden" id="slideEditIndex" value="-1" />
+
+    <div class="form-group">
+      <label for="slideType">Slide Type</label>
+      <select id="slideType">
+        <option value="title">Title (Background Image)</option>
+        <option value="data-image">Data Image (Background Image)</option>
+        <option value="table">Table (Data from JSON)</option>
+        <option value="comparison-detail">Comparison Detail (Metric)</option>
+        <option value="summary">Summary Report</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="slideName">Slide Name (for admin list)</label>
+      <input type="text" id="slideName" placeholder="e.g., Top Performing Agents – SIS" />
+    </div>
+
+    <!-- Table-specific fields -->
+    <div id="tableFields" style="display:none;">
+      <div class="form-group">
+        <label for="slideDataSource">Data Source</label>
+        <select id="slideDataSource">
+          <option value="leaderboard.json">leaderboard.json</option>
+          <option value="comparison.json">comparison.json</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="slideDataType">Data Type</label>
+        <input type="text" id="slideDataType" placeholder="e.g., agents, teams, branches" />
+        <div class="hint">The key in the JSON file (e.g., "agents", "teams")</div>
+      </div>
+      <div class="form-group">
+        <label for="slideTableTitle">Table Title</label>
+        <input type="text" id="slideTableTitle" placeholder="e.g., Top Performing Agents – SIS" />
+      </div>
+    </div>
+
+    <!-- Comparison-specific fields -->
+    <div id="comparisonFields" style="display:none;">
+      <div class="form-group">
+        <label for="slideMetric">Metric Name</label>
+        <input type="text" id="slideMetric" placeholder="e.g., SIS, IFSR, CHT" />
+        <div class="hint">Must match a key in the JSON's "targets" object</div>
+      </div>
+    </div>
+
+    <!-- Title/Data-image fields -->
+    <div id="bgFields" style="display:none;">
+      <div class="form-group">
+        <label for="slideBg">Background Image Path</label>
+        <input type="text" id="slideBg" placeholder="e.g., assets/slides/slide-title.webp.jpg" />
+        <div class="hint">Path to the background image</div>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button class="btn btn-secondary" id="modalCancelBtn">Cancel</button>
+      <button class="btn btn-primary" id="modalSaveBtn">Save Slide</button>
+    </div>
+  </div>
+</div>
+
 <script>
   // ============================================================
-  // UNIFIED ADMIN – LOGIN + TABS + BOTH SECTIONS
+  // UNIFIED ADMIN – LOGIN + TABS + ALL SECTIONS + SLIDE MANAGER
   // ============================================================
 
-  const ADMIN_PIN = '1234'; // Change this to your own PIN
+  const ADMIN_PIN = '1234';
 
   // ---- Auto-detect repo ----
   let REPO_OWNER = 'YOUR_USERNAME';
@@ -279,9 +356,9 @@
       error.textContent = '';
       document.getElementById('loginOverlay').classList.remove('show');
       document.getElementById('adminContent').style.display = 'block';
-      // Load both sections
       loadLeaderboard();
       loadComparison();
+      loadSlides();
     } else {
       error.textContent = '❌ Incorrect PIN. Try again.';
       input.value = '';
@@ -310,6 +387,7 @@
       this.classList.add('active');
       document.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active'));
       document.getElementById(this.dataset.tab).classList.add('active');
+      if (this.dataset.tab === 'tab-slides') loadSlides();
     });
   });
 
@@ -323,30 +401,19 @@
   document.getElementById('globalToken').addEventListener('change', function() {
     if (this.value.trim()) localStorage.setItem('unified_github_token', this.value.trim());
   });
-  // Load saved token
   const savedToken = localStorage.getItem('unified_github_token');
   if (savedToken) document.getElementById('globalToken').value = savedToken;
 
-  // ============================================================
-  // HELPERS
-  // ============================================================
   function setStatus(id, msg, isError = false) {
     const el = document.getElementById(id);
     el.textContent = msg;
     el.style.color = isError ? '#dc2626' : '#0f172a';
-  }
-
-  function showPortalStatus(id, msg, type) {
-    const el = document.getElementById(id);
-    el.textContent = msg;
-    el.className = 'portal-status ' + type;
+    el.className = isError ? 'error' : 'success';
   }
 
   // ============================================================
-  // SECTION 1: LEADERBOARD (SIS)
+  // LEADERBOARD (SIS)
   // ============================================================
-
-  // ---- SIS helpers ----
   function sisSetCurrentWeek() {
     const now = new Date();
     const day = now.getDay();
@@ -361,7 +428,6 @@
   }
   sisSetCurrentWeek();
 
-  // ---- SIS smart parser ----
   function sisParseData(text) {
     const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
     if (lines.length === 0) return [];
@@ -399,7 +465,6 @@
       return rows;
     }
 
-    // Alternating
     const pairs = [];
     let i = 0;
     while (i < lines.length) {
@@ -420,7 +485,6 @@
     return pairs;
   }
 
-  // ---- SIS load ----
   async function loadLeaderboard() {
     try {
       const res = await fetch('data/leaderboard.json');
@@ -430,13 +494,11 @@
       setStatus('sisStatus', '✅ Loaded leaderboard.json');
     } catch(e) {
       setStatus('sisStatus', '⚠️ Could not load leaderboard.json, using samples.', true);
-      // Set sample data
       document.getElementById('sisTeamsInput').value = 'Sinazo Nogaga\t88.18%\nZintle Daba\t87.14%';
       document.getElementById('sisAgentsInput').value = 'Abdul Abrahams\t100.00%\nStone Jade\t100.00%';
     }
   }
 
-  // ---- SIS publish ----
   async function sisPublish() {
     const token = getToken();
     if (!token) { setStatus('sisStatus', '❌ Please enter a GitHub token.', true); return; }
@@ -468,7 +530,6 @@
 
     const url = `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/data/leaderboard.json`;
     try {
-      // Get current SHA
       let sha = '';
       try {
         const getRes = await fetch(url);
@@ -497,8 +558,6 @@
 
       if (res.ok) {
         setStatus('sisStatus', '✅ Leaderboard published successfully!');
-        showPortalStatus('sisTeamsStatus', '✅ Published!', 'success');
-        showPortalStatus('sisAgentsStatus', '✅ Published!', 'success');
       } else {
         const err = await res.json();
         setStatus('sisStatus', `❌ Publish failed: ${err.message}`, true);
@@ -508,27 +567,29 @@
     }
   }
 
-  // ---- SIS UI events ----
   document.getElementById('sisLoadBtn').addEventListener('click', loadLeaderboard);
   document.getElementById('sisPublishBtn').addEventListener('click', sisPublish);
-
   document.getElementById('sisResetTeamsBtn').addEventListener('click', () => {
     document.getElementById('sisTeamsInput').value = 'Sinazo Nogaga\t88.18%\nZintle Daba\t87.14%';
-    showPortalStatus('sisTeamsStatus', '↺ Reset to sample', 'success');
   });
   document.getElementById('sisResetAgentsBtn').addEventListener('click', () => {
     document.getElementById('sisAgentsInput').value = 'Abdul Abrahams\t100.00%\nStone Jade\t100.00%';
-    showPortalStatus('sisAgentsStatus', '↺ Reset to sample', 'success');
+  });
+  document.getElementById('sisPreviewTeamsBtn').addEventListener('click', () => {
+    const data = sisParseData(document.getElementById('sisTeamsInput').value);
+    alert(`👁 ${data.length} teams parsed`);
+  });
+  document.getElementById('sisPreviewAgentsBtn').addEventListener('click', () => {
+    const data = sisParseData(document.getElementById('sisAgentsInput').value);
+    alert(`👁 ${data.length} agents parsed`);
   });
 
-  // File upload for SIS
   document.getElementById('sisTeamsFileInput').addEventListener('change', function(e) {
     const file = e.target.files[0];
     if (!file) return;
     const reader = new FileReader();
     reader.onload = function(ev) {
       document.getElementById('sisTeamsInput').value = ev.target.result;
-      showPortalStatus('sisTeamsStatus', '📎 File loaded!', 'success');
     };
     reader.readAsText(file);
   });
@@ -538,28 +599,15 @@
     const reader = new FileReader();
     reader.onload = function(ev) {
       document.getElementById('sisAgentsInput').value = ev.target.result;
-      showPortalStatus('sisAgentsStatus', '📎 File loaded!', 'success');
     };
     reader.readAsText(file);
   });
 
-  // Preview buttons (just show count)
-  document.getElementById('sisPreviewTeamsBtn').addEventListener('click', () => {
-    const data = sisParseData(document.getElementById('sisTeamsInput').value);
-    showPortalStatus('sisTeamsStatus', `👁 ${data.length} teams parsed`, data.length > 0 ? 'success' : 'error');
-  });
-  document.getElementById('sisPreviewAgentsBtn').addEventListener('click', () => {
-    const data = sisParseData(document.getElementById('sisAgentsInput').value);
-    showPortalStatus('sisAgentsStatus', `👁 ${data.length} agents parsed`, data.length > 0 ? 'success' : 'error');
-  });
-
   // ============================================================
-  // SECTION 2: COMPARISON (TP/WNS)
+  // COMPARISON (TP/WNS)
   // ============================================================
-
   let compCurrentData = null;
 
-  // ---- Build comparison forms ----
   function compBuildForms(data) {
     compCurrentData = data;
     const targets = data.targets;
@@ -568,7 +616,10 @@
     ['SIS', 'IFSR', 'CHT'].forEach(key => {
       const div = document.createElement('div');
       div.className = 'comp-field-group';
-      div.innerHTML = `<label for="comp-target-${key}">${key} Target</label><input type="number" step="0.01" id="comp-target-${key}" value="${targets[key]}" />`;
+      div.style.display = 'flex';
+      div.style.flexDirection = 'column';
+      div.style.gap = '0.3rem';
+      div.innerHTML = `<label for="comp-target-${key}" style="font-weight:600;font-size:0.9rem;color:#334155;">${key} Target</label><input type="number" step="0.01" id="comp-target-${key}" value="${targets[key]}" style="padding:0.6rem 0.8rem;border:1.5px solid #cbd5e1;border-radius:10px;font-size:1rem;width:100%;" />`;
       container.appendChild(div);
     });
 
@@ -577,16 +628,28 @@
     data.centres.forEach(centre => {
       const box = document.createElement('div');
       box.className = `comp-centre-box ${centre.name.toLowerCase() === 'wns' ? 'wns' : ''}`;
+      box.style.background = '#f8fafc';
+      box.style.borderRadius = '16px';
+      box.style.padding = '1.2rem 1.5rem';
+      box.style.borderLeft = `6px solid ${centre.colour}`;
       const colourDot = `<span style="display:inline-block;width:14px;height:14px;border-radius:50%;background:${centre.colour};margin-right:6px;"></span>`;
-      box.innerHTML = `<h3>${colourDot} ${centre.name}</h3>`;
+      box.innerHTML = `<h3 style="font-size:1.2rem;margin-bottom:0.8rem;display:flex;align-items:center;gap:0.5rem;">${colourDot} ${centre.name}</h3>`;
       ['SIS', 'IFSR', 'CHT'].forEach(metric => {
         const row = document.createElement('div');
         row.className = 'comp-metric-row';
+        row.style.display = 'grid';
+        row.style.gridTemplateColumns = '1fr 1fr 1fr';
+        row.style.gap = '0.8rem';
+        row.style.marginBottom = '0.6rem';
+        row.style.background = 'white';
+        row.style.padding = '0.5rem 0.8rem';
+        row.style.borderRadius = '10px';
+        row.style.alignItems = 'center';
         const val = centre.metrics[metric];
         row.innerHTML = `
-          <span class="mname">${metric}</span>
-          <input type="number" step="0.01" id="comp-${centre.name}-${metric}-current" value="${val.current}" placeholder="Current" />
-          <input type="number" step="0.01" id="comp-${centre.name}-${metric}-previous" value="${val.previous}" placeholder="Previous" />
+          <span style="font-weight:600;color:#0f172a;font-size:0.9rem;">${metric}</span>
+          <input type="number" step="0.01" id="comp-${centre.name}-${metric}-current" value="${val.current}" placeholder="Current" style="width:100%;padding:0.3rem 0.5rem;border:1px solid #d1d5db;border-radius:6px;font-size:0.9rem;" />
+          <input type="number" step="0.01" id="comp-${centre.name}-${metric}-previous" value="${val.previous}" placeholder="Previous" style="width:100%;padding:0.3rem 0.5rem;border:1px solid #d1d5db;border-radius:6px;font-size:0.9rem;" />
         `;
         box.appendChild(row);
       });
@@ -594,7 +657,6 @@
     });
   }
 
-  // ---- Collect comparison data ----
   function compCollectData() {
     const targets = {};
     ['SIS', 'IFSR', 'CHT'].forEach(key => {
@@ -633,7 +695,6 @@
     return { targets, centres, lastUpdated: new Date().toISOString(), lastUpdatedBy: 'admin' };
   }
 
-  // ---- Load comparison ----
   async function loadComparison() {
     try {
       const res = await fetch('data/comparison.json');
@@ -653,7 +714,6 @@
     }
   }
 
-  // ---- Publish comparison ----
   async function compPublish() {
     const token = getToken();
     if (!token) { setStatus('compStatus', '❌ Please enter a GitHub token.', true); return; }
@@ -699,11 +759,9 @@
     }
   }
 
-  // ---- Comparison UI events ----
   document.getElementById('compLoadBtn').addEventListener('click', loadComparison);
   document.getElementById('compPublishBtn').addEventListener('click', compPublish);
 
-  // ---- Comparison file upload ----
   document.getElementById('compFileInput').addEventListener('change', function(e) {
     const file = e.target.files[0];
     if (!file) return;
@@ -715,19 +773,18 @@
         const sheet = workbook.Sheets[workbook.SheetNames[0]];
         const json = XLSX.utils.sheet_to_json(sheet);
         document.getElementById('compPreviewTable').style.display = 'block';
-        let html = '<table><thead><tr>';
+        let html = '<table style="width:100%;border-collapse:collapse;font-size:0.9rem;"><thead><tr>';
         if (json.length > 0) {
-          Object.keys(json[0]).forEach(k => html += `<th>${k}</th>`);
+          Object.keys(json[0]).forEach(k => html += `<th style="border:1px solid #e2e8f0;padding:0.4rem 0.6rem;background:#f1f5f9;font-weight:600;">${k}</th>`);
           html += '</tr></thead><tbody>';
           json.slice(0, 5).forEach(row => {
             html += '<tr>';
-            Object.values(row).forEach(v => html += `<td>${v}</td>`);
+            Object.values(row).forEach(v => html += `<td style="border:1px solid #e2e8f0;padding:0.4rem 0.6rem;">${v}</td>`);
             html += '</tr>';
           });
           html += '</tbody></table>';
           document.getElementById('compPreviewTable').innerHTML = html;
           document.getElementById('compApplyFileBtn').style.display = 'inline-block';
-          // Store for apply
           window._compUploadedData = json;
         }
       } catch(e) {
@@ -740,9 +797,7 @@
   document.getElementById('compApplyFileBtn').addEventListener('click', function() {
     const data = window._compUploadedData;
     if (!data || data.length === 0) return;
-    // Try to map columns to centres/metrics
     const headers = Object.keys(data[0]);
-    // Simple heuristic: find columns with TP, WNS, SIS, IFSR, CHT
     const centres = ['TP', 'WNS'];
     const metrics = ['SIS', 'IFSR', 'CHT'];
     let found = 0;
@@ -766,7 +821,6 @@
     }
   });
 
-  // ---- Preview & Export (stubs) ----
   document.getElementById('compPreviewBtn').addEventListener('click', function() {
     const data = compCollectData();
     alert('📊 Preview:\n' + JSON.stringify(data, null, 2));
@@ -780,11 +834,287 @@
   });
 
   // ============================================================
+  // SLIDE MANAGER
+  // ============================================================
+
+  let slideConfig = null;
+  let slideConfigSha = '';
+
+  async function loadSlides() {
+    try {
+      const res = await fetch('slides-config.json?t=' + Date.now());
+      if (res.ok) {
+        slideConfig = await res.json();
+        // Try to get SHA for saving
+        try {
+          const shaRes = await fetch('slides-config.json');
+          const data = await shaRes.json();
+          slideConfigSha = data.sha || '';
+        } catch(e) {}
+      } else {
+        // Default config if file doesn't exist
+        slideConfig = {
+          slides: [
+            { id: 0, type: 'title', name: 'SIS Title', bg: 'assets/slides/slide-title.webp.jpg' },
+            { id: 1, type: 'data-image', name: 'SIS Data Image', bg: 'assets/slides/slide-data.webp.jpg' },
+            { id: 2, type: 'table', name: 'Agents – SIS', dataSource: 'leaderboard.json', dataType: 'agents', title: 'Top Performing Agents – SIS' },
+            { id: 3, type: 'table', name: 'Teams – SIS', dataSource: 'leaderboard.json', dataType: 'teams', title: 'Top Performing Teams – SIS' },
+            { id: 4, type: 'comparison-detail', name: 'SIS Detail', dataSource: 'comparison.json', metric: 'SIS' },
+            { id: 5, type: 'comparison-detail', name: 'IFSR Detail', dataSource: 'comparison.json', metric: 'IFSR' },
+            { id: 6, type: 'comparison-detail', name: 'CHT Detail', dataSource: 'comparison.json', metric: 'CHT' },
+            { id: 7, type: 'summary', name: 'Summary Report', dataSource: 'comparison.json' }
+          ]
+        };
+        slideConfigSha = '';
+      }
+      renderSlideList();
+      setStatus('slidesStatus', '✅ Slides loaded');
+    } catch(e) {
+      setStatus('slidesStatus', '❌ Failed to load slides config', true);
+    }
+  }
+
+  function renderSlideList() {
+    const container = document.getElementById('slideListContainer');
+    if (!slideConfig || !slideConfig.slides || slideConfig.slides.length === 0) {
+      container.innerHTML = '<p style="color:#94a3b8;text-align:center;padding:2rem;">No slides configured. Add one!</p>';
+      return;
+    }
+
+    const typeLabels = {
+      'title': '🖼️ Title',
+      'data-image': '🖼️ Data Image',
+      'table': '📊 Table',
+      'comparison-detail': '📈 Comparison Detail',
+      'summary': '📋 Summary'
+    };
+
+    let html = '';
+    slideConfig.slides.forEach((slide, idx) => {
+      const typeClass = slide.type || 'unknown';
+      const typeLabel = typeLabels[slide.type] || slide.type;
+      const name = slide.name || slide.title || slide.metric || 'Unnamed';
+      html += `
+        <div class="slide-item">
+          <span class="slide-index">${idx + 1}.</span>
+          <span class="slide-type ${typeClass}">${typeLabel}</span>
+          <span class="slide-name">${name}</span>
+          <div class="slide-actions">
+            <button class="move-up" data-idx="${idx}" title="Move Up">↑</button>
+            <button class="move-down" data-idx="${idx}" title="Move Down">↓</button>
+            <button class="edit" data-idx="${idx}" title="Edit">✏️</button>
+            <button class="delete" data-idx="${idx}" title="Delete">✕</button>
+          </div>
+        </div>
+      `;
+    });
+
+    container.innerHTML = html;
+
+    // Event listeners
+    container.querySelectorAll('.move-up').forEach(btn => {
+      btn.addEventListener('click', function() {
+        const idx = parseInt(this.dataset.idx);
+        if (idx > 0) {
+          const temp = slideConfig.slides[idx];
+          slideConfig.slides[idx] = slideConfig.slides[idx - 1];
+          slideConfig.slides[idx - 1] = temp;
+          // Update IDs
+          slideConfig.slides.forEach((s, i) => s.id = i);
+          renderSlideList();
+          setStatus('slidesStatus', '🔄 Slides reordered (not saved yet)');
+        }
+      });
+    });
+
+    container.querySelectorAll('.move-down').forEach(btn => {
+      btn.addEventListener('click', function() {
+        const idx = parseInt(this.dataset.idx);
+        if (idx < slideConfig.slides.length - 1) {
+          const temp = slideConfig.slides[idx];
+          slideConfig.slides[idx] = slideConfig.slides[idx + 1];
+          slideConfig.slides[idx + 1] = temp;
+          slideConfig.slides.forEach((s, i) => s.id = i);
+          renderSlideList();
+          setStatus('slidesStatus', '🔄 Slides reordered (not saved yet)');
+        }
+      });
+    });
+
+    container.querySelectorAll('.delete').forEach(btn => {
+      btn.addEventListener('click', function() {
+        const idx = parseInt(this.dataset.idx);
+        if (confirm(`Delete slide "${slideConfig.slides[idx].name || slideConfig.slides[idx].title || 'Untitled'}"?`)) {
+          slideConfig.slides.splice(idx, 1);
+          slideConfig.slides.forEach((s, i) => s.id = i);
+          renderSlideList();
+          setStatus('slidesStatus', '🗑️ Slide deleted (not saved yet)');
+        }
+      });
+    });
+
+    container.querySelectorAll('.edit').forEach(btn => {
+      btn.addEventListener('click', function() {
+        const idx = parseInt(this.dataset.idx);
+        openEditModal(idx);
+      });
+    });
+  }
+
+  // ---- Modal ----
+  const modal = document.getElementById('slideModal');
+  const modalTitle = document.getElementById('modalTitle');
+  const slideEditIndex = document.getElementById('slideEditIndex');
+
+  function openEditModal(idx) {
+    const slide = slideConfig.slides[idx];
+    if (!slide) return;
+    slideEditIndex.value = idx;
+    modalTitle.textContent = 'Edit Slide';
+
+    document.getElementById('slideType').value = slide.type || 'title';
+    document.getElementById('slideName').value = slide.name || '';
+
+    // Show/hide fields
+    toggleFields(slide.type || 'title');
+
+    // Fill specific fields
+    if (slide.type === 'table') {
+      document.getElementById('slideDataSource').value = slide.dataSource || 'leaderboard.json';
+      document.getElementById('slideDataType').value = slide.dataType || '';
+      document.getElementById('slideTableTitle').value = slide.title || '';
+    } else if (slide.type === 'comparison-detail') {
+      document.getElementById('slideMetric').value = slide.metric || '';
+    } else if (slide.type === 'title' || slide.type === 'data-image') {
+      document.getElementById('slideBg').value = slide.bg || '';
+    }
+
+    modal.classList.add('open');
+  }
+
+  function openAddModal() {
+    slideEditIndex.value = -1;
+    modalTitle.textContent = 'Add Slide';
+
+    document.getElementById('slideType').value = 'title';
+    document.getElementById('slideName').value = '';
+    document.getElementById('slideDataSource').value = 'leaderboard.json';
+    document.getElementById('slideDataType').value = '';
+    document.getElementById('slideTableTitle').value = '';
+    document.getElementById('slideMetric').value = '';
+    document.getElementById('slideBg').value = '';
+
+    toggleFields('title');
+    modal.classList.add('open');
+  }
+
+  function toggleFields(type) {
+    document.getElementById('tableFields').style.display = type === 'table' ? 'block' : 'none';
+    document.getElementById('comparisonFields').style.display = type === 'comparison-detail' ? 'block' : 'none';
+    document.getElementById('bgFields').style.display = (type === 'title' || type === 'data-image') ? 'block' : 'none';
+  }
+
+  document.getElementById('slideType').addEventListener('change', function() {
+    toggleFields(this.value);
+  });
+
+  function closeModal() {
+    modal.classList.remove('open');
+  }
+
+  document.getElementById('modalCloseBtn').addEventListener('click', closeModal);
+  document.getElementById('modalCancelBtn').addEventListener('click', closeModal);
+  modal.addEventListener('click', function(e) {
+    if (e.target === this) closeModal();
+  });
+
+  document.getElementById('modalSaveBtn').addEventListener('click', function() {
+    const idx = parseInt(slideEditIndex.value);
+    const type = document.getElementById('slideType').value;
+    const name = document.getElementById('slideName').value.trim() || 'Unnamed';
+
+    const newSlide = { id: idx >= 0 ? idx : slideConfig.slides.length, type, name };
+
+    if (type === 'table') {
+      newSlide.dataSource = document.getElementById('slideDataSource').value;
+      newSlide.dataType = document.getElementById('slideDataType').value.trim();
+      newSlide.title = document.getElementById('slideTableTitle').value.trim() || 'Table';
+    } else if (type === 'comparison-detail') {
+      newSlide.dataSource = 'comparison.json';
+      newSlide.metric = document.getElementById('slideMetric').value.trim();
+      if (!newSlide.metric) { alert('Please enter a metric name (e.g., SIS, IFSR, CHT)'); return; }
+    } else if (type === 'title' || type === 'data-image') {
+      newSlide.bg = document.getElementById('slideBg').value.trim() || 'assets/slides/default.jpg';
+    } else if (type === 'summary') {
+      newSlide.dataSource = 'comparison.json';
+    }
+
+    if (idx >= 0 && idx < slideConfig.slides.length) {
+      // Edit existing
+      slideConfig.slides[idx] = newSlide;
+    } else {
+      // Add new
+      slideConfig.slides.push(newSlide);
+    }
+    slideConfig.slides.forEach((s, i) => s.id = i);
+
+    renderSlideList();
+    closeModal();
+    setStatus('slidesStatus', '✅ Slide saved (publish to GitHub to apply)');
+  });
+
+  document.getElementById('addSlideBtn').addEventListener('click', openAddModal);
+
+  // ---- Save slides to GitHub ----
+  document.getElementById('saveSlidesBtn').addEventListener('click', async function() {
+    const token = getToken();
+    if (!token) { setStatus('slidesStatus', '❌ Please enter a GitHub token.', true); return; }
+
+    const url = `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/slides-config.json`;
+    const payload = JSON.stringify(slideConfig, null, 2);
+
+    try {
+      const body = {
+        message: 'Update slides configuration via admin',
+        content: btoa(unescape(encodeURIComponent(payload))),
+        branch: 'main'
+      };
+      if (slideConfigSha) body.sha = slideConfigSha;
+
+      const res = await fetch(url, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `token ${token}`,
+          'Accept': 'application/vnd.github.v3+json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(body)
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        slideConfigSha = data.content.sha || '';
+        setStatus('slidesStatus', '✅ Slides published to GitHub successfully!');
+        // Reload config to get updated SHA
+        await loadSlides();
+      } else {
+        const err = await res.json();
+        setStatus('slidesStatus', `❌ Publish failed: ${err.message}`, true);
+      }
+    } catch(e) {
+      setStatus('slidesStatus', `❌ Error: ${e.message}`, true);
+    }
+  });
+
+  document.getElementById('loadSlidesBtn').addEventListener('click', loadSlides);
+
+  // ============================================================
   // INIT
   // ============================================================
   if (checkLogin()) {
     loadLeaderboard();
     loadComparison();
+    loadSlides();
   }
 </script>
 </body>
