@@ -392,7 +392,8 @@
       .trend-arrow { font-size: 1.6vh; }
       .comp-slide-wrapper .metric-header h2 { font-size: 3.2vh; }
       .comp-slide-wrapper .details-area .main-value { font-size: 5vh; }
-      /* ===== FULLSCREEN FIX: THE TWO LINES BELOW ARE DELETED ===== */
+      .comp-slide-wrapper .card-row { flex-direction: row; flex-wrap: wrap; height: auto; }
+      .comp-slide-wrapper .centre-card { flex-direction: row; padding: 1.5vh 2.5vw; }
       .comp-slide-wrapper .chart-area { flex: 0 0 30%; width: 30%; max-width: 30%; }
       .comp-slide-wrapper .details-area { padding-left: 0; align-items: center; text-align: center; }
       .centre-logo { height: 4vh; }
@@ -425,6 +426,54 @@
       .comp-slide-wrapper .summary-row-vertical .values .current { font-size: 2vh; }
       .centre-logo { height: 3vh; }
       .comp-delta-logo { height: 6vh; }
+    }
+
+    /* ===== FULLSCREEN – MAKE EVERYTHING BIGGER & VISIBLE ===== */
+    body.is-fullscreen .comp-delta-logo {
+      height: 18vh !important;
+    }
+    body.is-fullscreen .comp-slide-wrapper .metric-header h2 {
+      font-size: 6vh !important;
+    }
+    body.is-fullscreen .comp-slide-wrapper .metric-header .unit-badge {
+      font-size: 3vh !important;
+    }
+    body.is-fullscreen .comp-slide-wrapper .details-area .main-value {
+      font-size: 10vh !important;
+    }
+    body.is-fullscreen .comp-slide-wrapper .details-area .main-value .trend {
+      font-size: 4vh !important;
+    }
+    body.is-fullscreen .comp-slide-wrapper .details-area .comparison-row {
+      font-size: 3vh !important;
+    }
+    body.is-fullscreen .comp-slide-wrapper .details-area .insight-row {
+      font-size: 3vh !important;
+    }
+    body.is-fullscreen .centre-logo {
+      height: 9vh !important;
+    }
+    body.is-fullscreen .comp-slide-wrapper .chart-area {
+      flex: 0 0 35% !important;
+      max-width: 35% !important;
+    }
+    body.is-fullscreen .comp-slide-wrapper .details-area {
+      padding-left: 3vw !important;
+    }
+    body.is-fullscreen .comp-slide-wrapper .summary-card-vertical .metric-title {
+      font-size: 4vh !important;
+    }
+    body.is-fullscreen .comp-slide-wrapper .summary-row-vertical .values .current {
+      font-size: 4vh !important;
+    }
+    body.is-fullscreen .comp-slide-wrapper .summary-row-vertical .values .change {
+      font-size: 3vh !important;
+    }
+    body.is-fullscreen .comp-slide-wrapper .summary-row-vertical .values .gap-badge {
+      font-size: 2.5vh !important;
+    }
+    body.is-fullscreen .comp-slide-wrapper .summary-card-vertical .metric-title .unit {
+      font-size: 2.5vh !important;
     }
   </style>
 </head>
@@ -640,14 +689,12 @@
   let totalSlides = 8;
   let intervalId = null;
 
-  // ---- Helper: get row class based on score ----
   function getRowClass(scoreStr) {
     const num = parseFloat(scoreStr.replace('%', ''));
     if (isNaN(num)) return '';
     return num >= 86.30 ? 'green' : 'amber';
   }
 
-  // ---- SIS render functions ----
   function renderSISTable(data, type) {
     const items = type === 'agents' ? data.agents : data.teams;
     if (!items || items.length === 0) return '<div class="empty-state">No data available</div>';
@@ -678,7 +725,6 @@
     return html;
   }
 
-  // ---- TP/WNS helpers ----
   function getGapText(v, t, isHigher) {
     const diff = isHigher ? v - t : t - v;
     const gap = Math.abs(diff);
@@ -729,14 +775,12 @@
     const isHigher = metric !== 'CHT';
     const unit = metric === 'CHT' ? 's' : '%';
 
-    // Update header
     const slideWrapper = document.getElementById(slideId);
     const headerH2 = slideWrapper.querySelector('.metric-header h2');
     const unitBadge = slideWrapper.querySelector('.unit-badge');
     if (headerH2) headerH2.textContent = metric;
     if (unitBadge) unitBadge.textContent = `Target: ${target}${unit}`;
 
-    // For each centre card (TP and WNS)
     const cards = slideWrapper.querySelectorAll('.centre-card');
     data.centres.forEach((centre, idx) => {
       const card = cards[idx];
@@ -745,7 +789,6 @@
       const current = m.current;
       const previous = m.previous;
 
-      // main-value
       const mainVal = card.querySelector('.main-value');
       if (mainVal) {
         const trendSpan = mainVal.querySelector('.trend');
@@ -759,7 +802,6 @@
         }
       }
 
-      // comparison-row
       const compRow = card.querySelector('.comparison-row');
       if (compRow) {
         const prevLabel = compRow.querySelector('.prev-label');
@@ -773,7 +815,6 @@
         }
       }
 
-      // insight-row
       const insightRow = card.querySelector('.insight-row');
       if (insightRow) {
         const badge = insightRow.querySelector('.insight-badge');
@@ -785,7 +826,6 @@
         }
       }
 
-      // Chart
       const canvasId = `chart-${metric}-${centre.name}-${slideId}`;
       const canvas = document.getElementById(canvasId);
       if (canvas) {
@@ -861,7 +901,6 @@
     });
   }
 
-  // ---- Load data and populate ----
   async function loadData() {
     try {
       const [lbRes, compRes] = await Promise.all([
@@ -918,7 +957,6 @@
     }
   }
 
-  // ---- Navigation ----
   function updateUI() {
     document.querySelectorAll('.slide').forEach((el, i) => {
       el.classList.toggle('active', i === currentSlide);
