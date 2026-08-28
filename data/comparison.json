@@ -11,18 +11,36 @@
       "metrics": {
         "SIS": {
           "current": 77,
-          "previous": 77,
-          "history": [76, 77, 78, 77, 78]
+          "previous": 76,
+          "history": [
+            76,
+            77,
+            78,
+            77,
+            78
+          ]
         },
         "IFSR": {
           "current": 85,
           "previous": 85,
-          "history": [86, 87, 86, 86, 85]
+          "history": [
+            86,
+            87,
+            86,
+            86,
+            85
+          ]
         },
         "CHT": {
           "current": 847,
           "previous": 847,
-          "history": [868, 859, 822, 823, 829]
+          "history": [
+            868,
+            859,
+            822,
+            823,
+            829
+          ]
         }
       }
     },
@@ -33,22 +51,39 @@
         "SIS": {
           "current": 83,
           "previous": 83,
-          "history": [82, 83, 84, 83, 85]
+          "history": [
+            82,
+            83,
+            84,
+            83,
+            85
+          ]
         },
         "IFSR": {
           "current": 79,
           "previous": 79,
-          "history": [78, 79, 79, 79, 79]
+          "history": [
+            78,
+            79,
+            79,
+            79,
+            79
+          ]
         },
         "CHT": {
           "current": 924,
           "previous": 924,
-          "history": [920, 910, 905, 904, 906]
+          "history": [
+            920,
+            910,
+            905,
+            904,
+            906
+          ]
         }
       }
     }
   ],
-  "lastUpdated": "2026-08-11T22:58:03.132Z",
-  "lastUpdatedBy": "admin",
-  "historyLog": []
+  "lastUpdated": "2026-08-28T19:43:51.678Z",
+  "lastUpdatedBy": "admin"
 }
