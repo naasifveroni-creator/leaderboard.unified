@@ -103,7 +103,7 @@
     .dot { width: 1vh; height: 1vh; border-radius: 50%; background: rgba(255,255,255,0.2); border: none; cursor: pointer; transition: all 0.3s ease; padding: 0; }
     .dot.active { background: #d32f2f; transform: scale(1.4); box-shadow: 0 0 20px rgba(211,47,47,0.5); }
 
-    /* ===== COMPARISON CSS (BIGGER DELTA LOGO) ===== */
+    /* ===== COMPARISON CSS ===== */
     #slide4, #slide5, #slide6, #slide7 {
       background: #f2f5f9;
       padding: 0;
@@ -199,7 +199,7 @@
     }
     .comp-slide-wrapper .details-area {
       flex: 1;
-      padding-left: 2vw;
+      padding-left: 0.5vw;   /* ← reduced to bring content close to the bar */
       display: flex;
       flex-direction: column;
       justify-content: center;
@@ -395,7 +395,7 @@
       .comp-slide-wrapper .card-row { flex-direction: row; flex-wrap: wrap; height: auto; }
       .comp-slide-wrapper .centre-card { flex-direction: row; padding: 1.5vh 2.5vw; }
       .comp-slide-wrapper .chart-area { flex: 0 0 30%; width: 30%; max-width: 30%; }
-      .comp-slide-wrapper .details-area { padding-left: 0; align-items: center; text-align: center; }
+      .comp-slide-wrapper .details-area { padding-left: 0.5vw; align-items: center; text-align: center; }
       .centre-logo { height: 4vh; }
       .comp-delta-logo { height: 9vh; }
     }
@@ -428,7 +428,7 @@
       .comp-delta-logo { height: 6vh; }
     }
 
-    /* ===== FULLSCREEN – BIGGER & ALIGNED TO COLOURED BARS ===== */
+    /* ===== FULLSCREEN – BIGGER & ALIGNED ===== */
     body.is-fullscreen .comp-delta-logo {
       height: 22vh !important;
     }
@@ -458,7 +458,7 @@
       max-width: 38% !important;
     }
     body.is-fullscreen .comp-slide-wrapper .details-area {
-      padding-left: 0.5vw !important;  /* moves content closer to the coloured bar */
+      padding-left: 0.5vw !important;  /* consistent with normal */
     }
     body.is-fullscreen .comp-slide-wrapper .summary-card-vertical .metric-title {
       font-size: 5vh !important;
@@ -681,15 +681,224 @@
 
 <script>
   // ============================================================
-  // COMBINED JAVASCRIPT – LOAD DATA AND FILL SLIDES
+  // SLIDESHOW ENGINE – EXACTLY AS YOUR ORIGINAL SIS
   // ============================================================
 
-  const SLIDE_INTERVAL = 15000;
-  let currentSlide = 0;
-  let totalSlides = 8;
-  let intervalId = null;
-  let isPaused = false;   // <-- added for pause-on-hover
+  const slides = document.querySelectorAll('.slide');
+  const dotsContainer = document.getElementById('dotsContainer');
+  const progressBar = document.getElementById('progressBar');
+  const wrapper = document.getElementById('slidesWrapper');
 
+  // Timing constants (from original)
+  const AGENTS_TIME_PER_ROW = 0.6;
+  const TEAMS_TIME_PER_ROW  = 0.8;
+  const AGENTS_MIN_DISPLAY  = 40;
+  const TEAMS_MIN_DISPLAY   = 45;
+  const MAX_DISPLAY         = 120;
+  const DEFAULT_DURATION    = 15000;  // 15s for non‑table slides
+
+  let currentIndex = 0;
+  let timer = null;
+  let progressInterval = null;
+  let isPaused = false;
+  let slideDuration = DEFAULT_DURATION;
+  let elapsedTime = 0;
+  let scrollAnimFrames = [];
+
+  // ---- Helpers ----
+  function getSlideDuration(slide) {
+    const custom = parseInt(slide.dataset.duration);
+    if (!isNaN(custom) && custom > 0) return custom;
+    return DEFAULT_DURATION;
+  }
+
+  function startProgressBar(duration, startPercent = 0) {
+    if (progressInterval) clearInterval(progressInterval);
+    const startTime = Date.now();
+    progressBar.style.width = startPercent + '%';
+    progressInterval = setInterval(() => {
+      const now = Date.now();
+      const elapsed = now - startTime;
+      const additional = (elapsed / duration) * 100;
+      const total = Math.min(startPercent + additional, 100);
+      progressBar.style.width = total + '%';
+      if (total >= 100) {
+        clearInterval(progressInterval);
+        progressInterval = null;
+      }
+    }, 50);
+  }
+
+  function stopProgressBar() {
+    if (progressInterval) {
+      clearInterval(progressInterval);
+      progressInterval = null;
+    }
+    if (progressBar) {
+      const currentWidth = parseFloat(progressBar.style.width) || 0;
+      elapsedTime = (currentWidth / 100) * slideDuration;
+    }
+  }
+
+  function clearSlideshowTimer() {
+    if (timer) {
+      clearTimeout(timer);
+      timer = null;
+    }
+    stopProgressBar();
+  }
+
+  function startSlideshowTimer(duration = null, startFromElapsed = null) {
+    clearSlideshowTimer();
+    if (duration !== null) slideDuration = duration;
+    if (startFromElapsed !== null) elapsedTime = startFromElapsed;
+    else elapsedTime = 0;
+
+    const remaining = slideDuration - elapsedTime;
+    if (remaining <= 0) {
+      nextSlide();
+      return;
+    }
+    startProgressBar(slideDuration, (elapsedTime / slideDuration) * 100);
+    timer = setTimeout(() => {
+      if (!isPaused) nextSlide();
+    }, remaining);
+  }
+
+  function pauseSlideshow() {
+    if (isPaused) return;
+    isPaused = true;
+    clearSlideshowTimer();
+    scrollAnimFrames.forEach(id => cancelAnimationFrame(id));
+    scrollAnimFrames = [];
+  }
+
+  function resumeSlideshow() {
+    if (!isPaused) return;
+    isPaused = false;
+    startSlideshowTimer(slideDuration, elapsedTime);
+    if (slides[currentIndex]) startInfiniteScroll(slides[currentIndex]);
+  }
+
+  // ---- Navigation ----
+  function goToSlide(index) {
+    if (index < 0) index = slides.length - 1;
+    if (index >= slides.length) index = 0;
+    if (index === currentIndex) return;
+
+    clearSlideshowTimer();
+    cancelAllScrollAnimations();
+
+    slides[currentIndex].classList.remove('active');
+    dots[currentIndex].classList.remove('active');
+
+    currentIndex = index;
+    slides[currentIndex].classList.add('active');
+    dots[currentIndex].classList.add('active');
+
+    const dur = getSlideDuration(slides[currentIndex]);
+    startSlideshowTimer(dur);
+    startInfiniteScroll(slides[currentIndex]);
+    updateSlideCounter();
+  }
+
+  function nextSlide() { goToSlide(currentIndex + 1); }
+  function prevSlide() { goToSlide(currentIndex - 1); }
+
+  // ---- Scroll animation (for tables) ----
+  function cancelAllScrollAnimations() {
+    scrollAnimFrames.forEach(id => cancelAnimationFrame(id));
+    scrollAnimFrames = [];
+  }
+
+  function startInfiniteScroll(slide) {
+    cancelAllScrollAnimations();
+    const wrappers = slide.querySelectorAll('.table-grid .scroll-wrapper');
+    wrappers.forEach(wrapper => {
+      const inner = wrapper.querySelector('.scroll-inner');
+      if (!inner) return;
+      const contentHeight = inner.scrollHeight;
+      const half = contentHeight / 2;
+      if (half <= 0) return;
+      wrapper.scrollTop = 0;
+      const pixelsPerMs = half / slideDuration;  // slideDuration is in ms
+      let lastTime = performance.now();
+
+      function step(now) {
+        if (isPaused) return;
+        const dt = now - lastTime;
+        lastTime = now;
+        wrapper.scrollTop += pixelsPerMs * dt;
+        if (wrapper.scrollTop >= half) wrapper.scrollTop -= half;
+        const frameId = requestAnimationFrame(step);
+        scrollAnimFrames.push(frameId);
+      }
+      const frameId = requestAnimationFrame(step);
+      scrollAnimFrames.push(frameId);
+    });
+  }
+
+  // ---- Compute dynamic duration for agents/teams ----
+  function computeTableDuration(slide, type) {
+    const rows = slide.querySelectorAll('tbody tr');
+    const count = rows.length;
+    let durationSec = (type === 'agents') ? count * AGENTS_TIME_PER_ROW : count * TEAMS_TIME_PER_ROW;
+    if (type === 'agents') durationSec = Math.max(AGENTS_MIN_DISPLAY, durationSec);
+    else durationSec = Math.max(TEAMS_MIN_DISPLAY, durationSec);
+    durationSec = Math.min(MAX_DISPLAY, durationSec);
+    return durationSec * 1000;
+  }
+
+  // ---- Update slide counter ----
+  function updateSlideCounter() {
+    document.querySelectorAll('.slide-counter .current').forEach(el => {
+      el.textContent = currentIndex + 1;
+    });
+  }
+
+  // ---- Build dots ----
+  function buildDots() {
+    dotsContainer.innerHTML = '';
+    slides.forEach((_, i) => {
+      const dot = document.createElement('button');
+      dot.className = 'dot' + (i === 0 ? ' active' : '');
+      dot.dataset.index = i;
+      dot.addEventListener('click', () => goToSlide(i));
+      dotsContainer.appendChild(dot);
+    });
+    window.dots = dotsContainer.querySelectorAll('.dot');
+  }
+
+  // ---- Pause / resume on hover (from original) ----
+  wrapper.addEventListener('mouseenter', pauseSlideshow);
+  wrapper.addEventListener('mouseleave', resumeSlideshow);
+
+  // ---- Fullscreen toggle with class ----
+  document.getElementById('fullscreenBtn').addEventListener('click', function() {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen();
+      document.body.classList.add('is-fullscreen');
+    } else {
+      document.exitFullscreen();
+      document.body.classList.remove('is-fullscreen');
+    }
+  });
+  document.addEventListener('fullscreenchange', function() {
+    if (!document.fullscreenElement) {
+      document.body.classList.remove('is-fullscreen');
+    }
+  });
+
+  // ---- Remote control ----
+  async function checkRemote() {
+    try {
+      const res = await fetch('command.json?t=' + Date.now());
+      const cmd = await res.json();
+      if (cmd.command === 'next') nextSlide();
+    } catch (e) {}
+  }
+
+  // ---- Data loading & rendering ----
   function getRowClass(scoreStr) {
     const num = parseFloat(scoreStr.replace('%', ''));
     if (isNaN(num)) return '';
@@ -726,6 +935,7 @@
     return html;
   }
 
+  // ---- TP/WNS helpers ----
   function getGapText(v, t, isHigher) {
     const diff = isHigher ? v - t : t - v;
     const gap = Math.abs(diff);
@@ -737,7 +947,6 @@
       return `+${gap.toFixed(1)}`;
     }
   }
-
   function getGapClass(v, t, isHigher) {
     if (isHigher) {
       if (v >= t) return 'above';
@@ -749,7 +958,6 @@
       return 'well-below';
     }
   }
-
   function getStatusClass(v, t, isHigher) {
     if (isHigher) {
       if (v >= t) return 'on-target';
@@ -761,7 +969,6 @@
       return 'well-below';
     }
   }
-
   function getInsightText(c, p, isHigher, unit) {
     const d = c - p;
     if (Math.abs(d) < 0.01) return `→ Steady at ${c}${unit}`;
@@ -934,6 +1141,19 @@
         teamWrap.innerHTML = '<div class="empty-state">No team data available</div>';
       }
 
+      // Set dynamic durations for agents (slide2) and teams (slide3)
+      const agentsSlide = document.getElementById('slide2');
+      const teamsSlide = document.getElementById('slide3');
+      if (agentsSlide) {
+        const dur = computeTableDuration(agentsSlide, 'agents');
+        agentsSlide.dataset.duration = dur;
+      }
+      if (teamsSlide) {
+        const dur = computeTableDuration(teamsSlide, 'teams');
+        teamsSlide.dataset.duration = dur;
+      }
+
+      // Behaviour tags
       document.querySelectorAll('.behavior-tags').forEach(container => {
         const tags = container.querySelectorAll('.tag');
         tags.forEach((tag, index) => {
@@ -944,10 +1164,17 @@
         });
       });
 
+      // Comparison data
       updateComparisonSlide(comparisonData, 'SIS', 'compSlide4');
       updateComparisonSlide(comparisonData, 'IFSR', 'compSlide5');
       updateComparisonSlide(comparisonData, 'CHT', 'compSlide6');
       updateSummarySlide(comparisonData);
+
+      // If we're on slide 2 or 3, restart timer with new duration
+      if (currentIndex === 2 || currentIndex === 3) {
+        const newDur = getSlideDuration(slides[currentIndex]);
+        startSlideshowTimer(newDur);
+      }
 
       console.log('Data loaded successfully');
 
@@ -958,112 +1185,36 @@
     }
   }
 
-  function updateUI() {
-    document.querySelectorAll('.slide').forEach((el, i) => {
-      el.classList.toggle('active', i === currentSlide);
-    });
-    document.querySelectorAll('.dot').forEach((el, i) => {
-      el.classList.toggle('active', i === currentSlide);
-    });
-    document.querySelectorAll('.slide-counter .current').forEach((el, i) => {
-      if (i === currentSlide) el.textContent = i + 1;
-    });
-    const progress = ((currentSlide + 1) / totalSlides) * 100;
-    document.getElementById('progressBar').style.width = progress + '%';
-  }
-
-  function goToSlide(index) {
-    if (index < 0) index = totalSlides - 1;
-    if (index >= totalSlides) index = 0;
-    currentSlide = index;
-    updateUI();
-    resetAutoSlide();
-  }
-
-  function nextSlide() { goToSlide(currentSlide + 1); }
-  function prevSlide() { goToSlide(currentSlide - 1); }
-
-  function startAutoSlide() {
-    if (intervalId) clearInterval(intervalId);
-    intervalId = setInterval(nextSlide, SLIDE_INTERVAL);
-  }
-
-  function resetAutoSlide() {
-    if (intervalId) clearInterval(intervalId);
-    startAutoSlide();
-  }
-
-  function buildDots() {
-    const dotsContainer = document.getElementById('dotsContainer');
-    dotsContainer.innerHTML = '';
-    for (let i = 0; i < totalSlides; i++) {
-      const dot = document.createElement('button');
-      dot.className = 'dot' + (i === 0 ? ' active' : '');
-      dot.dataset.index = i;
-      dot.addEventListener('click', () => goToSlide(i));
-      dotsContainer.appendChild(dot);
+  // ---- Keyboard shortcuts ----
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight') nextSlide();
+    if (e.key === 'ArrowLeft') prevSlide();
+    if (e.key === ' ' || e.code === 'Space') {
+      e.preventDefault();
+      if (isPaused) resumeSlideshow();
+      else pauseSlideshow();
     }
-  }
-
-  async function checkRemote() {
-    try {
-      const res = await fetch('command.json?t=' + Date.now());
-      const cmd = await res.json();
-      if (cmd.command === 'next') {
-        nextSlide();
-      }
-    } catch (e) {}
-  }
-
-  document.getElementById('prevBtn').addEventListener('click', prevSlide);
-  document.getElementById('nextBtn').addEventListener('click', nextSlide);
-
-  document.getElementById('fullscreenBtn').addEventListener('click', function() {
-    if (!document.fullscreenElement) {
-      document.documentElement.requestFullscreen();
-      document.body.classList.add('is-fullscreen');
-    } else {
-      document.exitFullscreen();
-      document.body.classList.remove('is-fullscreen');
+    if (e.key === 'f' || e.key === 'F') {
+      const btn = document.getElementById('fullscreenBtn');
+      if (btn) btn.click();
     }
   });
 
-  document.addEventListener('fullscreenchange', function() {
-    if (!document.fullscreenElement) {
-      document.body.classList.remove('is-fullscreen');
-    }
-  });
-
-  // ---- Pause on hover – FIXED ----
-  const slideDeck = document.querySelector('.slide-deck');
-
-  slideDeck.addEventListener('mouseenter', function() {
-    if (intervalId) {
-      clearInterval(intervalId);
-      intervalId = null;
-      isPaused = true;
-    }
-  });
-
-  slideDeck.addEventListener('mouseleave', function() {
-    if (isPaused && !intervalId) {
-      startAutoSlide();
-      isPaused = false;
-    }
-  });
-
-  async function init() {
-    totalSlides = document.querySelectorAll('.slide').length;
-    console.log('Total slides:', totalSlides);
+  // ---- Init ----
+  function init() {
     buildDots();
-    await loadData();
-    updateUI();
-    startAutoSlide();
-    setInterval(checkRemote, 3000);
-
+    loadData().then(() => {
+      // start on first slide
+      goToSlide(0);
+      // remote control polling
+      setInterval(checkRemote, 3000);
+    });
+    // expose globally
     window.goToSlide = goToSlide;
     window.nextSlide = nextSlide;
     window.prevSlide = prevSlide;
+    window.pauseSlideshow = pauseSlideshow;
+    window.resumeSlideshow = resumeSlideshow;
   }
 
   init();
