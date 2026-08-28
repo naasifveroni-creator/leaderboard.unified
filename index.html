@@ -1035,22 +1035,38 @@
   });
 
   // ---- Pause on hover – FIXED ----
-  const slideDeck = document.querySelector('.slide-deck');
+  // ---- Pause on hover with resume from same point ----
+const slideDeck = document.querySelector('.slide-deck');
+let elapsedTime = 0;
+let slideStartTime = Date.now();
 
-  slideDeck.addEventListener('mouseenter', function() {
-    if (intervalId) {
-      clearInterval(intervalId);
-      intervalId = null;
-      isPaused = true;
-    }
-  });
+slideDeck.addEventListener('mouseenter', function() {
+  if (intervalId) {
+    // Store elapsed time before clearing
+    const now = Date.now();
+    elapsedTime += (now - slideStartTime);
+    clearInterval(intervalId);
+    intervalId = null;
+    isPaused = true;
+  }
+});
 
-  slideDeck.addEventListener('mouseleave', function() {
-    if (isPaused && !intervalId) {
-      startAutoSlide();
-      isPaused = false;
+slideDeck.addEventListener('mouseleave', function() {
+  if (isPaused && !intervalId) {
+    isPaused = false;
+    slideStartTime = Date.now();
+    // Calculate remaining time
+    const remaining = Math.max(0, SLIDE_INTERVAL - elapsedTime);
+    if (remaining <= 0) {
+      nextSlide();
+      return;
     }
-  });
+    // Restart timer with remaining time
+    intervalId = setInterval(() => {
+      nextSlide();
+    }, remaining);
+  }
+});;
 
   async function init() {
     totalSlides = document.querySelectorAll('.slide').length;
