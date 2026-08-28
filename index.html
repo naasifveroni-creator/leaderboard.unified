@@ -421,7 +421,7 @@
       .comp-delta-logo { height: 6vh; }
     }
 
-    /* ===== FULLSCREEN FIX – OVERRIDE MEDIA QUERY ===== */
+    /* ===== FULLSCREEN FIX – FORCE COMPARISON CARDS SIDE-BY-SIDE ===== */
     body.is-fullscreen .comp-slide-wrapper .card-row {
       flex-direction: row !important;
       flex-wrap: nowrap !important;
@@ -764,7 +764,9 @@
         const trendSpan = mainVal.querySelector('.trend');
         const trendClass = current > previous ? 'up' : (current < previous ? 'down' : 'flat');
         const trendArrow = current > previous ? '↑' : (current < previous ? '↓' : '→');
-        mainVal.childNodes[0].textContent = current + unit;
+        // replace the text node before the trend span
+        const textNode = mainVal.childNodes[0];
+        if (textNode) textNode.textContent = current + unit + ' ';
         if (trendSpan) {
           trendSpan.className = 'trend ' + trendClass;
           trendSpan.textContent = trendArrow;
@@ -803,7 +805,9 @@
       if (canvas) {
         const ctx = canvas.getContext('2d');
         const remaining = isHigher ? Math.max(0, 100 - current) : Math.max(0, current);
-        new Chart(ctx, {
+        // Destroy old chart if exists
+        if (canvas._chart) canvas._chart.destroy();
+        const chart = new Chart(ctx, {
           type: 'doughnut',
           data: {
             labels: ['Current', 'Remaining'],
@@ -820,6 +824,7 @@
             maintainAspectRatio: true
           }
         });
+        canvas._chart = chart;
       }
     });
   }
@@ -926,12 +931,10 @@
       updateComparisonSlide(comparisonData, 'CHT', 'compSlide6');
       updateSummarySlide(comparisonData);
 
-      // All good
       console.log('Data loaded successfully');
 
     } catch (e) {
       console.error('Error loading data:', e);
-      // Show error messages in place of slides
       document.getElementById('agentTableWrap').innerHTML = '<div class="empty-state">❌ Failed to load data. Check console.</div>';
       document.getElementById('teamTableWrap').innerHTML = '<div class="empty-state">❌ Failed to load data. Check console.</div>';
     }
@@ -997,7 +1000,7 @@
     } catch (e) {}
   }
 
-  // ---- Fullscreen toggle ----
+  // ---- Fullscreen toggle with body class ----
   document.getElementById('fullscreenBtn').addEventListener('click', function() {
     if (!document.fullscreenElement) {
       document.documentElement.requestFullscreen();
@@ -1036,7 +1039,6 @@
     startAutoSlide();
     setInterval(checkRemote, 3000);
 
-    // Expose navigation globally
     window.goToSlide = goToSlide;
     window.nextSlide = nextSlide;
     window.prevSlide = prevSlide;
