@@ -688,7 +688,6 @@
   let currentSlide = 0;
   let totalSlides = 8;
   let intervalId = null;
-  let isPaused = false;   // <-- added for pause-on-hover
 
   function getRowClass(scoreStr) {
     const num = parseFloat(scoreStr.replace('%', ''));
@@ -1034,39 +1033,18 @@
     }
   });
 
-  // ---- Pause on hover – FIXED ----
-  // ---- Pause on hover with resume from same point ----
-const slideDeck = document.querySelector('.slide-deck');
-let elapsedTime = 0;
-let slideStartTime = Date.now();
-
-slideDeck.addEventListener('mouseenter', function() {
-  if (intervalId) {
-    // Store elapsed time before clearing
-    const now = Date.now();
-    elapsedTime += (now - slideStartTime);
-    clearInterval(intervalId);
-    intervalId = null;
-    isPaused = true;
-  }
-});
-
-slideDeck.addEventListener('mouseleave', function() {
-  if (isPaused && !intervalId) {
-    isPaused = false;
-    slideStartTime = Date.now();
-    // Calculate remaining time
-    const remaining = Math.max(0, SLIDE_INTERVAL - elapsedTime);
-    if (remaining <= 0) {
-      nextSlide();
-      return;
+  const slideDeck = document.querySelector('.slide-deck');
+  slideDeck.addEventListener('mouseenter', function() {
+    if (intervalId) {
+      clearInterval(intervalId);
+      intervalId = null;
     }
-    // Restart timer with remaining time
-    intervalId = setInterval(() => {
-      nextSlide();
-    }, remaining);
-  }
-});;
+  });
+  slideDeck.addEventListener('mouseleave', function() {
+    if (!intervalId) {
+      startAutoSlide();
+    }
+  });
 
   async function init() {
     totalSlides = document.querySelectorAll('.slide').length;
