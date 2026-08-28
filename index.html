@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Δ SIS Performance · Delta</title>
+  <title>Δ Unified Dashboard</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <style>
@@ -13,19 +13,6 @@
     body { display: flex; justify-content: center; align-items: center; padding: 0; }
     .slide-deck { width: 100vw; height: 100vh; background: #0b1a33; overflow: hidden; position: relative; border-radius: 0; }
     .slides-wrapper { position: relative; width: 100%; height: 100%; overflow: hidden; }
-
-    /* ===== FULLSCREEN FIX – MATCH NORMAL VIEW ===== */
-    .slide-deck:fullscreen {
-      width: 100vw !important;
-      height: 100vh !important;
-      background: #0b1a33 !important;
-      border-radius: 0 !important;
-    }
-    .slide-deck:fullscreen .slides-wrapper {
-      width: 100% !important;
-      height: 100% !important;
-    }
-
     .fullscreen-btn { position: absolute; bottom: 2vh; right: 1.5vw; z-index: 100; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); color: rgba(255,255,255,0.5); border-radius: 8px; padding: 0.5vh 0.8vw; font-size: 1.8vh; cursor: pointer; transition: all 0.3s ease; backdrop-filter: blur(8px); display: flex; align-items: center; gap: 0.4vw; font-weight: 500; letter-spacing: 0.05em; }
     .fullscreen-btn:hover { background: rgba(255,255,255,0.12); color: #fff; border-color: rgba(255,255,255,0.2); transform: scale(1.05); }
     .fullscreen-btn .icon { font-size: 2vh; line-height: 1; }
@@ -71,14 +58,8 @@
 
     /* ===== SCROLLING – EXACTLY AS ORIGINAL ===== */
     .scroll-wrapper { flex: 1; overflow: hidden; position: relative; mask-image: linear-gradient(to bottom, transparent 0%, black 8%, black 92%, transparent 100%); -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 8%, black 92%, transparent 100%); z-index: 1; }
-    .scroll-inner { 
-      animation: scrollUp 60s linear infinite;
-      will-change: transform;
-    }
-    @keyframes scrollUp {
-      0% { transform: translateY(0); }
-      100% { transform: translateY(-50%); }
-    }
+    .scroll-inner { animation: scrollUp 60s linear infinite; will-change: transform; }
+    @keyframes scrollUp { 0% { transform: translateY(0); } 100% { transform: translateY(-50%); } }
 
     .table-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8vw 1.5vw; flex: 1; min-height: 0; height: 100%; }
     .table-grid .scroll-wrapper { flex: 1; overflow: hidden; position: relative; mask-image: linear-gradient(to bottom, transparent 0%, black 8%, black 92%, transparent 100%); -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 8%, black 92%, transparent 100%); }
@@ -411,8 +392,7 @@
       .trend-arrow { font-size: 1.6vh; }
       .comp-slide-wrapper .metric-header h2 { font-size: 3.2vh; }
       .comp-slide-wrapper .details-area .main-value { font-size: 5vh; }
-      .comp-slide-wrapper .card-row { flex-direction: column; height: auto; }
-      .comp-slide-wrapper .centre-card { flex-direction: column; padding: 1.5vh; }
+      /* ===== FULLSCREEN FIX: THE TWO LINES BELOW ARE DELETED ===== */
       .comp-slide-wrapper .chart-area { flex: 0 0 30%; width: 30%; max-width: 30%; }
       .comp-slide-wrapper .details-area { padding-left: 0; align-items: center; text-align: center; }
       .centre-logo { height: 4vh; }
@@ -455,15 +435,17 @@
     <button class="fullscreen-btn" id="fullscreenBtn"><span class="icon">⛶</span> FULL</button>
     <div id="adminAccess"><a href="admin.html" target="_blank">⚙ ADMIN</a></div>
 
-    <!-- ===== SIS SLIDES (0-3) ===== -->
+    <!-- ===== SLIDE 0: TITLE ===== -->
     <div class="slide active" id="slide0" data-index="0" data-slide="1">
       <div class="slide-counter"><span class="current">1</span> / 8</div>
     </div>
 
+    <!-- ===== SLIDE 1: DATA IMAGE ===== -->
     <div class="slide" id="slide1" data-index="1" data-slide="2">
       <div class="slide-counter"><span class="current">2</span> / 8</div>
     </div>
 
+    <!-- ===== SLIDE 2: AGENTS ===== -->
     <div class="slide" id="slide2" data-index="2" data-slide="3">
       <div class="slide-counter"><span class="current">3</span> / 8</div>
       <div class="slide-header">
@@ -479,13 +461,14 @@
         <div class="border-line"></div>
       </div>
       <div class="table-wrap">
-        <div class="slide-title">Top Performing Agents – SIS <span class="week-date" id="agentsWeek">Week of Jul 20 – Jul 26, 2026</span></div>
+        <div class="slide-title">Top Performing Agents – SIS <span class="week-date" id="agentsWeek">Loading...</span></div>
         <div class="table-grid" id="agentTableWrap"><div class="empty-state">Loading agents…</div></div>
       </div>
       <div class="slide-footer"><div class="footer-animation"><div class="spray-fill"></div><svg class="plane" viewBox="0 0 80 50" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M15 25 L70 20 L80 25 L70 30 L15 25Z" fill="#d32f2f" stroke="#b71c1c" stroke-width="1"/><path d="M45 22 L60 10 L68 15 L52 25 L45 22Z" fill="#ffffff" stroke="#d32f2f" stroke-width="1.5"/><path d="M45 28 L60 40 L68 35 L52 25 L45 28Z" fill="#ffffff" stroke="#d32f2f" stroke-width="1.5"/><path d="M15 25 L5 15 L15 20 L15 25Z" fill="#d32f2f"/><path d="M15 25 L5 35 L15 30 L15 25Z" fill="#d32f2f"/><path d="M15 23 L8 18 L15 22 L15 23Z" fill="#ffffff" stroke="#d32f2f" stroke-width="1"/><path d="M15 27 L8 32 L15 28 L15 27Z" fill="#ffffff" stroke="#d32f2f" stroke-width="1"/><circle cx="78" cy="25" r="3" fill="#fdb913"/><ellipse cx="82" cy="25" rx="8" ry="2" fill="#fdb913" opacity="0.8"/><path d="M65 23 Q72 23 68 27 Q65 27 65 23Z" fill="#0b1a33" opacity="0.6"/></svg><div class="spray-text">DELTA</div></div></div>
       <div class="progress-container"><div class="progress-bar" id="progressBar"></div></div>
     </div>
 
+    <!-- ===== SLIDE 3: TEAMS ===== -->
     <div class="slide" id="slide3" data-index="3" data-slide="4">
       <div class="slide-counter"><span class="current">4</span> / 8</div>
       <div class="slide-header">
@@ -501,18 +484,141 @@
         <div class="border-line"></div>
       </div>
       <div class="table-wrap">
-        <div class="slide-title">Top Performing Teams – SIS <span class="week-date" id="teamsWeek">Week of Jul 20 – Jul 26, 2026</span></div>
+        <div class="slide-title">Top Performing Teams – SIS <span class="week-date" id="teamsWeek">Loading...</span></div>
         <div class="table-grid" id="teamTableWrap"><div class="empty-state">Loading teams…</div></div>
       </div>
       <div class="slide-footer"><div class="footer-animation"><div class="spray-fill"></div><svg class="plane" viewBox="0 0 80 50" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M15 25 L70 20 L80 25 L70 30 L15 25Z" fill="#d32f2f" stroke="#b71c1c" stroke-width="1"/><path d="M45 22 L60 10 L68 15 L52 25 L45 22Z" fill="#ffffff" stroke="#d32f2f" stroke-width="1.5"/><path d="M45 28 L60 40 L68 35 L52 25 L45 28Z" fill="#ffffff" stroke="#d32f2f" stroke-width="1.5"/><path d="M15 25 L5 15 L15 20 L15 25Z" fill="#d32f2f"/><path d="M15 25 L5 35 L15 30 L15 25Z" fill="#d32f2f"/><path d="M15 23 L8 18 L15 22 L15 23Z" fill="#ffffff" stroke="#d32f2f" stroke-width="1"/><path d="M15 27 L8 32 L15 28 L15 27Z" fill="#ffffff" stroke="#d32f2f" stroke-width="1"/><circle cx="78" cy="25" r="3" fill="#fdb913"/><ellipse cx="82" cy="25" rx="8" ry="2" fill="#fdb913" opacity="0.8"/><path d="M65 23 Q72 23 68 27 Q65 27 65 23Z" fill="#0b1a33" opacity="0.6"/></svg><div class="spray-text">DELTA</div></div></div>
       <div class="progress-container"><div class="progress-bar" id="progressBar"></div></div>
     </div>
 
-    <!-- ===== TP/WNS SLIDES (4-7) ===== -->
-    <div class="slide" id="slide4" data-index="4" data-slide="5"></div>
-    <div class="slide" id="slide5" data-index="5" data-slide="6"></div>
-    <div class="slide" id="slide6" data-index="6" data-slide="7"></div>
-    <div class="slide" id="slide7" data-index="7" data-slide="8"></div>
+    <!-- ===== SLIDE 4: COMPARISON – SIS DETAIL ===== -->
+    <div class="slide" id="slide4" data-index="4" data-slide="5">
+      <div class="slide-counter"><span class="current">5</span> / 8</div>
+      <div class="comp-slide-wrapper" id="compSlide4">
+        <div class="metric-header">
+          <img src="assets/logos/delta-logo.png" alt="Delta" class="comp-delta-logo" onerror="this.style.display='none'" />
+          <h2>SIS</h2>
+          <span class="unit-badge">Target: --</span>
+        </div>
+        <div class="card-row">
+          <div class="centre-card tp">
+            <div class="chart-area"><canvas id="chart-SIS-TP-slide4"></canvas></div>
+            <div class="details-area">
+              <div class="centre-name"><img src="assets/logos/TP-logo.png" alt="TP" class="centre-logo" onerror="this.style.display='none'" /></div>
+              <div class="main-value">-- <span class="trend">—</span></div>
+              <div class="comparison-row"><span class="prev-label">Prev: --</span><span class="gap-label">-- vs target</span></div>
+              <div class="insight-row"><span class="insight-badge">Loading...</span></div>
+            </div>
+          </div>
+          <div class="centre-card wns">
+            <div class="chart-area"><canvas id="chart-SIS-WNS-slide4"></canvas></div>
+            <div class="details-area">
+              <div class="centre-name"><img src="assets/logos/wns-logo.png" alt="WNS" class="centre-logo" onerror="this.style.display='none'" /></div>
+              <div class="main-value">-- <span class="trend">—</span></div>
+              <div class="comparison-row"><span class="prev-label">Prev: --</span><span class="gap-label">-- vs target</span></div>
+              <div class="insight-row"><span class="insight-badge">Loading...</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="progress-container"><div class="progress-bar" id="progressBar"></div></div>
+    </div>
+
+    <!-- ===== SLIDE 5: COMPARISON – IFSR DETAIL ===== -->
+    <div class="slide" id="slide5" data-index="5" data-slide="6">
+      <div class="slide-counter"><span class="current">6</span> / 8</div>
+      <div class="comp-slide-wrapper" id="compSlide5">
+        <div class="metric-header">
+          <img src="assets/logos/delta-logo.png" alt="Delta" class="comp-delta-logo" onerror="this.style.display='none'" />
+          <h2>IFSR</h2>
+          <span class="unit-badge">Target: --</span>
+        </div>
+        <div class="card-row">
+          <div class="centre-card tp">
+            <div class="chart-area"><canvas id="chart-IFSR-TP-slide5"></canvas></div>
+            <div class="details-area">
+              <div class="centre-name"><img src="assets/logos/TP-logo.png" alt="TP" class="centre-logo" onerror="this.style.display='none'" /></div>
+              <div class="main-value">-- <span class="trend">—</span></div>
+              <div class="comparison-row"><span class="prev-label">Prev: --</span><span class="gap-label">-- vs target</span></div>
+              <div class="insight-row"><span class="insight-badge">Loading...</span></div>
+            </div>
+          </div>
+          <div class="centre-card wns">
+            <div class="chart-area"><canvas id="chart-IFSR-WNS-slide5"></canvas></div>
+            <div class="details-area">
+              <div class="centre-name"><img src="assets/logos/wns-logo.png" alt="WNS" class="centre-logo" onerror="this.style.display='none'" /></div>
+              <div class="main-value">-- <span class="trend">—</span></div>
+              <div class="comparison-row"><span class="prev-label">Prev: --</span><span class="gap-label">-- vs target</span></div>
+              <div class="insight-row"><span class="insight-badge">Loading...</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="progress-container"><div class="progress-bar" id="progressBar"></div></div>
+    </div>
+
+    <!-- ===== SLIDE 6: COMPARISON – CHT DETAIL ===== -->
+    <div class="slide" id="slide6" data-index="6" data-slide="7">
+      <div class="slide-counter"><span class="current">7</span> / 8</div>
+      <div class="comp-slide-wrapper" id="compSlide6">
+        <div class="metric-header">
+          <img src="assets/logos/delta-logo.png" alt="Delta" class="comp-delta-logo" onerror="this.style.display='none'" />
+          <h2>CHT</h2>
+          <span class="unit-badge">Target: --</span>
+        </div>
+        <div class="card-row">
+          <div class="centre-card tp">
+            <div class="chart-area"><canvas id="chart-CHT-TP-slide6"></canvas></div>
+            <div class="details-area">
+              <div class="centre-name"><img src="assets/logos/TP-logo.png" alt="TP" class="centre-logo" onerror="this.style.display='none'" /></div>
+              <div class="main-value">-- <span class="trend">—</span></div>
+              <div class="comparison-row"><span class="prev-label">Prev: --</span><span class="gap-label">-- vs target</span></div>
+              <div class="insight-row"><span class="insight-badge">Loading...</span></div>
+            </div>
+          </div>
+          <div class="centre-card wns">
+            <div class="chart-area"><canvas id="chart-CHT-WNS-slide6"></canvas></div>
+            <div class="details-area">
+              <div class="centre-name"><img src="assets/logos/wns-logo.png" alt="WNS" class="centre-logo" onerror="this.style.display='none'" /></div>
+              <div class="main-value">-- <span class="trend">—</span></div>
+              <div class="comparison-row"><span class="prev-label">Prev: --</span><span class="gap-label">-- vs target</span></div>
+              <div class="insight-row"><span class="insight-badge">Loading...</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="progress-container"><div class="progress-bar" id="progressBar"></div></div>
+    </div>
+
+    <!-- ===== SLIDE 7: COMPARISON – SUMMARY ===== -->
+    <div class="slide" id="slide7" data-index="7" data-slide="8">
+      <div class="slide-counter"><span class="current">8</span> / 8</div>
+      <div class="comp-slide-wrapper" id="compSlide7">
+        <div class="metric-header">
+          <img src="assets/logos/delta-logo.png" alt="Delta" class="comp-delta-logo" onerror="this.style.display='none'" />
+          <h2>📊 Summary Report</h2>
+          <span class="unit-badge">All Metrics</span>
+        </div>
+        <div class="summary-grid-vertical" id="summaryGrid">
+          <div class="summary-card-vertical">
+            <div class="metric-title">SIS <span class="unit">Target: --</span></div>
+            <div class="summary-row-vertical"><div class="centre-info"><img src="assets/logos/TP-logo.png" alt="TP" class="centre-logo" style="height:3.5vh;width:auto;object-fit:contain;" onerror="this.style.display='none'" /></div><div class="values"><span class="current">--</span><span class="change">--</span><span class="gap-badge">--</span></div></div>
+            <div class="summary-row-vertical"><div class="centre-info"><img src="assets/logos/wns-logo.png" alt="WNS" class="centre-logo" style="height:3.5vh;width:auto;object-fit:contain;" onerror="this.style.display='none'" /></div><div class="values"><span class="current">--</span><span class="change">--</span><span class="gap-badge">--</span></div></div>
+          </div>
+          <div class="summary-card-vertical">
+            <div class="metric-title">IFSR <span class="unit">Target: --</span></div>
+            <div class="summary-row-vertical"><div class="centre-info"><img src="assets/logos/TP-logo.png" alt="TP" class="centre-logo" style="height:3.5vh;width:auto;object-fit:contain;" onerror="this.style.display='none'" /></div><div class="values"><span class="current">--</span><span class="change">--</span><span class="gap-badge">--</span></div></div>
+            <div class="summary-row-vertical"><div class="centre-info"><img src="assets/logos/wns-logo.png" alt="WNS" class="centre-logo" style="height:3.5vh;width:auto;object-fit:contain;" onerror="this.style.display='none'" /></div><div class="values"><span class="current">--</span><span class="change">--</span><span class="gap-badge">--</span></div></div>
+          </div>
+          <div class="summary-card-vertical">
+            <div class="metric-title">CHT <span class="unit">Target: --</span></div>
+            <div class="summary-row-vertical"><div class="centre-info"><img src="assets/logos/TP-logo.png" alt="TP" class="centre-logo" style="height:3.5vh;width:auto;object-fit:contain;" onerror="this.style.display='none'" /></div><div class="values"><span class="current">--</span><span class="change">--</span><span class="gap-badge">--</span></div></div>
+            <div class="summary-row-vertical"><div class="centre-info"><img src="assets/logos/wns-logo.png" alt="WNS" class="centre-logo" style="height:3.5vh;width:auto;object-fit:contain;" onerror="this.style.display='none'" /></div><div class="values"><span class="current">--</span><span class="change">--</span><span class="gap-badge">--</span></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="progress-container"><div class="progress-bar" id="progressBar"></div></div>
+    </div>
 
     <!-- ===== NAVIGATION CONTROLS ===== -->
     <div class="nav-controls">
@@ -526,27 +632,22 @@
 
 <script>
   // ============================================================
-  // ORIGINAL SIS JAVASCRIPT – WITH SCORE-BASED RULE
+  // COMBINED JAVASCRIPT – LOAD DATA AND FILL SLIDES
   // ============================================================
 
   const SLIDE_INTERVAL = 15000;
   let currentSlide = 0;
   let totalSlides = 8;
   let intervalId = null;
-  let leaderboardData = null;
-  let comparisonData = null;
 
-  async function loadSISData() {
-    try {
-      const res = await fetch('data/leaderboard.json?t=' + Date.now());
-      if (!res.ok) throw new Error('Failed to fetch leaderboard data');
-      return await res.json();
-    } catch (e) {
-      console.error('Error loading SIS data:', e);
-      return null;
-    }
+  // ---- Helper: get row class based on score ----
+  function getRowClass(scoreStr) {
+    const num = parseFloat(scoreStr.replace('%', ''));
+    if (isNaN(num)) return '';
+    return num >= 86.30 ? 'green' : 'amber';
   }
 
+  // ---- SIS render functions ----
   function renderSISTable(data, type) {
     const items = type === 'agents' ? data.agents : data.teams;
     if (!items || items.length === 0) return '<div class="empty-state">No data available</div>';
@@ -554,12 +655,6 @@
     const half = Math.ceil(items.length / 2);
     const leftCol = items.slice(0, half);
     const rightCol = items.slice(half);
-
-    function getRowClass(scoreStr) {
-      const num = parseFloat(scoreStr.replace('%', ''));
-      if (isNaN(num)) return '';
-      return num >= 86.30 ? 'green' : 'amber';
-    }
 
     function buildTableRows(columnItems, startRank) {
       let html = '';
@@ -583,62 +678,9 @@
     return html;
   }
 
-  async function initSIS() {
-    const data = await loadSISData();
-    if (!data) {
-      document.getElementById('agentTableWrap').innerHTML = '<div class="empty-state">❌ Failed to load SIS data. Make sure data/leaderboard.json exists.</div>';
-      document.getElementById('teamTableWrap').innerHTML = '<div class="empty-state">❌ Failed to load SIS data. Make sure data/leaderboard.json exists.</div>';
-      return;
-    }
-
-    if (data.week) {
-      document.getElementById('agentsWeek').textContent = data.week;
-      document.getElementById('teamsWeek').textContent = data.week;
-    }
-
-    const agentTableWrap = document.getElementById('agentTableWrap');
-    if (data.agents && data.agents.length > 0) {
-      agentTableWrap.innerHTML = renderSISTable(data, 'agents');
-    } else {
-      agentTableWrap.innerHTML = '<div class="empty-state">No agent data available</div>';
-    }
-
-    const teamTableWrap = document.getElementById('teamTableWrap');
-    if (data.teams && data.teams.length > 0) {
-      teamTableWrap.innerHTML = renderSISTable(data, 'teams');
-    } else {
-      teamTableWrap.innerHTML = '<div class="empty-state">No team data available</div>';
-    }
-
-    document.querySelectorAll('.behavior-tags').forEach(container => {
-      const tags = container.querySelectorAll('.tag');
-      tags.forEach((tag, index) => {
-        const delay = parseInt(tag.dataset.delay) || 0;
-        setTimeout(() => {
-          tag.classList.add('visible');
-        }, delay + 300);
-      });
-    });
-  }
-
-  // ============================================================
-  // ORIGINAL TP/WNS JAVASCRIPT
-  // ============================================================
-
-  function getStatusClass(value, target, isHigher) {
-    if (isHigher) {
-      if (value >= target) return 'on-target';
-      if (value >= target * 0.9) return 'below-target';
-      return 'well-below';
-    } else {
-      if (value <= target) return 'on-target';
-      if (value <= target * 1.1) return 'below-target';
-      return 'well-below';
-    }
-  }
-
-  function getGapText(value, target, isHigher) {
-    const diff = isHigher ? value - target : target - value;
+  // ---- TP/WNS helpers ----
+  function getGapText(v, t, isHigher) {
+    const diff = isHigher ? v - t : t - v;
     const gap = Math.abs(diff);
     if (isHigher) {
       if (diff >= 0) return `+${gap.toFixed(1)}`;
@@ -649,110 +691,150 @@
     }
   }
 
-  function getGapClass(value, target, isHigher) {
+  function getGapClass(v, t, isHigher) {
     if (isHigher) {
-      if (value >= target) return 'above';
-      if (value >= target * 0.9) return 'below';
+      if (v >= t) return 'above';
+      if (v >= t * 0.9) return 'below';
       return 'well-below';
     } else {
-      if (value <= target) return 'above';
-      if (value <= target * 1.1) return 'below';
+      if (v <= t) return 'above';
+      if (v <= t * 1.1) return 'below';
       return 'well-below';
     }
   }
 
-  function getInsightText(current, previous, isHigher, unit) {
-    const diff = current - previous;
-    if (Math.abs(diff) < 0.01) {
-      return `→ Steady at ${current}${unit}`;
+  function getStatusClass(v, t, isHigher) {
+    if (isHigher) {
+      if (v >= t) return 'on-target';
+      if (v >= t * 0.9) return 'below-target';
+      return 'well-below';
+    } else {
+      if (v <= t) return 'on-target';
+      if (v <= t * 1.1) return 'below-target';
+      return 'well-below';
     }
-    const pctChange = (diff / Math.abs(previous)) * 100;
-    const sign = diff > 0 ? '+' : '';
-    const direction = diff > 0 ? (isHigher ? 'improving' : 'declining') : (isHigher ? 'declining' : 'improving');
-    const emoji = diff > 0 ? '📈' : '📉';
-    return `${emoji} ${direction} (${sign}${pctChange.toFixed(1)}%)`;
   }
 
-  function renderComparisonSlide(data, metric, slideId) {
-    const { targets, centres } = data;
-    const target = targets[metric];
+  function getInsightText(c, p, isHigher, unit) {
+    const d = c - p;
+    if (Math.abs(d) < 0.01) return `→ Steady at ${c}${unit}`;
+    const pct = (d / Math.abs(p)) * 100;
+    const sign = d > 0 ? '+' : '';
+    const dir = d > 0 ? (isHigher ? 'improving' : 'declining') : (isHigher ? 'declining' : 'improving');
+    return (d > 0 ? '📈' : '📉') + ' ' + dir + ' (' + sign + pct.toFixed(1) + '%)';
+  }
+
+  function updateComparisonSlide(data, metric, slideId) {
+    const target = data.targets[metric];
     const isHigher = metric !== 'CHT';
+    const unit = metric === 'CHT' ? 's' : '%';
 
-    let html = `<div class="comp-slide-wrapper">
-      <div class="metric-header">
-        <img src="assets/logos/delta-logo.png" alt="Delta" class="comp-delta-logo" onerror="this.style.display='none'" />
-        <h2>${metric}</h2>
-        <span class="unit-badge">Target: ${target}${metric === 'CHT' ? 's' : '%'}</span>
-      </div>
-      <div class="card-row">`;
+    // Update header
+    const slideWrapper = document.getElementById(slideId);
+    const headerH2 = slideWrapper.querySelector('.metric-header h2');
+    const unitBadge = slideWrapper.querySelector('.unit-badge');
+    if (headerH2) headerH2.textContent = metric;
+    if (unitBadge) unitBadge.textContent = `Target: ${target}${unit}`;
 
-    centres.forEach(centre => {
+    // For each centre card (TP and WNS)
+    const cards = slideWrapper.querySelectorAll('.centre-card');
+    data.centres.forEach((centre, idx) => {
+      const card = cards[idx];
+      if (!card) return;
       const m = centre.metrics[metric];
       const current = m.current;
       const previous = m.previous;
-      const logoFile = centre.name.toLowerCase() === 'tp' ? 'TP-logo.png' : 'wns-logo.png';
-      const gapText = getGapText(current, target, isHigher);
-      const gapClass = getGapClass(current, target, isHigher);
-      const statusClass = getStatusClass(current, target, isHigher);
-      const insight = getInsightText(current, previous, isHigher, metric === 'CHT' ? 's' : '%');
-      const trendClass = current > previous ? 'up' : (current < previous ? 'down' : 'flat');
-      const trendArrow = current > previous ? '↑' : (current < previous ? '↓' : '→');
 
-      html += `<div class="centre-card ${centre.name.toLowerCase()}">
-        <div class="chart-area">
-          <canvas id="chart-${metric}-${centre.name}-${slideId}"></canvas>
-        </div>
-        <div class="details-area">
-          <div class="centre-name">
-            <img src="assets/logos/${logoFile}" alt="${centre.name}" class="centre-logo" onerror="this.style.display='none'" />
-          </div>
-          <div class="main-value">
-            ${current}${metric === 'CHT' ? 's' : '%'}
-            <span class="trend ${trendClass}">${trendArrow}</span>
-          </div>
-          <div class="comparison-row">
-            <span class="prev-label">Prev: ${previous}${metric === 'CHT' ? 's' : '%'}</span>
-            <span class="gap-label ${gapClass}">${gapText} vs target</span>
-          </div>
-          <div class="insight-row">
-            <span class="insight-badge ${statusClass}">${insight}</span>
-          </div>
-        </div>
-      </div>`;
+      // main-value
+      const mainVal = card.querySelector('.main-value');
+      if (mainVal) {
+        const trendSpan = mainVal.querySelector('.trend');
+        const trendClass = current > previous ? 'up' : (current < previous ? 'down' : 'flat');
+        const trendArrow = current > previous ? '↑' : (current < previous ? '↓' : '→');
+        const textNode = mainVal.childNodes[0];
+        if (textNode) textNode.textContent = current + unit + ' ';
+        if (trendSpan) {
+          trendSpan.className = 'trend ' + trendClass;
+          trendSpan.textContent = trendArrow;
+        }
+      }
+
+      // comparison-row
+      const compRow = card.querySelector('.comparison-row');
+      if (compRow) {
+        const prevLabel = compRow.querySelector('.prev-label');
+        const gapLabel = compRow.querySelector('.gap-label');
+        const gapText = getGapText(current, target, isHigher);
+        const gapClass = getGapClass(current, target, isHigher);
+        if (prevLabel) prevLabel.textContent = `Prev: ${previous}${unit}`;
+        if (gapLabel) {
+          gapLabel.className = 'gap-label ' + gapClass;
+          gapLabel.textContent = gapText + ' vs target';
+        }
+      }
+
+      // insight-row
+      const insightRow = card.querySelector('.insight-row');
+      if (insightRow) {
+        const badge = insightRow.querySelector('.insight-badge');
+        const insight = getInsightText(current, previous, isHigher, unit);
+        const statusClass = getStatusClass(current, target, isHigher);
+        if (badge) {
+          badge.className = 'insight-badge ' + statusClass;
+          badge.textContent = insight;
+        }
+      }
+
+      // Chart
+      const canvasId = `chart-${metric}-${centre.name}-${slideId}`;
+      const canvas = document.getElementById(canvasId);
+      if (canvas) {
+        const ctx = canvas.getContext('2d');
+        const remaining = isHigher ? Math.max(0, 100 - current) : Math.max(0, current);
+        if (canvas._chart) canvas._chart.destroy();
+        const chart = new Chart(ctx, {
+          type: 'doughnut',
+          data: {
+            labels: ['Current', 'Remaining'],
+            datasets: [{
+              data: [current, remaining],
+              backgroundColor: [centre.colour, 'rgba(0,0,0,0.06)'],
+              borderWidth: 0
+            }]
+          },
+          options: {
+            cutout: '75%',
+            plugins: { legend: { display: false } },
+            responsive: true,
+            maintainAspectRatio: true
+          }
+        });
+        canvas._chart = chart;
+      }
     });
-
-    html += `</div></div>`;
-    return html;
   }
 
-  function renderSummarySlide(data, slideId) {
-    const { targets, centres } = data;
+  function updateSummarySlide(data) {
+    const summaryGrid = document.getElementById('summaryGrid');
+    const cards = summaryGrid.querySelectorAll('.summary-card-vertical');
     const metrics = ['SIS', 'IFSR', 'CHT'];
 
-    let html = `<div class="comp-slide-wrapper">
-      <div class="metric-header">
-        <img src="assets/logos/delta-logo.png" alt="Delta" class="comp-delta-logo" onerror="this.style.display='none'" />
-        <h2>📊 Summary Report</h2>
-        <span class="unit-badge">All Metrics</span>
-      </div>
-      <div class="summary-grid-vertical">`;
-
-    metrics.forEach(metric => {
-      const target = targets[metric];
+    cards.forEach((card, idx) => {
+      const metric = metrics[idx];
+      const target = data.targets[metric];
       const isHigher = metric !== 'CHT';
       const unit = metric === 'CHT' ? 's' : '%';
 
-      html += `<div class="summary-card-vertical">
-        <div class="metric-title">
-          ${metric}
-          <span class="unit">Target: ${target}${unit}</span>
-        </div>`;
+      const titleSpan = card.querySelector('.metric-title .unit');
+      if (titleSpan) titleSpan.textContent = `Target: ${target}${unit}`;
 
-      centres.forEach(centre => {
+      const rows = card.querySelectorAll('.summary-row-vertical');
+      data.centres.forEach((centre, centreIdx) => {
+        const row = rows[centreIdx];
+        if (!row) return;
         const m = centre.metrics[metric];
         const current = m.current;
         const prev = m.previous;
-        const logoFile = centre.name.toLowerCase() === 'tp' ? 'TP-logo.png' : 'wns-logo.png';
         const gapText = getGapText(current, target, isHigher);
         const gapClass = getGapClass(current, target, isHigher);
         const change = current - prev;
@@ -760,92 +842,83 @@
         const sym = change > 0 ? '↑' : (change < 0 ? '↓' : '→');
         const pct = prev !== 0 ? (change / Math.abs(prev)) * 100 : 0;
 
-        html += `<div class="summary-row-vertical">
-          <div class="centre-info">
-            <img src="assets/logos/${logoFile}" alt="${centre.name}" class="centre-logo" onerror="this.style.display='none'" />
-          </div>
-          <div class="values">
-            <span class="current">${current}${unit}</span>
-            <span class="change ${changeClass}">${sym} ${Math.abs(pct).toFixed(1)}%</span>
-            <span class="gap-badge ${gapClass}">${gapText}</span>
-          </div>
-        </div>`;
-      });
-
-      html += `</div>`;
-    });
-
-    html += `</div></div>`;
-    return html;
-  }
-
-  async function loadComparisonData() {
-    try {
-      const res = await fetch('data/comparison.json?t=' + Date.now());
-      if (!res.ok) throw new Error('Failed to fetch comparison data');
-      return await res.json();
-    } catch (e) {
-      console.error('Error loading comparison data:', e);
-      return null;
-    }
-  }
-
-  async function initComparison() {
-    const data = await loadComparisonData();
-    if (!data) {
-      document.getElementById('slide4').innerHTML = '<div class="comp-slide-wrapper"><div class="empty-state">❌ Failed to load comparison data. Make sure data/comparison.json exists.</div></div>';
-      document.getElementById('slide5').innerHTML = '<div class="comp-slide-wrapper"><div class="empty-state">❌ Failed to load comparison data.</div></div>';
-      document.getElementById('slide6').innerHTML = '<div class="comp-slide-wrapper"><div class="empty-state">❌ Failed to load comparison data.</div></div>';
-      document.getElementById('slide7').innerHTML = '<div class="comp-slide-wrapper"><div class="empty-state">❌ Failed to load comparison data.</div></div>';
-      return;
-    }
-
-    document.getElementById('slide4').innerHTML = renderComparisonSlide(data, 'SIS', 'slide4');
-    document.getElementById('slide5').innerHTML = renderComparisonSlide(data, 'IFSR', 'slide5');
-    document.getElementById('slide6').innerHTML = renderComparisonSlide(data, 'CHT', 'slide6');
-    document.getElementById('slide7').innerHTML = renderSummarySlide(data, 'slide7');
-
-    setTimeout(() => {
-      const slides = ['slide4', 'slide5', 'slide6'];
-      const metrics = ['SIS', 'IFSR', 'CHT'];
-      slides.forEach((slideId, idx) => {
-        const metric = metrics[idx];
-        data.centres.forEach(centre => {
-          const canvas = document.getElementById(`chart-${metric}-${centre.name}-${slideId}`);
-          if (canvas) {
-            const ctx = canvas.getContext('2d');
-            const m = centre.metrics[metric];
-            const current = m.current;
-            const target = data.targets[metric];
-            const isHigher = metric !== 'CHT';
-            const remaining = isHigher ? Math.max(0, 100 - current) : Math.max(0, current);
-            new Chart(ctx, {
-              type: 'doughnut',
-              data: {
-                labels: ['Current', 'Remaining'],
-                datasets: [{
-                  data: [current, remaining],
-                  backgroundColor: [centre.colour, 'rgba(0,0,0,0.06)'],
-                  borderWidth: 0
-                }]
-              },
-              options: {
-                cutout: '75%',
-                plugins: { legend: { display: false } },
-                responsive: true,
-                maintainAspectRatio: true
-              }
-            });
+        const valuesDiv = row.querySelector('.values');
+        if (valuesDiv) {
+          const currentSpan = valuesDiv.querySelector('.current');
+          const changeSpan = valuesDiv.querySelector('.change');
+          const gapSpan = valuesDiv.querySelector('.gap-badge');
+          if (currentSpan) currentSpan.textContent = current + unit;
+          if (changeSpan) {
+            changeSpan.className = 'change ' + changeClass;
+            changeSpan.textContent = sym + ' ' + Math.abs(pct).toFixed(1) + '%';
           }
+          if (gapSpan) {
+            gapSpan.className = 'gap-badge ' + gapClass;
+            gapSpan.textContent = gapText;
+          }
+        }
+      });
+    });
+  }
+
+  // ---- Load data and populate ----
+  async function loadData() {
+    try {
+      const [lbRes, compRes] = await Promise.all([
+        fetch('data/leaderboard.json?t=' + Date.now()),
+        fetch('data/comparison.json?t=' + Date.now())
+      ]);
+
+      if (!lbRes.ok) throw new Error('Leaderboard data not found');
+      if (!compRes.ok) throw new Error('Comparison data not found');
+
+      const leaderboardData = await lbRes.json();
+      const comparisonData = await compRes.json();
+
+      if (leaderboardData.week) {
+        document.getElementById('agentsWeek').textContent = leaderboardData.week;
+        document.getElementById('teamsWeek').textContent = leaderboardData.week;
+      }
+
+      const agentWrap = document.getElementById('agentTableWrap');
+      if (leaderboardData.agents && leaderboardData.agents.length > 0) {
+        agentWrap.innerHTML = renderSISTable(leaderboardData, 'agents');
+      } else {
+        agentWrap.innerHTML = '<div class="empty-state">No agent data available</div>';
+      }
+
+      const teamWrap = document.getElementById('teamTableWrap');
+      if (leaderboardData.teams && leaderboardData.teams.length > 0) {
+        teamWrap.innerHTML = renderSISTable(leaderboardData, 'teams');
+      } else {
+        teamWrap.innerHTML = '<div class="empty-state">No team data available</div>';
+      }
+
+      document.querySelectorAll('.behavior-tags').forEach(container => {
+        const tags = container.querySelectorAll('.tag');
+        tags.forEach((tag, index) => {
+          const delay = parseInt(tag.dataset.delay) || 0;
+          setTimeout(() => {
+            tag.classList.add('visible');
+          }, delay + 300);
         });
       });
-    }, 300);
+
+      updateComparisonSlide(comparisonData, 'SIS', 'compSlide4');
+      updateComparisonSlide(comparisonData, 'IFSR', 'compSlide5');
+      updateComparisonSlide(comparisonData, 'CHT', 'compSlide6');
+      updateSummarySlide(comparisonData);
+
+      console.log('Data loaded successfully');
+
+    } catch (e) {
+      console.error('Error loading data:', e);
+      document.getElementById('agentTableWrap').innerHTML = '<div class="empty-state">❌ Failed to load data. Check console.</div>';
+      document.getElementById('teamTableWrap').innerHTML = '<div class="empty-state">❌ Failed to load data. Check console.</div>';
+    }
   }
 
-  // ============================================================
-  // COMBINED NAVIGATION
-  // ============================================================
-
+  // ---- Navigation ----
   function updateUI() {
     document.querySelectorAll('.slide').forEach((el, i) => {
       el.classList.toggle('active', i === currentSlide);
@@ -881,16 +954,6 @@
     startAutoSlide();
   }
 
-  async function checkRemote() {
-    try {
-      const res = await fetch('command.json?t=' + Date.now());
-      const cmd = await res.json();
-      if (cmd.command === 'next') {
-        nextSlide();
-      }
-    } catch (e) {}
-  }
-
   function buildDots() {
     const dotsContainer = document.getElementById('dotsContainer');
     dotsContainer.innerHTML = '';
@@ -903,50 +966,61 @@
     }
   }
 
+  async function checkRemote() {
+    try {
+      const res = await fetch('command.json?t=' + Date.now());
+      const cmd = await res.json();
+      if (cmd.command === 'next') {
+        nextSlide();
+      }
+    } catch (e) {}
+  }
+
   document.getElementById('prevBtn').addEventListener('click', prevSlide);
   document.getElementById('nextBtn').addEventListener('click', nextSlide);
 
-  document.getElementById('fullscreenBtn').addEventListener('click', () => {
-    if (document.fullscreenElement) {
-      document.exitFullscreen();
-    } else {
+  document.getElementById('fullscreenBtn').addEventListener('click', function() {
+    if (!document.fullscreenElement) {
       document.documentElement.requestFullscreen();
+      document.body.classList.add('is-fullscreen');
+    } else {
+      document.exitFullscreen();
+      document.body.classList.remove('is-fullscreen');
     }
   });
 
-  // ============================================================
-  // PAUSE ON HOVER – EXACTLY AS YOUR ORIGINAL
-  // ============================================================
-  const slideDeck = document.querySelector('.slide-deck');
+  document.addEventListener('fullscreenchange', function() {
+    if (!document.fullscreenElement) {
+      document.body.classList.remove('is-fullscreen');
+    }
+  });
 
+  const slideDeck = document.querySelector('.slide-deck');
   slideDeck.addEventListener('mouseenter', function() {
     if (intervalId) {
       clearInterval(intervalId);
       intervalId = null;
     }
   });
-
   slideDeck.addEventListener('mouseleave', function() {
     if (!intervalId) {
       startAutoSlide();
     }
   });
 
-  // ============================================================
-  // INIT
-  // ============================================================
-
   async function init() {
+    totalSlides = document.querySelectorAll('.slide').length;
+    console.log('Total slides:', totalSlides);
     buildDots();
-    await Promise.all([initSIS(), initComparison()]);
+    await loadData();
     updateUI();
     startAutoSlide();
     setInterval(checkRemote, 3000);
-  }
 
-  window.goToSlide = goToSlide;
-  window.nextSlide = nextSlide;
-  window.prevSlide = prevSlide;
+    window.goToSlide = goToSlide;
+    window.nextSlide = nextSlide;
+    window.prevSlide = prevSlide;
+  }
 
   init();
 </script>
