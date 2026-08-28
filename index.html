@@ -61,11 +61,6 @@
     .scroll-inner { animation: scrollUp 60s linear infinite; will-change: transform; }
     @keyframes scrollUp { 0% { transform: translateY(0); } 100% { transform: translateY(-50%); } }
 
-    /* ===== PAUSE SCROLL ON HOVER ===== */
-    .slide-deck.paused .scroll-inner {
-      animation-play-state: paused !important;
-    }
-
     .table-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8vw 1.5vw; flex: 1; min-height: 0; height: 100%; }
     .table-grid .scroll-wrapper { flex: 1; overflow: hidden; position: relative; mask-image: linear-gradient(to bottom, transparent 0%, black 8%, black 92%, transparent 100%); -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 8%, black 92%, transparent 100%); }
     .table-grid .scroll-inner { animation: scrollUp 60s linear infinite; }
@@ -108,7 +103,7 @@
     .dot { width: 1vh; height: 1vh; border-radius: 50%; background: rgba(255,255,255,0.2); border: none; cursor: pointer; transition: all 0.3s ease; padding: 0; }
     .dot.active { background: #d32f2f; transform: scale(1.4); box-shadow: 0 0 20px rgba(211,47,47,0.5); }
 
-    /* ===== COMPARISON CSS ===== */
+    /* ===== COMPARISON CSS (BIGGER DELTA LOGO) ===== */
     #slide4, #slide5, #slide6, #slide7 {
       background: #f2f5f9;
       padding: 0;
@@ -123,16 +118,6 @@
       min-height: 0;
       height: 100%;
       background: #f2f5f9;
-    }
-    /* Ensure summary report doesn't overlap buttons */
-    .comp-slide-wrapper .summary-grid-vertical {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      gap: 1.5vh;
-      width: 100%;
-      height: 100%;
-      padding-bottom: 3vh; /* extra space for buttons */
     }
     .comp-slide-wrapper .metric-header {
       display: flex;
@@ -214,7 +199,7 @@
     }
     .comp-slide-wrapper .details-area {
       flex: 1;
-      padding-left: 0.5vw;
+      padding-left: 2vw;
       display: flex;
       flex-direction: column;
       justify-content: center;
@@ -288,6 +273,14 @@
       gap: 0.3vw;
     }
 
+    .comp-slide-wrapper .summary-grid-vertical {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 2vh;
+      width: 100%;
+      height: 100%;
+    }
     .comp-slide-wrapper .summary-card-vertical {
       flex: 1;
       background: rgba(255,255,255,0.85);
@@ -402,12 +395,9 @@
       .comp-slide-wrapper .card-row { flex-direction: row; flex-wrap: wrap; height: auto; }
       .comp-slide-wrapper .centre-card { flex-direction: row; padding: 1.5vh 2.5vw; }
       .comp-slide-wrapper .chart-area { flex: 0 0 30%; width: 30%; max-width: 30%; }
-      .comp-slide-wrapper .details-area { padding-left: 0.5vw; align-items: center; text-align: center; }
+      .comp-slide-wrapper .details-area { padding-left: 0; align-items: center; text-align: center; }
       .centre-logo { height: 4vh; }
       .comp-delta-logo { height: 9vh; }
-      .comp-slide-wrapper .summary-grid-vertical {
-        padding-bottom: 5vh; /* more space for buttons in narrow screens */
-      }
     }
     @media (max-width: 768px) {
       .slide-counter { display: none; }
@@ -436,12 +426,9 @@
       .comp-slide-wrapper .summary-row-vertical .values .current { font-size: 2vh; }
       .centre-logo { height: 3vh; }
       .comp-delta-logo { height: 6vh; }
-      .comp-slide-wrapper .summary-grid-vertical {
-        padding-bottom: 4vh;
-      }
     }
 
-    /* ===== FULLSCREEN – BIGGER & ALIGNED ===== */
+    /* ===== FULLSCREEN – BIGGER & ALIGNED TO COLOURED BARS ===== */
     body.is-fullscreen .comp-delta-logo {
       height: 22vh !important;
     }
@@ -471,7 +458,7 @@
       max-width: 38% !important;
     }
     body.is-fullscreen .comp-slide-wrapper .details-area {
-      padding-left: 0.5vw !important;
+      padding-left: 0.5vw !important;  /* moves content closer to the coloured bar */
     }
     body.is-fullscreen .comp-slide-wrapper .summary-card-vertical .metric-title {
       font-size: 5vh !important;
@@ -487,10 +474,6 @@
     }
     body.is-fullscreen .comp-slide-wrapper .summary-card-vertical .metric-title .unit {
       font-size: 3vh !important;
-    }
-    /* More bottom padding for summary in fullscreen */
-    body.is-fullscreen .comp-slide-wrapper .summary-grid-vertical {
-      padding-bottom: 4vh !important;
     }
   </style>
 </head>
@@ -698,180 +681,14 @@
 
 <script>
   // ============================================================
-  // SLIDESHOW ENGINE – SIMPLE SETINTERVAL + CSS SCROLL
+  // COMBINED JAVASCRIPT – LOAD DATA AND FILL SLIDES
   // ============================================================
 
-  const slides = document.querySelectorAll('.slide');
-  const dotsContainer = document.getElementById('dotsContainer');
-  const progressBar = document.getElementById('progressBar');
-  const slideDeck = document.querySelector('.slide-deck');
-
-  const SLIDE_INTERVAL = 15000; // 15s default
-  let currentIndex = 0;
+  const SLIDE_INTERVAL = 15000;
+  let currentSlide = 0;
+  let totalSlides = 8;
   let intervalId = null;
-  let isPaused = false;
-
-  // ---- Build dots ----
-  function buildDots() {
-    dotsContainer.innerHTML = '';
-    slides.forEach((_, i) => {
-      const dot = document.createElement('button');
-      dot.className = 'dot' + (i === 0 ? ' active' : '');
-      dot.dataset.index = i;
-      dot.addEventListener('click', () => goToSlide(i));
-      dotsContainer.appendChild(dot);
-    });
-  }
-  const dots = dotsContainer.querySelectorAll('.dot');
-
-  // ---- Navigation ----
-  function goToSlide(index) {
-    if (index < 0) index = slides.length - 1;
-    if (index >= slides.length) index = 0;
-    if (index === currentIndex) return;
-
-    slides[currentIndex].classList.remove('active');
-    dots[currentIndex].classList.remove('active');
-
-    currentIndex = index;
-    slides[currentIndex].classList.add('active');
-    dots[currentIndex].classList.add('active');
-
-    // Update counter
-    document.querySelectorAll('.slide-counter .current').forEach(el => {
-      el.textContent = currentIndex + 1;
-    });
-
-    // Reset progress bar
-    progressBar.style.width = '0%';
-    // Reset scroll position for table slides (optional)
-  }
-
-  function nextSlide() { goToSlide(currentIndex + 1); }
-  function prevSlide() { goToSlide(currentIndex - 1); }
-
-  // ---- Auto-slide ----
-  function startAutoSlide() {
-    if (intervalId) clearInterval(intervalId);
-    intervalId = setInterval(nextSlide, SLIDE_INTERVAL);
-  }
-
-  function stopAutoSlide() {
-    if (intervalId) {
-      clearInterval(intervalId);
-      intervalId = null;
-    }
-  }
-
-  // ---- Progress bar update ----
-  let progressInterval = null;
-  function startProgressBar() {
-    if (progressInterval) clearInterval(progressInterval);
-    progressBar.style.width = '0%';
-    const startTime = Date.now();
-    progressInterval = setInterval(() => {
-      const elapsed = Date.now() - startTime;
-      const percent = Math.min((elapsed / SLIDE_INTERVAL) * 100, 100);
-      progressBar.style.width = percent + '%';
-      if (percent >= 100) {
-        clearInterval(progressInterval);
-        progressInterval = null;
-      }
-    }, 50);
-  }
-
-  // Reset progress when slide changes
-  function resetProgress() {
-    if (progressInterval) {
-      clearInterval(progressInterval);
-      progressInterval = null;
-    }
-    progressBar.style.width = '0%';
-    startProgressBar();
-  }
-
-  // ---- Pause on hover ----
-  slideDeck.addEventListener('mouseenter', function() {
-    if (!isPaused) {
-      isPaused = true;
-      stopAutoSlide();
-      if (progressInterval) {
-        clearInterval(progressInterval);
-        progressInterval = null;
-      }
-      // Pause CSS scroll animation by adding class
-      slideDeck.classList.add('paused');
-    }
-  });
-
-  slideDeck.addEventListener('mouseleave', function() {
-    if (isPaused) {
-      isPaused = false;
-      startAutoSlide();
-      startProgressBar();
-      // Resume CSS scroll
-      slideDeck.classList.remove('paused');
-    }
-  });
-
-  // ---- Fullscreen toggle ----
-  document.getElementById('fullscreenBtn').addEventListener('click', function() {
-    if (!document.fullscreenElement) {
-      document.documentElement.requestFullscreen();
-      document.body.classList.add('is-fullscreen');
-    } else {
-      document.exitFullscreen();
-      document.body.classList.remove('is-fullscreen');
-    }
-  });
-  document.addEventListener('fullscreenchange', function() {
-    if (!document.fullscreenElement) {
-      document.body.classList.remove('is-fullscreen');
-    }
-  });
-
-  // ---- Remote control ----
-  async function checkRemote() {
-    try {
-      const res = await fetch('command.json?t=' + Date.now());
-      const cmd = await res.json();
-      if (cmd.command === 'next') nextSlide();
-    } catch (e) {}
-  }
-
-  // ---- Keyboard shortcuts ----
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'ArrowRight') nextSlide();
-    if (e.key === 'ArrowLeft') prevSlide();
-    if (e.key === ' ' || e.code === 'Space') {
-      e.preventDefault();
-      if (isPaused) {
-        // resume
-        slideDeck.dispatchEvent(new Event('mouseleave'));
-      } else {
-        // pause
-        slideDeck.dispatchEvent(new Event('mouseenter'));
-      }
-    }
-    if (e.key === 'f' || e.key === 'F') {
-      document.getElementById('fullscreenBtn').click();
-    }
-  });
-
-  // ---- Data loading & rendering ----
-  // (same as before – keep the existing logic)
-  // I'll include the minimal functions to keep the answer focused.
-  // Actually, for brevity, I'll include only the key data render functions, but you can keep the full ones.
-  // Since the user already has the full file, I'll assume the rendering part is unchanged.
-  // For safety, I'll include a placeholder comment and the essential loadData function.
-
-  // ***** PLACEHOLDER FOR DATA RENDERING – SAME AS BEFORE *****
-  // The full data rendering functions are unchanged from the previous working version.
-  // I'll include a minimal version to ensure the file is complete.
-
-  // (You can copy your existing data rendering functions here)
-  // For the sake of this answer, I'll assume the user already has them.
-  // But to avoid breaking, I'll include them.
+  let isPaused = false;   // <-- added for pause-on-hover
 
   function getRowClass(scoreStr) {
     const num = parseFloat(scoreStr.replace('%', ''));
@@ -882,9 +699,11 @@
   function renderSISTable(data, type) {
     const items = type === 'agents' ? data.agents : data.teams;
     if (!items || items.length === 0) return '<div class="empty-state">No data available</div>';
+
     const half = Math.ceil(items.length / 2);
     const leftCol = items.slice(0, half);
     const rightCol = items.slice(half);
+
     function buildTableRows(columnItems, startRank) {
       let html = '';
       columnItems.forEach((item, idx) => {
@@ -894,13 +713,16 @@
       });
       return html;
     }
+
     let html = '';
     html += '<div class="scroll-wrapper"><div class="scroll-inner"><table><thead><tr><th>Rank</th><th>Name</th><th>SIS%</th></tr></thead><tbody>';
     html += buildTableRows(leftCol, 1);
     html += '</tbody></table></div></div>';
+
     html += '<div class="scroll-wrapper"><div class="scroll-inner"><table><thead><tr><th>Rank</th><th>Name</th><th>SIS%</th></tr></thead><tbody>';
     html += buildTableRows(rightCol, half + 1);
     html += '</tbody></table></div></div>';
+
     return html;
   }
 
@@ -915,6 +737,7 @@
       return `+${gap.toFixed(1)}`;
     }
   }
+
   function getGapClass(v, t, isHigher) {
     if (isHigher) {
       if (v >= t) return 'above';
@@ -926,6 +749,7 @@
       return 'well-below';
     }
   }
+
   function getStatusClass(v, t, isHigher) {
     if (isHigher) {
       if (v >= t) return 'on-target';
@@ -937,6 +761,7 @@
       return 'well-below';
     }
   }
+
   function getInsightText(c, p, isHigher, unit) {
     const d = c - p;
     if (Math.abs(d) < 0.01) return `→ Steady at ${c}${unit}`;
@@ -950,11 +775,13 @@
     const target = data.targets[metric];
     const isHigher = metric !== 'CHT';
     const unit = metric === 'CHT' ? 's' : '%';
+
     const slideWrapper = document.getElementById(slideId);
     const headerH2 = slideWrapper.querySelector('.metric-header h2');
     const unitBadge = slideWrapper.querySelector('.unit-badge');
     if (headerH2) headerH2.textContent = metric;
     if (unitBadge) unitBadge.textContent = `Target: ${target}${unit}`;
+
     const cards = slideWrapper.querySelectorAll('.centre-card');
     data.centres.forEach((centre, idx) => {
       const card = cards[idx];
@@ -962,6 +789,7 @@
       const m = centre.metrics[metric];
       const current = m.current;
       const previous = m.previous;
+
       const mainVal = card.querySelector('.main-value');
       if (mainVal) {
         const trendSpan = mainVal.querySelector('.trend');
@@ -974,6 +802,7 @@
           trendSpan.textContent = trendArrow;
         }
       }
+
       const compRow = card.querySelector('.comparison-row');
       if (compRow) {
         const prevLabel = compRow.querySelector('.prev-label');
@@ -986,6 +815,7 @@
           gapLabel.textContent = gapText + ' vs target';
         }
       }
+
       const insightRow = card.querySelector('.insight-row');
       if (insightRow) {
         const badge = insightRow.querySelector('.insight-badge');
@@ -996,6 +826,7 @@
           badge.textContent = insight;
         }
       }
+
       const canvasId = `chart-${metric}-${centre.name}-${slideId}`;
       const canvas = document.getElementById(canvasId);
       if (canvas) {
@@ -1028,13 +859,16 @@
     const summaryGrid = document.getElementById('summaryGrid');
     const cards = summaryGrid.querySelectorAll('.summary-card-vertical');
     const metrics = ['SIS', 'IFSR', 'CHT'];
+
     cards.forEach((card, idx) => {
       const metric = metrics[idx];
       const target = data.targets[metric];
       const isHigher = metric !== 'CHT';
       const unit = metric === 'CHT' ? 's' : '%';
+
       const titleSpan = card.querySelector('.metric-title .unit');
       if (titleSpan) titleSpan.textContent = `Target: ${target}${unit}`;
+
       const rows = card.querySelectorAll('.summary-row-vertical');
       data.centres.forEach((centre, centreIdx) => {
         const row = rows[centreIdx];
@@ -1048,6 +882,7 @@
         const changeClass = change > 0 ? 'up' : (change < 0 ? 'down' : 'flat');
         const sym = change > 0 ? '↑' : (change < 0 ? '↓' : '→');
         const pct = prev !== 0 ? (change / Math.abs(prev)) * 100 : 0;
+
         const valuesDiv = row.querySelector('.values');
         if (valuesDiv) {
           const currentSpan = valuesDiv.querySelector('.current');
@@ -1073,26 +908,32 @@
         fetch('data/leaderboard.json?t=' + Date.now()),
         fetch('data/comparison.json?t=' + Date.now())
       ]);
+
       if (!lbRes.ok) throw new Error('Leaderboard data not found');
       if (!compRes.ok) throw new Error('Comparison data not found');
+
       const leaderboardData = await lbRes.json();
       const comparisonData = await compRes.json();
+
       if (leaderboardData.week) {
         document.getElementById('agentsWeek').textContent = leaderboardData.week;
         document.getElementById('teamsWeek').textContent = leaderboardData.week;
       }
+
       const agentWrap = document.getElementById('agentTableWrap');
       if (leaderboardData.agents && leaderboardData.agents.length > 0) {
         agentWrap.innerHTML = renderSISTable(leaderboardData, 'agents');
       } else {
         agentWrap.innerHTML = '<div class="empty-state">No agent data available</div>';
       }
+
       const teamWrap = document.getElementById('teamTableWrap');
       if (leaderboardData.teams && leaderboardData.teams.length > 0) {
         teamWrap.innerHTML = renderSISTable(leaderboardData, 'teams');
       } else {
         teamWrap.innerHTML = '<div class="empty-state">No team data available</div>';
       }
+
       document.querySelectorAll('.behavior-tags').forEach(container => {
         const tags = container.querySelectorAll('.tag');
         tags.forEach((tag, index) => {
@@ -1102,11 +943,14 @@
           }, delay + 300);
         });
       });
+
       updateComparisonSlide(comparisonData, 'SIS', 'compSlide4');
       updateComparisonSlide(comparisonData, 'IFSR', 'compSlide5');
       updateComparisonSlide(comparisonData, 'CHT', 'compSlide6');
       updateSummarySlide(comparisonData);
+
       console.log('Data loaded successfully');
+
     } catch (e) {
       console.error('Error loading data:', e);
       document.getElementById('agentTableWrap').innerHTML = '<div class="empty-state">❌ Failed to load data. Check console.</div>';
@@ -1114,21 +958,109 @@
     }
   }
 
-  // ---- Init ----
-  function init() {
-    buildDots();
-    loadData().then(() => {
-      // start on first slide
-      goToSlide(0);
-      startAutoSlide();
-      startProgressBar();
-      // remote polling
-      setInterval(checkRemote, 3000);
+  function updateUI() {
+    document.querySelectorAll('.slide').forEach((el, i) => {
+      el.classList.toggle('active', i === currentSlide);
     });
-    // attach arrow button events
-    document.getElementById('prevBtn').addEventListener('click', prevSlide);
-    document.getElementById('nextBtn').addEventListener('click', nextSlide);
-    // expose to global
+    document.querySelectorAll('.dot').forEach((el, i) => {
+      el.classList.toggle('active', i === currentSlide);
+    });
+    document.querySelectorAll('.slide-counter .current').forEach((el, i) => {
+      if (i === currentSlide) el.textContent = i + 1;
+    });
+    const progress = ((currentSlide + 1) / totalSlides) * 100;
+    document.getElementById('progressBar').style.width = progress + '%';
+  }
+
+  function goToSlide(index) {
+    if (index < 0) index = totalSlides - 1;
+    if (index >= totalSlides) index = 0;
+    currentSlide = index;
+    updateUI();
+    resetAutoSlide();
+  }
+
+  function nextSlide() { goToSlide(currentSlide + 1); }
+  function prevSlide() { goToSlide(currentSlide - 1); }
+
+  function startAutoSlide() {
+    if (intervalId) clearInterval(intervalId);
+    intervalId = setInterval(nextSlide, SLIDE_INTERVAL);
+  }
+
+  function resetAutoSlide() {
+    if (intervalId) clearInterval(intervalId);
+    startAutoSlide();
+  }
+
+  function buildDots() {
+    const dotsContainer = document.getElementById('dotsContainer');
+    dotsContainer.innerHTML = '';
+    for (let i = 0; i < totalSlides; i++) {
+      const dot = document.createElement('button');
+      dot.className = 'dot' + (i === 0 ? ' active' : '');
+      dot.dataset.index = i;
+      dot.addEventListener('click', () => goToSlide(i));
+      dotsContainer.appendChild(dot);
+    }
+  }
+
+  async function checkRemote() {
+    try {
+      const res = await fetch('command.json?t=' + Date.now());
+      const cmd = await res.json();
+      if (cmd.command === 'next') {
+        nextSlide();
+      }
+    } catch (e) {}
+  }
+
+  document.getElementById('prevBtn').addEventListener('click', prevSlide);
+  document.getElementById('nextBtn').addEventListener('click', nextSlide);
+
+  document.getElementById('fullscreenBtn').addEventListener('click', function() {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen();
+      document.body.classList.add('is-fullscreen');
+    } else {
+      document.exitFullscreen();
+      document.body.classList.remove('is-fullscreen');
+    }
+  });
+
+  document.addEventListener('fullscreenchange', function() {
+    if (!document.fullscreenElement) {
+      document.body.classList.remove('is-fullscreen');
+    }
+  });
+
+  // ---- Pause on hover – FIXED ----
+  const slideDeck = document.querySelector('.slide-deck');
+
+  slideDeck.addEventListener('mouseenter', function() {
+    if (intervalId) {
+      clearInterval(intervalId);
+      intervalId = null;
+      isPaused = true;
+    }
+  });
+
+  slideDeck.addEventListener('mouseleave', function() {
+    if (isPaused && !intervalId) {
+      startAutoSlide();
+      isPaused = false;
+    }
+  });
+
+  async function init() {
+    totalSlides = document.querySelectorAll('.slide').length;
+    console.log('Total slides:', totalSlides);
+    buildDots();
+    await loadData();
+    updateUI();
+    startAutoSlide();
+    setInterval(checkRemote, 3000);
+
     window.goToSlide = goToSlide;
     window.nextSlide = nextSlide;
     window.prevSlide = prevSlide;
