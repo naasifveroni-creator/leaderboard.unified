@@ -688,6 +688,7 @@
   let currentSlide = 0;
   let totalSlides = 8;
   let intervalId = null;
+  let isPaused = false;   // <-- added for pause-on-hover
 
   function getRowClass(scoreStr) {
     const num = parseFloat(scoreStr.replace('%', ''));
@@ -1033,16 +1034,21 @@
     }
   });
 
+  // ---- Pause on hover – FIXED ----
   const slideDeck = document.querySelector('.slide-deck');
+
   slideDeck.addEventListener('mouseenter', function() {
     if (intervalId) {
       clearInterval(intervalId);
       intervalId = null;
+      isPaused = true;
     }
   });
+
   slideDeck.addEventListener('mouseleave', function() {
-    if (!intervalId) {
+    if (isPaused && !intervalId) {
       startAutoSlide();
+      isPaused = false;
     }
   });
 
