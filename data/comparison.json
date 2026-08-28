@@ -10,7 +10,7 @@
       "colour": "#3b82f6",
       "metrics": {
         "SIS": {
-          "current": 77,
+          "current": 75,
           "previous": 76,
           "history": [
             76,
@@ -84,6 +84,6 @@
       }
     }
   ],
-  "lastUpdated": "2026-08-28T19:43:51.678Z",
+  "lastUpdated": "2026-08-28T19:44:33.638Z",
   "lastUpdatedBy": "admin"
 }
