@@ -56,7 +56,7 @@
     .slide-title::after { content: ''; display: block; width: 60px; height: 3px; background: linear-gradient(90deg, #d32f2f, #d32f2f); margin: 0.15vh auto 0; border-radius: 10px; }
     .slide-title .week-date { font-weight: 800; font-size: 2.4vh; color: #0b1a33; display: inline-block; margin-top: 0.1vh; letter-spacing: 0.05em; background: rgba(255,255,255,0.2); padding: 0.1vh 2vw; border-radius: 30px; margin-left: auto; margin-right: auto; backdrop-filter: blur(4px); }
 
-    /* ===== SCROLLING – PURE CSS (EXACTLY AS ORIGINAL) ===== */
+    /* ===== SCROLLING – PURE CSS ===== */
     .scroll-wrapper { flex: 1; overflow: hidden; position: relative; mask-image: linear-gradient(to bottom, transparent 0%, black 8%, black 92%, transparent 100%); -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 8%, black 92%, transparent 100%); z-index: 1; }
     .scroll-inner { animation: scrollUp 60s linear infinite; will-change: transform; }
     @keyframes scrollUp { 0% { transform: translateY(0); } 100% { transform: translateY(-50%); } }
@@ -130,7 +130,7 @@
       gap: 1.5vh;
       width: 100%;
       height: 100%;
-      padding-bottom: 3vh; /* prevent button overlap */
+      padding-bottom: 3vh;
     }
     .comp-slide-wrapper .metric-header {
       display: flex;
@@ -212,7 +212,7 @@
     }
     .comp-slide-wrapper .details-area {
       flex: 1;
-      padding-left: 0.5vw;   /* aligns content with coloured bar */
+      padding-left: 0.5vw;
       display: flex;
       flex-direction: column;
       justify-content: center;
@@ -691,7 +691,7 @@
 
 <script>
   // ============================================================
-  // SLIDESHOW ENGINE – EXACTLY AS ORIGINAL SIS
+  // SLIDESHOW ENGINE – WITH PAUSE‑RESUME (EXACTLY LIKE ORIGINAL)
   // ============================================================
 
   const slides = document.querySelectorAll('.slide');
@@ -701,11 +701,10 @@
 
   const SLIDE_INTERVAL = 15000; // 15s default
   let currentIndex = 0;
-  let timer = null;           // holds the setTimeout for auto-advance
-  let progressInterval = null;
-  let elapsedTime = 0;        // ms elapsed since slide started
-  let slideStartTime = Date.now();
+  let intervalId = null;
   let isPaused = false;
+  let elapsedTime = 0;      // ms elapsed since slide started
+  let slideStartTime = Date.now();
 
   // ---- Build dots ----
   function buildDots() {
@@ -733,7 +732,7 @@
     slides[currentIndex].classList.add('active');
     dots[currentIndex].classList.add('active');
 
-    // Update slide counter
+    // Update counter
     document.querySelectorAll('.slide-counter .current').forEach(el => {
       el.textContent = currentIndex + 1;
     });
@@ -751,50 +750,49 @@
 
   // ---- Auto-slide ----
   function startAutoSlide() {
-    stopAutoSlide(); // clear any existing timer/interval
+    stopAutoSlide(); // clear any existing
     const remaining = Math.max(0, SLIDE_INTERVAL - elapsedTime);
     if (remaining <= 0) {
+      // Time's up, go to next slide immediately
       nextSlide();
       return;
     }
-    timer = setTimeout(() => {
+    intervalId = setTimeout(() => {
       if (!isPaused) nextSlide();
     }, remaining);
-
-    // Progress bar update every 50ms
-    if (progressInterval) clearInterval(progressInterval);
-    progressInterval = setInterval(() => {
+    // update progress bar every 50ms
+    if (window.progressInterval) clearInterval(window.progressInterval);
+    window.progressInterval = setInterval(() => {
       const now = Date.now();
-      const totalElapsed = elapsedTime + (now - slideStartTime);
-      const percent = Math.min((totalElapsed / SLIDE_INTERVAL) * 100, 100);
+      const elapsed = now - slideStartTime + elapsedTime;
+      const percent = Math.min((elapsed / SLIDE_INTERVAL) * 100, 100);
       progressBar.style.width = percent + '%';
       if (percent >= 100) {
-        clearInterval(progressInterval);
-        progressInterval = null;
+        clearInterval(window.progressInterval);
+        window.progressInterval = null;
       }
     }, 50);
   }
 
   function stopAutoSlide() {
-    if (timer) {
-      clearTimeout(timer);
-      timer = null;
+    if (intervalId) {
+      clearTimeout(intervalId);
+      intervalId = null;
     }
-    if (progressInterval) {
-      clearInterval(progressInterval);
-      progressInterval = null;
+    if (window.progressInterval) {
+      clearInterval(window.progressInterval);
+      window.progressInterval = null;
     }
   }
 
-  // ---- Pause on hover (exactly like original) ----
+  // ---- Pause on hover (with resume) ----
   slideDeck.addEventListener('mouseenter', function() {
     if (!isPaused) {
       isPaused = true;
-      // store elapsed time so far
+      // store elapsed time
       const now = Date.now();
       elapsedTime += (now - slideStartTime);
       stopAutoSlide();
-      // pause CSS scroll animation
       slideDeck.classList.add('paused');
     }
   });
@@ -852,9 +850,7 @@
     }
   });
 
-  // ============================================================
-  // DATA RENDERING (unchanged – works with both JSONs)
-  // ============================================================
+  // ---- Data loading & rendering (same as before) ----
   function getRowClass(scoreStr) {
     const num = parseFloat(scoreStr.replace('%', ''));
     if (isNaN(num)) return '';
