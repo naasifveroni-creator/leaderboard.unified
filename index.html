@@ -390,6 +390,7 @@
       .trend-arrow { font-size: 1.6vh; }
       .comp-slide-wrapper .metric-header h2 { font-size: 3.2vh; }
       .comp-slide-wrapper .details-area .main-value { font-size: 5vh; }
+      /* In narrow aspect ratio, the media query normally stacks cards – we'll override this in fullscreen */
       .comp-slide-wrapper .card-row { flex-direction: column; height: auto; }
       .comp-slide-wrapper .centre-card { flex-direction: column; padding: 1.5vh; }
       .comp-slide-wrapper .chart-area { flex: 0 0 30%; width: 30%; max-width: 30%; }
@@ -426,7 +427,7 @@
       .comp-delta-logo { height: 6vh; }
     }
 
-    /* ===== FULLSCREEN FIX – FORCE COMPARISON CARDS SIDE-BY-SIDE ===== */
+    /* ===== FULLSCREEN FIX – ONLY OVERRIDE WHEN IN FULLSCREEN ===== */
     body.is-fullscreen .comp-slide-wrapper .card-row {
       flex-direction: row !important;
       flex-wrap: nowrap !important;
@@ -515,7 +516,7 @@
       <div class="progress-container"><div class="progress-bar" id="progressBar"></div></div>
     </div>
 
-    <!-- ===== TP/WNS SLIDES (4-7) ===== -->
+    <!-- ===== TP/WNS SLIDES (4-7) – will be populated by JavaScript ===== -->
     <div class="slide" id="slide4" data-index="4" data-slide="5"></div>
     <div class="slide" id="slide5" data-index="5" data-slide="6"></div>
     <div class="slide" id="slide6" data-index="6" data-slide="7"></div>
