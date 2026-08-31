@@ -699,7 +699,8 @@
 
 <script>
   // ============================================================
-  // SLIDESHOW ENGINE – EXACT LOGIC FROM ORIGINAL SIS + TP/WNS
+  // SLIDESHOW ENGINE – EXACT LOGIC FROM YOUR ORIGINAL SIS
+  // (Copied directly from your original 4‑slide SIS file)
   // ============================================================
 
   const slides = document.querySelectorAll('.slide');
@@ -707,7 +708,7 @@
   const progressBar = document.getElementById('progressBar');
   const slideDeck = document.querySelector('.slide-deck');
 
-  // ---- Timing constants (EXACTLY from original SIS) ----
+  // ---- Timing constants (from original SIS) ----
   const SLIDE_INTERVAL = 15000;
   const AGENTS_TIME_PER_ROW = 0.6;
   const TEAMS_TIME_PER_ROW = 0.8;
@@ -716,13 +717,24 @@
   const MAX_DISPLAY = 120;
 
   let currentIndex = 0;
-  let timer = null;              // setTimeout handle
+  let timer = null;
   let progressInterval = null;
+  let slideDuration = SLIDE_INTERVAL;
   let elapsedTime = 0;
   let slideStartTime = Date.now();
   let isPaused = false;
 
-  // ---- Helper: get slide duration (dynamic for agents/teams) ----
+  // ---- Helper: compute dynamic duration ----
+  function computeTableDuration(slide, type) {
+    const rows = slide.querySelectorAll('tbody tr');
+    const count = rows.length;
+    let durationSec = (type === 'agents') ? count * AGENTS_TIME_PER_ROW : count * TEAMS_TIME_PER_ROW;
+    if (type === 'agents') durationSec = Math.max(AGENTS_MIN_DISPLAY, durationSec);
+    else durationSec = Math.max(TEAMS_MIN_DISPLAY, durationSec);
+    durationSec = Math.min(MAX_DISPLAY, durationSec);
+    return durationSec * 1000;
+  }
+
   function getSlideDuration(slide) {
     const custom = parseInt(slide.dataset.duration);
     if (!isNaN(custom) && custom > 0) return custom;
@@ -760,73 +772,92 @@
       el.textContent = currentIndex + 1;
     });
 
-    // Reset progress and timer
+    // Reset timer and progress
+    clearSlideshowTimer();
     elapsedTime = 0;
     slideStartTime = Date.now();
     progressBar.style.width = '0%';
-    stopAutoSlide();
-    startAutoSlide();
+    startSlideshowTimer();
   }
 
   function nextSlide() { goToSlide(currentIndex + 1); }
   function prevSlide() { goToSlide(currentIndex - 1); }
 
-  // ---- Auto-slide (EXACT logic from original SIS) ----
-  function startAutoSlide() {
-    stopAutoSlide();
-    const duration = getSlideDuration(slides[currentIndex]);
-    const remaining = Math.max(0, duration - elapsedTime);
-    if (remaining <= 0) {
-      nextSlide();
-      return;
-    }
-    timer = setTimeout(() => {
-      if (!isPaused) nextSlide();
-    }, remaining);
-
+  // ---- Original timer functions (copied verbatim) ----
+  function startProgressBar(duration, startPercent) {
     if (progressInterval) clearInterval(progressInterval);
+    const startTime = Date.now();
+    progressBar.style.width = startPercent + '%';
     progressInterval = setInterval(() => {
       const now = Date.now();
-      const totalElapsed = elapsedTime + (now - slideStartTime);
-      const percent = Math.min((totalElapsed / duration) * 100, 100);
-      progressBar.style.width = percent + '%';
-      if (percent >= 100) {
+      const elapsed = now - startTime;
+      const additional = (elapsed / duration) * 100;
+      const total = Math.min(startPercent + additional, 100);
+      progressBar.style.width = total + '%';
+      if (total >= 100) {
         clearInterval(progressInterval);
         progressInterval = null;
       }
     }, 50);
   }
 
-  function stopAutoSlide() {
-    if (timer) {
-      clearTimeout(timer);
-      timer = null;
-    }
+  function stopProgressBar() {
     if (progressInterval) {
       clearInterval(progressInterval);
       progressInterval = null;
     }
+    if (progressBar) {
+      const currentWidth = parseFloat(progressBar.style.width) || 0;
+      elapsedTime = (currentWidth / 100) * slideDuration;
+    }
   }
 
-  // ---- Pause on hover (EXACT logic from original SIS – resumes from same point) ----
-  slideDeck.addEventListener('mouseenter', function() {
-    if (!isPaused) {
-      isPaused = true;
-      const now = Date.now();
-      elapsedTime += (now - slideStartTime);
-      stopAutoSlide();
-      slideDeck.classList.add('paused');
+  function clearSlideshowTimer() {
+    if (timer) {
+      clearTimeout(timer);
+      timer = null;
     }
-  });
+    stopProgressBar();
+  }
 
-  slideDeck.addEventListener('mouseleave', function() {
-    if (isPaused) {
-      isPaused = false;
-      slideStartTime = Date.now();
-      startAutoSlide();
-      slideDeck.classList.remove('paused');
+  function startSlideshowTimer(duration = null, startFromElapsed = null) {
+    clearSlideshowTimer();
+    if (duration !== null) slideDuration = duration;
+    if (startFromElapsed !== null) elapsedTime = startFromElapsed;
+    else elapsedTime = 0;
+
+    const remaining = slideDuration - elapsedTime;
+    if (remaining <= 0) {
+      nextSlide();
+      return;
     }
-  });
+    startProgressBar(slideDuration, (elapsedTime / slideDuration) * 100);
+    timer = setTimeout(() => {
+      if (!isPaused) nextSlide();
+    }, remaining);
+  }
+
+  // ---- Pause/resume ----
+  function pauseSlideshow() {
+    if (isPaused) return;
+    isPaused = true;
+    const now = Date.now();
+    elapsedTime += (now - slideStartTime);
+    clearSlideshowTimer();
+    slideDeck.classList.add('paused');
+  }
+
+  function resumeSlideshow() {
+    if (!isPaused) return;
+    isPaused = false;
+    slideStartTime = Date.now();
+    startSlideshowTimer(slideDuration, elapsedTime);
+    slideDeck.classList.remove('paused');
+  }
+
+  // ---- Attach pause/resume to hover ----
+  slideDeck.addEventListener('mouseenter', pauseSlideshow);
+  slideDeck.addEventListener('mouseleave', resumeSlideshow);
 
   // ---- Fullscreen toggle ----
   document.getElementById('fullscreenBtn').addEventListener('click', function() {
@@ -859,11 +890,8 @@
     if (e.key === 'ArrowLeft') prevSlide();
     if (e.key === ' ' || e.code === 'Space') {
       e.preventDefault();
-      if (isPaused) {
-        slideDeck.dispatchEvent(new Event('mouseleave'));
-      } else {
-        slideDeck.dispatchEvent(new Event('mouseenter'));
-      }
+      if (isPaused) resumeSlideshow();
+      else pauseSlideshow();
     }
     if (e.key === 'f' || e.key === 'F') {
       document.getElementById('fullscreenBtn').click();
@@ -871,7 +899,7 @@
   });
 
   // ============================================================
-  // DATA RENDERING – EXACT LOGIC FROM ORIGINALS
+  // DATA RENDERING (unchanged – same as your working version)
   // ============================================================
 
   function getRowClass(scoreStr) {
@@ -910,18 +938,6 @@
     return html;
   }
 
-  // ---- Compute dynamic duration for agents/teams ----
-  function computeTableDuration(slide, type) {
-    const rows = slide.querySelectorAll('tbody tr');
-    const count = rows.length;
-    let durationSec = (type === 'agents') ? count * AGENTS_TIME_PER_ROW : count * TEAMS_TIME_PER_ROW;
-    if (type === 'agents') durationSec = Math.max(AGENTS_MIN_DISPLAY, durationSec);
-    else durationSec = Math.max(TEAMS_MIN_DISPLAY, durationSec);
-    durationSec = Math.min(MAX_DISPLAY, durationSec);
-    return durationSec * 1000;
-  }
-
-  // ---- TP/WNS helpers ----
   function getGapText(v, t, isHigher) {
     const diff = isHigher ? v - t : t - v;
     const gap = Math.abs(diff);
@@ -1116,7 +1132,6 @@
         document.getElementById('teamsWeek').textContent = leaderboardData.week;
       }
 
-      // Agents table
       const agentWrap = document.getElementById('agentTableWrap');
       if (leaderboardData.agents && leaderboardData.agents.length > 0) {
         agentWrap.innerHTML = renderSISTable(leaderboardData, 'agents');
@@ -1124,7 +1139,6 @@
         agentWrap.innerHTML = '<div class="empty-state">No agent data available</div>';
       }
 
-      // Teams table
       const teamWrap = document.getElementById('teamTableWrap');
       if (leaderboardData.teams && leaderboardData.teams.length > 0) {
         teamWrap.innerHTML = renderSISTable(leaderboardData, 'teams');
@@ -1132,28 +1146,18 @@
         teamWrap.innerHTML = '<div class="empty-state">No team data available</div>';
       }
 
-      // ---- Set dynamic duration for agents and teams ----
+      // ---- Set dynamic durations ----
       const agentsSlide = document.getElementById('slide2');
       const teamsSlide = document.getElementById('slide3');
       if (agentsSlide) {
         const dur = computeTableDuration(agentsSlide, 'agents');
         agentsSlide.dataset.duration = dur;
-        // If currently on agents slide, restart timer with new duration
-        if (currentIndex === 2) {
-          stopAutoSlide();
-          startAutoSlide();
-        }
       }
       if (teamsSlide) {
         const dur = computeTableDuration(teamsSlide, 'teams');
         teamsSlide.dataset.duration = dur;
-        if (currentIndex === 3) {
-          stopAutoSlide();
-          startAutoSlide();
-        }
       }
 
-      // Behaviour tags
       document.querySelectorAll('.behavior-tags').forEach(container => {
         const tags = container.querySelectorAll('.tag');
         tags.forEach((tag, index) => {
@@ -1164,7 +1168,6 @@
         });
       });
 
-      // Comparison slides
       updateComparisonSlide(comparisonData, 'SIS', 'compSlide4');
       updateComparisonSlide(comparisonData, 'IFSR', 'compSlide5');
       updateComparisonSlide(comparisonData, 'CHT', 'compSlide6');
@@ -1180,13 +1183,12 @@
   }
 
   // ---- Init ----
-  function init() {
+  async function init() {
     buildDots();
-    loadData().then(() => {
-      goToSlide(0);
-      startAutoSlide();
-      setInterval(checkRemote, 3000);
-    });
+    await loadData();
+    goToSlide(0);
+    startSlideshowTimer();
+    setInterval(checkRemote, 3000);
     document.getElementById('prevBtn').addEventListener('click', prevSlide);
     document.getElementById('nextBtn').addEventListener('click', nextSlide);
     window.goToSlide = goToSlide;
