@@ -125,7 +125,7 @@
     .dot { width: 1vh; height: 1vh; border-radius: 50%; background: rgba(255,255,255,0.2); border: none; cursor: pointer; transition: all 0.3s ease; padding: 0; }
     .dot.active { background: #d32f2f; transform: scale(1.4); box-shadow: 0 0 20px rgba(211,47,47,0.5); }
 
-    /* ===== COMPARISON SLIDES ===== */
+    /* ===== COMPARISON SLIDES – UPDATED ===== */
     #slide4, #slide5, #slide6, #slide7 {
       background: #f2f5f9;
       padding: 0;
@@ -148,8 +148,9 @@
       flex-shrink: 0;
       flex-wrap: wrap;
     }
+    /* ===== BIGGER DELTA LOGO ===== */
     .comp-delta-logo {
-      height: 12vh;
+      height: 18vh !important;
       width: auto;
       object-fit: contain;
       margin-right: 0.5vw;
@@ -175,7 +176,7 @@
       flex: 1;
       display: flex;
       flex-direction: row;
-      gap: 2vw;
+      gap: 1.5vw;
       min-height: 0;
       height: 70%;
     }
@@ -189,7 +190,7 @@
       display: flex;
       flex-direction: row;
       align-items: center;
-      padding: 1.5vh 2.5vw;
+      padding: 1.5vh 0.5vw 1.5vh 0.5vw;  /* Reduced horizontal padding to pull donut closer to coloured bar */
       position: relative;
       overflow: hidden;
     }
@@ -206,14 +207,15 @@
     .comp-slide-wrapper .centre-card.tp { --brand-colour: #3b82f6; }
     .comp-slide-wrapper .centre-card.wns { --brand-colour: #f59e0b; }
     .comp-slide-wrapper .chart-area {
-      flex: 0 0 28%;
-      max-width: 28%;
+      flex: 0 0 25%;  /* Slightly smaller to pull details left too */
+      max-width: 25%;
       aspect-ratio: 1/1;
       max-height: 100%;
       position: relative;
       display: flex;
       align-items: center;
       justify-content: center;
+      margin-left: 0.3vw;  /* Small offset to sit tight against the coloured bar */
     }
     .comp-slide-wrapper .chart-area canvas {
       width: 100% !important;
@@ -221,7 +223,7 @@
     }
     .comp-slide-wrapper .details-area {
       flex: 1;
-      padding-left: 2vw;
+      padding-left: 0.8vw;  /* Reduced padding to bring content closer */
       display: flex;
       flex-direction: column;
       justify-content: center;
@@ -233,8 +235,9 @@
       justify-content: flex-start;
       margin-bottom: 0.2vh;
     }
+    /* ===== BIGGER CENTRE LOGOS INSIDE DONUTS ===== */
     .centre-logo {
-      height: 6vh;
+      height: 9vh !important;
       width: auto;
       object-fit: contain;
       max-width: 100%;
@@ -415,11 +418,11 @@
       .comp-slide-wrapper .metric-header h2 { font-size: 3.2vh; }
       .comp-slide-wrapper .details-area .main-value { font-size: 5vh; }
       .comp-slide-wrapper .card-row { flex-direction: row; flex-wrap: wrap; height: auto; }
-      .comp-slide-wrapper .centre-card { flex-direction: row; padding: 1.5vh 2.5vw; }
+      .comp-slide-wrapper .centre-card { flex-direction: row; padding: 1.5vh 1vw; }
       .comp-slide-wrapper .chart-area { flex: 0 0 30%; width: 30%; max-width: 30%; }
-      .comp-slide-wrapper .details-area { padding-left: 0; align-items: center; text-align: center; }
-      .centre-logo { height: 4vh; }
-      .comp-delta-logo { height: 9vh; }
+      .comp-slide-wrapper .details-area { padding-left: 0.5vw; align-items: center; text-align: center; }
+      .centre-logo { height: 7vh !important; }
+      .comp-delta-logo { height: 14vh !important; }
     }
     @media (max-aspect-ratio: 4/3) {
       .table-grid { grid-template-columns: 1fr; gap: 0.5vh; }
@@ -446,26 +449,26 @@
       .slide-footer { min-height: 8vh; }
       .trend-arrow { font-size: 1.2vh; }
       .comp-slide-wrapper { padding: 1vh 2vw; }
-      .comp-slide-wrapper .centre-card { border-radius: 2vh; }
+      .comp-slide-wrapper .centre-card { border-radius: 2vh; padding: 1vh 0.8vw; }
       .comp-slide-wrapper .metric-header h2 { font-size: 2.4vh; }
       .comp-slide-wrapper .details-area .main-value { font-size: 4vh; }
       .comp-slide-wrapper .summary-card-vertical .metric-title { font-size: 2vh; }
       .comp-slide-wrapper .summary-row-vertical .values .current { font-size: 2vh; }
-      .centre-logo { height: 3vh; }
-      .comp-delta-logo { height: 6vh; }
+      .centre-logo { height: 5vh !important; }
+      .comp-delta-logo { height: 10vh !important; }
     }
 
     /* ===== FULLSCREEN OVERRIDES ===== */
-    body.is-fullscreen .comp-delta-logo { height: 22vh !important; }
+    body.is-fullscreen .comp-delta-logo { height: 28vh !important; }
     body.is-fullscreen .comp-slide-wrapper .metric-header h2 { font-size: 7vh !important; }
     body.is-fullscreen .comp-slide-wrapper .metric-header .unit-badge { font-size: 3.5vh !important; }
     body.is-fullscreen .comp-slide-wrapper .details-area .main-value { font-size: 12vh !important; }
     body.is-fullscreen .comp-slide-wrapper .details-area .main-value .trend { font-size: 5vh !important; }
     body.is-fullscreen .comp-slide-wrapper .details-area .comparison-row { font-size: 3.5vh !important; }
     body.is-fullscreen .comp-slide-wrapper .details-area .insight-row { font-size: 3.5vh !important; }
-    body.is-fullscreen .centre-logo { height: 11vh !important; }
+    body.is-fullscreen .centre-logo { height: 14vh !important; }
     body.is-fullscreen .comp-slide-wrapper .chart-area { flex: 0 0 38% !important; max-width: 38% !important; }
-    body.is-fullscreen .comp-slide-wrapper .details-area { padding-left: 0.5vw !important; }
+    body.is-fullscreen .comp-slide-wrapper .details-area { padding-left: 0.3vw !important; }
     body.is-fullscreen .comp-slide-wrapper .summary-card-vertical .metric-title { font-size: 5vh !important; }
     body.is-fullscreen .comp-slide-wrapper .summary-row-vertical .values .current { font-size: 5vh !important; }
     body.is-fullscreen .comp-slide-wrapper .summary-row-vertical .values .change { font-size: 3.5vh !important; }
