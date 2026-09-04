@@ -54,12 +54,6 @@
       "type": "summary",
       "name": "Summary Report",
       "dataSource": "comparison.json"
-    },
-    {
-      "id": 8,
-      "type": "data-image",
-      "name": "IE Slide 1",
-      "bg": "assets/slides/iex1.webp.jpg"
     }
   ]
 }
