@@ -7,6 +7,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <style>
+    /* ===== ALL YOUR EXISTING CSS STAYS THE SAME ===== */
+    /* (Using your original CSS) */
     * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', 'Segoe UI', Roboto, system-ui, sans-serif; }
     html, body { width: 100%; height: 100%; background: #0b1a33; overflow: hidden; }
     body { display: flex; justify-content: center; align-items: center; padding: 0; }
@@ -21,36 +23,13 @@
 
     .slide { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; visibility: hidden; transition: opacity 0.8s ease, transform 0.8s ease, visibility 0.8s ease; display: flex; flex-direction: column; transform: scale(0.98); }
     .slide.active { opacity: 1; visibility: visible; position: relative; transform: scale(1); transition: opacity 0.8s ease, transform 0.8s ease, visibility 0.8s ease; }
-
-    /* ===== IMAGE SLIDES – CRISP & CLEAN ===== */
-    .slide-image {
-      position: absolute;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background-size: contain;
-      background-position: center;
-      background-repeat: no-repeat;
-      image-rendering: auto;
-      -webkit-background-size: cover;
-      -moz-background-size: cover;
-      -o-background-size: cover;
-    }
-    .slide-image::after {
-      content: '';
-      position: absolute;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: rgba(11, 26, 51, 0.05);
-      pointer-events: none;
-    }
-
-    #slide0 .slide-image { background-image: url('assets/slides/slide-title.webp.jpg'); }
-    #slide1 .slide-image { background-image: url('assets/slides/slide-data.webp.jpg'); }
-    #slide8 .slide-image { background-image: url('assets/slides/iex1.webp.jpg'); }
-    #slide9 .slide-image { background-image: url('assets/slides/iex2.webp.jpg'); }
-    #slide10 .slide-image { background-image: url('assets/slides/iex3.webp.jpg'); }
-
+    #slide0 { background: url('assets/slides/slide-title.webp.jpg?v=2') center/cover no-repeat, #0b1a33; }
+    #slide1 { background: url('assets/slides/slide-data.webp.jpg?v=2') center/cover no-repeat, #0b1a33; }
+    #slide8 { background: url('assets/slides/iex1.webp.jpg?v=2') center/cover no-repeat, #0b1a33; }
+    #slide9 { background: url('assets/slides/iex2.webp.jpg?v=2') center/cover no-repeat, #0b1a33; }
+    #slide10 { background: url('assets/slides/iex3.webp.jpg?v=2') center/cover no-repeat, #0b1a33; }
     #slide2, #slide3 { background: linear-gradient(145deg, #f0f3f8 0%, #e8ecf4 100%); padding: 0; }
+
     .slide-header { background: #0b1a33; backdrop-filter: blur(16px) saturate(180%); -webkit-backdrop-filter: blur(16px) saturate(180%); padding: 0.3vh 2vw; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.2vh 1vw; flex-shrink: 0; min-height: 10vh; border-bottom: 2px solid rgba(211,47,47,0.3); position: relative; overflow: hidden; box-shadow: 0 4px 30px rgba(0,0,0,0.3); border-radius: 0 0 12px 12px; margin: 0 0.5vw; }
     .slide-header::before { content: ''; position: absolute; top: 0; left: -150%; width: 300%; height: 100%; background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.02) 20%, rgba(255,255,255,0.06) 40%, rgba(255,255,255,0.02) 60%, transparent 100%); animation: shimmerWhite 10s ease-in-out infinite; pointer-events: none; z-index: 0; }
     @keyframes shimmerWhite { 0% { left: -150%; } 100% { left: 150%; } }
@@ -85,14 +64,17 @@
 
     .scroll-wrapper { flex: 1; overflow: hidden; position: relative; mask-image: linear-gradient(to bottom, transparent 0%, black 8%, black 92%, transparent 100%); -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 8%, black 92%, transparent 100%); z-index: 1; }
     .scroll-inner { transition: none; will-change: transform; }
+
     .table-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8vw 1.5vw; flex: 1; min-height: 0; height: 100%; }
     .table-grid .scroll-wrapper { flex: 1; overflow: hidden; position: relative; mask-image: linear-gradient(to bottom, transparent 0%, black 8%, black 92%, transparent 100%); -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 8%, black 92%, transparent 100%); }
     .table-grid .scroll-inner { animation: none; }
+
     .table-wrap th { background: linear-gradient(135deg, #0b1a33 0%, #1a3050 100%); color: #fff; font-weight: 700; padding: 1vh 1vw; text-align: center; border-bottom: 3px solid #d32f2f; font-size: 2vh; text-transform: uppercase; letter-spacing: 0.08em; position: sticky; top: 0; z-index: 10; }
     .table-wrap td { padding: 1.2vh 1vw; border-bottom: 1px solid rgba(237,240,246,0.6); vertical-align: middle; color: #0b1a33; text-align: center; font-size: 2.6vh; font-weight: 500; transition: all 0.3s ease; }
     .table-wrap tr:last-child td { border-bottom: none; }
     .table-wrap .rank-col { width: 10%; color: #6b7f96; font-weight: 600; font-size: 2.4vh; }
     .table-wrap .name-col { font-weight: 500; text-align: left; font-size: 2.4vh; }
+
     #slide2 .table-grid .score-col { width: 45% !important; min-width: 45% !important; max-width: 45% !important; text-align: right; justify-content: flex-end; white-space: nowrap; overflow: visible !important; }
     #slide3 .table-grid .score-col { width: 55% !important; min-width: 55% !important; max-width: 55% !important; text-align: right !important; justify-content: flex-end !important; white-space: nowrap; padding-right: 0.3vw; overflow: visible !important; }
 
@@ -101,16 +83,19 @@
     .trend-arrow.up { color: #2ecc71; }
     .trend-arrow.down { color: #d32f2f; }
     .trend-arrow.neutral { visibility: hidden; transform: translateX(0); }
+
     .table-wrap tr.top1 td { background: linear-gradient(90deg, rgba(27,138,78,0.12), rgba(211,47,47,0.06)); position: relative; border-left: 4px solid #1b8a4e; }
     .table-wrap tr.top1 .rank-col { color: #1b8a4e; font-weight: 900; font-size: 2.8vh; }
     .table-wrap tr.top1 .score-col { color: #1b8a4e; font-size: 3vh; font-weight: 800; }
     .table-wrap tr.top1 td::before { content: ''; position: absolute; top: -2px; left: -2px; right: -2px; bottom: -2px; background: radial-gradient(ellipse at center, rgba(27,138,78,0.2), transparent 70%); z-index: -1; border-radius: 4px; animation: pulseGlowGreen 2.5s ease-in-out infinite; pointer-events: none; }
     @keyframes pulseGlowGreen { 0%, 100% { opacity: 0.4; transform: scale(1); } 50% { opacity: 1; transform: scale(1.02); } }
+
     .table-wrap tr.amber td { background: linear-gradient(90deg, rgba(230,126,34,0.12), rgba(211,47,47,0.06)); position: relative; border-left: 4px solid #e67e22; }
     .table-wrap tr.amber .rank-col { color: #e67e22; font-weight: 900; font-size: 2.8vh; }
     .table-wrap tr.amber .score-col { color: #e67e22; font-size: 3vh; font-weight: 800; }
     .table-wrap tr.amber td::before { content: ''; position: absolute; top: -2px; left: -2px; right: -2px; bottom: -2px; background: radial-gradient(ellipse at center, rgba(230,126,34,0.2), transparent 70%); z-index: -1; border-radius: 4px; animation: pulseAmber 2.5s ease-in-out infinite; pointer-events: none; }
     @keyframes pulseAmber { 0%, 100% { opacity: 0.4; transform: scale(1); } 50% { opacity: 1; transform: scale(1.02); } }
+
     .table-wrap .empty-state { padding: 2vh; text-align: center; color: #8a9bb0; background: rgba(255,255,255,0.8); border-radius: 12px; width: 100%; font-size: 2vh; }
 
     .slide-footer { flex-shrink: 0; min-height: 14vh; background: transparent; border-top: 1px solid rgba(224,229,236,0.15); display: flex; align-items: center; justify-content: center; padding: 0.5vh 2vw 0.3vh; position: relative; overflow: hidden; width: 100%; }
@@ -121,6 +106,7 @@
     @keyframes textReveal { 0% { clip-path: inset(0 100% 0 0); } 100% { clip-path: inset(0 0% 0 0); } }
     .plane { position: absolute; top: 50%; transform: translateY(-50%); left: -80px; width: 70px; height: 50px; z-index: 5; animation: flyPlane 8s ease-in-out infinite; filter: drop-shadow(0 0 15px rgba(211,47,47,0.6)); }
     @keyframes flyPlane { 0% { left: -80px; } 50% { left: calc(100% - 40px); } 100% { left: calc(100% + 20px); } }
+
     .progress-container { position: absolute; bottom: 0; left: 0; right: 0; height: 3px; background: rgba(255,255,255,0.1); z-index: 30; overflow: hidden; }
     .progress-bar { height: 100%; width: 0%; background: #d32f2f; animation: progressPulse 1.5s ease-in-out infinite; border-radius: 0 4px 4px 0; transition: width 0.1s linear; }
     @keyframes progressPulse { 0%, 100% { opacity: 0.6; } 50% { opacity: 1; } }
@@ -243,6 +229,30 @@
     body.is-fullscreen .comp-slide-wrapper .centre-card { padding: 1.5vh 0.5vw 1.5vh 0.5vw !important; }
     body.is-fullscreen .comp-slide-wrapper .chart-area { flex: 0 0 25% !important; max-width: 25% !important; margin-left: 0.3vw !important; }
     body.is-fullscreen .comp-slide-wrapper .details-area { padding-left: 0.8vw !important; }
+
+    /* ===== IMAGE SLIDES – CRISP ===== */
+    .slide-image {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      image-rendering: auto;
+    }
+    .slide-image::after {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(11, 26, 51, 0.05);
+      pointer-events: none;
+    }
+    #slide0 .slide-image { background-image: url('assets/slides/slide-title.webp.jpg?v=2'); }
+    #slide1 .slide-image { background-image: url('assets/slides/slide-data.webp.jpg?v=2'); }
+    #slide8 .slide-image { background-image: url('assets/slides/iex1.webp.jpg?v=2'); }
+    #slide9 .slide-image { background-image: url('assets/slides/iex2.webp.jpg?v=2'); }
+    #slide10 .slide-image { background-image: url('assets/slides/iex3.webp.jpg?v=2'); }
   </style>
 </head>
 <body>
@@ -310,7 +320,7 @@
       <div class="progress-container"><div class="progress-bar" id="progressBar"></div></div>
     </div>
 
-    <!-- ===== SLIDE 4: COMPARISON – SIS ===== -->
+    <!-- ===== SLIDE 4: SIS COMPARISON ===== -->
     <div class="slide" id="slide4" data-index="4" data-duration="12000">
       <div class="slide-counter"><span class="current">5</span> / 11</div>
       <div class="comp-slide-wrapper" id="compSlide4">
@@ -343,7 +353,7 @@
       <div class="progress-container"><div class="progress-bar" id="progressBar"></div></div>
     </div>
 
-    <!-- ===== SLIDE 5: COMPARISON – IFSR ===== -->
+    <!-- ===== SLIDE 5: IFSR COMPARISON ===== -->
     <div class="slide" id="slide5" data-index="5" data-duration="12000">
       <div class="slide-counter"><span class="current">6</span> / 11</div>
       <div class="comp-slide-wrapper" id="compSlide5">
@@ -376,7 +386,7 @@
       <div class="progress-container"><div class="progress-bar" id="progressBar"></div></div>
     </div>
 
-    <!-- ===== SLIDE 6: COMPARISON – CHT ===== -->
+    <!-- ===== SLIDE 6: CHT COMPARISON ===== -->
     <div class="slide" id="slide6" data-index="6" data-duration="12000">
       <div class="slide-counter"><span class="current">7</span> / 11</div>
       <div class="comp-slide-wrapper" id="compSlide6">
@@ -519,7 +529,7 @@
   })();
 
   // ============================================================
-  // BEHAVIOUR TAGS – STAGGERED ENTRANCE
+  // BEHAVIOUR TAGS
   // ============================================================
   (function() {
     function animateTags(container) {
@@ -545,7 +555,7 @@
   })();
 
   // ============================================================
-  // SLIDESHOW ENGINE – JS scroll, dynamic duration, pause/resume
+  // SLIDESHOW ENGINE
   // ============================================================
   (function() {
     const slides = document.querySelectorAll('.slide');
@@ -554,20 +564,18 @@
     const wrapper = document.getElementById('slidesWrapper');
 
     const AGENTS_TIME_PER_ROW = 0.6;
-    const TEAMS_TIME_PER_ROW  = 0.8;
-    const AGENTS_MIN_DISPLAY  = 40;
-    const TEAMS_MIN_DISPLAY   = 45;
-    const MAX_DISPLAY         = 120;
+    const TEAMS_TIME_PER_ROW = 0.8;
+    const AGENTS_MIN_DISPLAY = 40;
+    const TEAMS_MIN_DISPLAY = 45;
+    const MAX_DISPLAY = 120;
 
     let currentIndex = 0;
     let timer = null;
     let progressInterval = null;
     let isTransitioning = false;
     let isPaused = false;
-
     let slideDuration = 5500;
     let elapsedTime = 0;
-
     let scrollAnimFrames = [];
     let slideAnimInitialized = new Array(slides.length).fill(false);
 
@@ -612,10 +620,8 @@
       if (duration !== null) slideDuration = duration;
       if (startFromElapsed !== null) elapsedTime = startFromElapsed;
       else elapsedTime = 0;
-
       const remaining = slideDuration - elapsedTime;
       if (remaining <= 0) { nextSlide(); return; }
-
       startProgressBar(slideDuration, (elapsedTime / slideDuration) * 100);
       timer = setTimeout(() => { if (!isPaused) nextSlide(); }, remaining);
     }
@@ -627,6 +633,7 @@
       scrollAnimFrames.forEach(id => cancelAnimationFrame(id));
       scrollAnimFrames = [];
     }
+
     function resumeSlideshow() {
       if (!isPaused) return;
       isPaused = false;
@@ -649,7 +656,6 @@
         const contentHeight = inner.scrollHeight;
         const half = contentHeight / 2;
         if (half <= 0) return;
-
         wrapper.scrollTop = 0;
         const pixelsPerMs = half / durationMs;
         let lastTime = performance.now();
@@ -674,7 +680,6 @@
         slideAnimInitialized[index] = true;
         return;
       }
-
       const rows = activeSlide.querySelectorAll('tbody tr');
       rows.forEach(row => {
         row.style.opacity = '0';
@@ -684,7 +689,6 @@
           row.dataset.targetScore = scoreCell.textContent.trim();
         }
       });
-
       rows.forEach((row, i) => {
         setTimeout(() => {
           row.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
@@ -698,7 +702,6 @@
           if (arrow) setTimeout(() => arrow.classList.add('visible'), 300 + (i * 80));
         }, 120 + (i * 80));
       });
-
       slideAnimInitialized[index] = true;
       startInfiniteScroll(activeSlide);
     }
@@ -709,6 +712,7 @@
       const suffix = target.includes('%') ? '%' : '';
       const duration = 1200;
       const startTime = performance.now();
+
       function updateCounter(currentTime) {
         const elapsed = currentTime - startTime;
         const progress = Math.min(elapsed / duration, 1);
@@ -725,24 +729,19 @@
       if (isTransitioning || index === currentIndex) return;
       if (index < 0) index = slides.length - 1;
       if (index >= slides.length) index = 0;
-
       isTransitioning = true;
       clearSlideshowTimer();
       cancelAllScrollAnimations();
-
       slides[currentIndex].classList.remove('active');
       dots[currentIndex].classList.remove('active');
-
       currentIndex = index;
       slides[currentIndex].classList.add('active');
       dots[currentIndex].classList.add('active');
-
       if (!slideAnimInitialized[currentIndex]) {
         resetEntranceAnimations(currentIndex);
       } else {
         startInfiniteScroll(slides[currentIndex]);
       }
-
       startSlideshowTimer(getSlideDuration(slides[currentIndex]));
       isPaused = false;
       setTimeout(() => { isTransitioning = false; }, 800);
@@ -1167,7 +1166,6 @@
 
     loadData();
     setInterval(loadData, 60000);
-
   })();
 
   // ============================================================
