@@ -7,8 +7,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <style>
-    /* ===== ALL YOUR EXISTING CSS STAYS THE SAME ===== */
-    /* (Using your original CSS) */
+    /* ===== ALL YOUR EXISTING CSS STYLES KEPT INTACT ===== */
     * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', 'Segoe UI', Roboto, system-ui, sans-serif; }
     html, body { width: 100%; height: 100%; background: #0b1a33; overflow: hidden; }
     body { display: flex; justify-content: center; align-items: center; padding: 0; }
@@ -23,13 +22,9 @@
 
     .slide { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; visibility: hidden; transition: opacity 0.8s ease, transform 0.8s ease, visibility 0.8s ease; display: flex; flex-direction: column; transform: scale(0.98); }
     .slide.active { opacity: 1; visibility: visible; position: relative; transform: scale(1); transition: opacity 0.8s ease, transform 0.8s ease, visibility 0.8s ease; }
-    #slide0 { background: url('assets/slides/slide-title.webp.jpg?v=2') center/cover no-repeat, #0b1a33; }
-    #slide1 { background: url('assets/slides/slide-data.webp.jpg?v=2') center/cover no-repeat, #0b1a33; }
-    #slide8 { background: url('assets/slides/iex1.webp.jpg?v=2') center/cover no-repeat, #0b1a33; }
-    #slide9 { background: url('assets/slides/iex2.webp.jpg?v=2') center/cover no-repeat, #0b1a33; }
-    #slide10 { background: url('assets/slides/iex3.webp.jpg?v=2') center/cover no-repeat, #0b1a33; }
+    #slide0 { background: url('assets/slides/slide-title.webp.jpg') center/cover no-repeat, #0b1a33; }
+    #slide1 { background: url('assets/slides/slide-data.webp.jpg') center/cover no-repeat, #0b1a33; }
     #slide2, #slide3 { background: linear-gradient(145deg, #f0f3f8 0%, #e8ecf4 100%); padding: 0; }
-
     .slide-header { background: #0b1a33; backdrop-filter: blur(16px) saturate(180%); -webkit-backdrop-filter: blur(16px) saturate(180%); padding: 0.3vh 2vw; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.2vh 1vw; flex-shrink: 0; min-height: 10vh; border-bottom: 2px solid rgba(211,47,47,0.3); position: relative; overflow: hidden; box-shadow: 0 4px 30px rgba(0,0,0,0.3); border-radius: 0 0 12px 12px; margin: 0 0.5vw; }
     .slide-header::before { content: ''; position: absolute; top: 0; left: -150%; width: 300%; height: 100%; background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.02) 20%, rgba(255,255,255,0.06) 40%, rgba(255,255,255,0.02) 60%, transparent 100%); animation: shimmerWhite 10s ease-in-out infinite; pointer-events: none; z-index: 0; }
     @keyframes shimmerWhite { 0% { left: -150%; } 100% { left: 150%; } }
@@ -230,7 +225,7 @@
     body.is-fullscreen .comp-slide-wrapper .chart-area { flex: 0 0 25% !important; max-width: 25% !important; margin-left: 0.3vw !important; }
     body.is-fullscreen .comp-slide-wrapper .details-area { padding-left: 0.8vw !important; }
 
-    /* ===== IMAGE SLIDES – CRISP ===== */
+    /* ===== IMAGE SLIDES ===== */
     .slide-image {
       position: absolute;
       top: 0; left: 0;
@@ -248,11 +243,17 @@
       background: rgba(11, 26, 51, 0.05);
       pointer-events: none;
     }
-    #slide0 .slide-image { background-image: url('assets/slides/slide-title.webp.jpg?v=2'); }
-    #slide1 .slide-image { background-image: url('assets/slides/slide-data.webp.jpg?v=2'); }
-    #slide8 .slide-image { background-image: url('assets/slides/iex1.webp.jpg?v=2'); }
-    #slide9 .slide-image { background-image: url('assets/slides/iex2.webp.jpg?v=2'); }
-    #slide10 .slide-image { background-image: url('assets/slides/iex3.webp.jpg?v=2'); }
+
+    /* ===== NEW 6 IE SLIDES ===== */
+    #slide8 .slide-image { background-image: url('assets/slides/iex1.webp.png'); }
+    #slide9 .slide-image { background-image: url('assets/slides/iex2.webp.png'); }
+    #slide10 .slide-image { background-image: url('assets/slides/iex3.webp.png'); }
+    #slide11 .slide-image { background-image: url('assets/slides/iex4.webp.png'); }
+    #slide12 .slide-image { background-image: url('assets/slides/iex5.webp.png'); }
+    #slide13 .slide-image { background-image: url('assets/slides/iex6.webp.png'); }
+
+    #slide0 .slide-image { background-image: url('assets/slides/slide-title.webp.jpg'); }
+    #slide1 .slide-image { background-image: url('assets/slides/slide-data.webp.jpg'); }
   </style>
 </head>
 <body>
@@ -265,18 +266,18 @@
     <!-- ===== SLIDE 0: TITLE ===== -->
     <div class="slide active" id="slide0" data-index="0" data-duration="6000">
       <div class="slide-image"></div>
-      <div class="slide-counter"><span class="current">1</span> / 11</div>
+      <div class="slide-counter"><span class="current">1</span> / 14</div>
     </div>
 
     <!-- ===== SLIDE 1: DATA IMAGE ===== -->
     <div class="slide" id="slide1" data-index="1" data-duration="8000">
       <div class="slide-image"></div>
-      <div class="slide-counter"><span class="current">2</span> / 11</div>
+      <div class="slide-counter"><span class="current">2</span> / 14</div>
     </div>
 
     <!-- ===== SLIDE 2: AGENTS ===== -->
     <div class="slide" id="slide2" data-index="2" data-duration="40000">
-      <div class="slide-counter"><span class="current">3</span> / 11</div>
+      <div class="slide-counter"><span class="current">3</span> / 14</div>
       <div class="slide-header">
         <div class="logo-area"><img src="assets/logos/delta-logo-ribbon.png?v=36" alt="Delta" /><h1><span>DELTA</span> · SIS</h1></div>
         <div class="behavior-tags" id="tags1">
@@ -299,7 +300,7 @@
 
     <!-- ===== SLIDE 3: TEAMS ===== -->
     <div class="slide" id="slide3" data-index="3" data-duration="45000">
-      <div class="slide-counter"><span class="current">4</span> / 11</div>
+      <div class="slide-counter"><span class="current">4</span> / 14</div>
       <div class="slide-header">
         <div class="logo-area"><img src="assets/logos/delta-logo-ribbon.png?v=36" alt="Delta" /><h1><span>DELTA</span> · SIS</h1></div>
         <div class="behavior-tags" id="tags2">
@@ -322,7 +323,7 @@
 
     <!-- ===== SLIDE 4: SIS COMPARISON ===== -->
     <div class="slide" id="slide4" data-index="4" data-duration="12000">
-      <div class="slide-counter"><span class="current">5</span> / 11</div>
+      <div class="slide-counter"><span class="current">5</span> / 14</div>
       <div class="comp-slide-wrapper" id="compSlide4">
         <div class="metric-header">
           <img src="assets/logos/delta-logo.png" alt="Delta" class="comp-delta-logo" onerror="this.style.display='none'" />
@@ -355,7 +356,7 @@
 
     <!-- ===== SLIDE 5: IFSR COMPARISON ===== -->
     <div class="slide" id="slide5" data-index="5" data-duration="12000">
-      <div class="slide-counter"><span class="current">6</span> / 11</div>
+      <div class="slide-counter"><span class="current">6</span> / 14</div>
       <div class="comp-slide-wrapper" id="compSlide5">
         <div class="metric-header">
           <img src="assets/logos/delta-logo.png" alt="Delta" class="comp-delta-logo" onerror="this.style.display='none'" />
@@ -388,7 +389,7 @@
 
     <!-- ===== SLIDE 6: CHT COMPARISON ===== -->
     <div class="slide" id="slide6" data-index="6" data-duration="12000">
-      <div class="slide-counter"><span class="current">7</span> / 11</div>
+      <div class="slide-counter"><span class="current">7</span> / 14</div>
       <div class="comp-slide-wrapper" id="compSlide6">
         <div class="metric-header">
           <img src="assets/logos/delta-logo.png" alt="Delta" class="comp-delta-logo" onerror="this.style.display='none'" />
@@ -421,7 +422,7 @@
 
     <!-- ===== SLIDE 7: SUMMARY ===== -->
     <div class="slide" id="slide7" data-index="7" data-duration="15000">
-      <div class="slide-counter"><span class="current">8</span> / 11</div>
+      <div class="slide-counter"><span class="current">8</span> / 14</div>
       <div class="comp-slide-wrapper" id="compSlide7">
         <div class="metric-header">
           <img src="assets/logos/delta-logo.png" alt="Delta" class="comp-delta-logo" onerror="this.style.display='none'" />
@@ -452,19 +453,37 @@
     <!-- ===== SLIDE 8: IE SLIDE 1 ===== -->
     <div class="slide" id="slide8" data-index="8" data-duration="6000">
       <div class="slide-image"></div>
-      <div class="slide-counter"><span class="current">9</span> / 11</div>
+      <div class="slide-counter"><span class="current">9</span> / 14</div>
     </div>
 
     <!-- ===== SLIDE 9: IE SLIDE 2 ===== -->
     <div class="slide" id="slide9" data-index="9" data-duration="6000">
       <div class="slide-image"></div>
-      <div class="slide-counter"><span class="current">10</span> / 11</div>
+      <div class="slide-counter"><span class="current">10</span> / 14</div>
     </div>
 
     <!-- ===== SLIDE 10: IE SLIDE 3 ===== -->
     <div class="slide" id="slide10" data-index="10" data-duration="6000">
       <div class="slide-image"></div>
-      <div class="slide-counter"><span class="current">11</span> / 11</div>
+      <div class="slide-counter"><span class="current">11</span> / 14</div>
+    </div>
+
+    <!-- ===== SLIDE 11: IE SLIDE 4 ===== -->
+    <div class="slide" id="slide11" data-index="11" data-duration="6000">
+      <div class="slide-image"></div>
+      <div class="slide-counter"><span class="current">12</span> / 14</div>
+    </div>
+
+    <!-- ===== SLIDE 12: IE SLIDE 5 ===== -->
+    <div class="slide" id="slide12" data-index="12" data-duration="6000">
+      <div class="slide-image"></div>
+      <div class="slide-counter"><span class="current">13</span> / 14</div>
+    </div>
+
+    <!-- ===== SLIDE 13: IE SLIDE 6 ===== -->
+    <div class="slide" id="slide13" data-index="13" data-duration="6000">
+      <div class="slide-image"></div>
+      <div class="slide-counter"><span class="current">14</span> / 14</div>
     </div>
 
     <!-- ===== NAVIGATION ===== -->
