@@ -22,43 +22,24 @@
 
     .slide { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; visibility: hidden; transition: opacity 0.8s ease, transform 0.8s ease, visibility 0.8s ease; display: flex; flex-direction: column; transform: scale(0.98); }
     .slide.active { opacity: 1; visibility: visible; position: relative; transform: scale(1); transition: opacity 0.8s ease, transform 0.8s ease, visibility 0.8s ease; }
+
+    /* ===== TITLE & DATA SLIDES ===== */
     #slide0 { background: url('assets/slides/slide-title.webp.jpg') center/cover no-repeat, #0b1a33; }
     #slide1 { background: url('assets/slides/slide-data.webp.jpg') center/cover no-repeat, #0b1a33; }
+
+    /* ===== IE SLIDES – CONTAIN (NO STRETCH) ===== */
+    #slide8 { background: #0b1a33 url('assets/slides/iex1.webp.png?v=2') center/contain no-repeat; }
+    #slide9 { background: #0b1a33 url('assets/slides/iex2.webp.png?v=2') center/contain no-repeat; }
+    #slide10 { background: #0b1a33 url('assets/slides/iex3.webp.png?v=2') center/contain no-repeat; }
+    #slide11 { background: #0b1a33 url('assets/slides/iex4.webp.png?v=2') center/contain no-repeat; }
+    #slide12 { background: #0b1a33 url('assets/slides/iex5.webp.png?v=2') center/contain no-repeat; }
+    #slide13 { background: #0b1a33 url('assets/slides/iex6.webp.png?v=2') center/contain no-repeat; }
+    #slide14 { background: #0b1a33 url('assets/slides/iex7.webp.png?v=2') center/contain no-repeat; }
+    #slide15 { background: #0b1a33 url('assets/slides/iex8.webp.png?v=2') center/contain no-repeat; }
+
+    /* ===== AGENTS & TEAMS SLIDES ===== */
     #slide2, #slide3 { background: linear-gradient(145deg, #f0f3f8 0%, #e8ecf4 100%); padding: 0; }
 
-    /* ===== IMAGE SLIDES ===== */
-    .slide-image {
-      position: absolute;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background-size: cover;
-      background-position: center;
-      background-repeat: no-repeat;
-      image-rendering: auto;
-    }
-    .slide-image::after {
-      content: '';
-      position: absolute;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: rgba(11, 26, 51, 0.05);
-      pointer-events: none;
-    }
-
-    /* ===== IE SLIDES 1-8 ===== */
-    #slide8 .slide-image { background-image: url('assets/slides/iex1.webp.png'); }
-    #slide9 .slide-image { background-image: url('assets/slides/iex2.webp.png'); }
-    #slide10 .slide-image { background-image: url('assets/slides/iex3.webp.png'); }
-    #slide11 .slide-image { background-image: url('assets/slides/iex4.webp.png'); }
-    #slide12 .slide-image { background-image: url('assets/slides/iex5.webp.png'); }
-    #slide13 .slide-image { background-image: url('assets/slides/iex6.webp.png'); }
-    #slide14 .slide-image { background-image: url('assets/slides/iex7.webp.png'); }
-    #slide15 .slide-image { background-image: url('assets/slides/iex8.webp.png'); }
-
-    #slide0 .slide-image { background-image: url('assets/slides/slide-title.webp.jpg'); }
-    #slide1 .slide-image { background-image: url('assets/slides/slide-data.webp.jpg'); }
-
-    /* ===== HEADER ===== */
     .slide-header { background: #0b1a33; backdrop-filter: blur(16px) saturate(180%); -webkit-backdrop-filter: blur(16px) saturate(180%); padding: 0.3vh 2vw; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.2vh 1vw; flex-shrink: 0; min-height: 10vh; border-bottom: 2px solid rgba(211,47,47,0.3); position: relative; overflow: hidden; box-shadow: 0 4px 30px rgba(0,0,0,0.3); border-radius: 0 0 12px 12px; margin: 0 0.5vw; }
     .slide-header::before { content: ''; position: absolute; top: 0; left: -150%; width: 300%; height: 100%; background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.02) 20%, rgba(255,255,255,0.06) 40%, rgba(255,255,255,0.02) 60%, transparent 100%); animation: shimmerWhite 10s ease-in-out infinite; pointer-events: none; z-index: 0; }
     @keyframes shimmerWhite { 0% { left: -150%; } 100% { left: 150%; } }
@@ -93,7 +74,6 @@
 
     .scroll-wrapper { flex: 1; overflow: hidden; position: relative; mask-image: linear-gradient(to bottom, transparent 0%, black 8%, black 92%, transparent 100%); -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 8%, black 92%, transparent 100%); z-index: 1; }
     .scroll-inner { transition: none; will-change: transform; }
-
     .table-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8vw 1.5vw; flex: 1; min-height: 0; height: 100%; }
     .table-grid .scroll-wrapper { flex: 1; overflow: hidden; position: relative; mask-image: linear-gradient(to bottom, transparent 0%, black 8%, black 92%, transparent 100%); -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 8%, black 92%, transparent 100%); }
     .table-grid .scroll-inner { animation: none; }
@@ -269,13 +249,11 @@
 
     <!-- ===== SLIDE 0: TITLE ===== -->
     <div class="slide active" id="slide0" data-index="0" data-duration="6000">
-      <div class="slide-image"></div>
       <div class="slide-counter"><span class="current">1</span> / 16</div>
     </div>
 
     <!-- ===== SLIDE 1: DATA IMAGE ===== -->
     <div class="slide" id="slide1" data-index="1" data-duration="8000">
-      <div class="slide-image"></div>
       <div class="slide-counter"><span class="current">2</span> / 16</div>
     </div>
 
@@ -456,49 +434,41 @@
 
     <!-- ===== SLIDE 8: IE SLIDE 1 ===== -->
     <div class="slide" id="slide8" data-index="8" data-duration="6000">
-      <div class="slide-image"></div>
       <div class="slide-counter"><span class="current">9</span> / 16</div>
     </div>
 
     <!-- ===== SLIDE 9: IE SLIDE 2 ===== -->
     <div class="slide" id="slide9" data-index="9" data-duration="6000">
-      <div class="slide-image"></div>
       <div class="slide-counter"><span class="current">10</span> / 16</div>
     </div>
 
     <!-- ===== SLIDE 10: IE SLIDE 3 ===== -->
     <div class="slide" id="slide10" data-index="10" data-duration="6000">
-      <div class="slide-image"></div>
       <div class="slide-counter"><span class="current">11</span> / 16</div>
     </div>
 
     <!-- ===== SLIDE 11: IE SLIDE 4 ===== -->
     <div class="slide" id="slide11" data-index="11" data-duration="6000">
-      <div class="slide-image"></div>
       <div class="slide-counter"><span class="current">12</span> / 16</div>
     </div>
 
     <!-- ===== SLIDE 12: IE SLIDE 5 ===== -->
     <div class="slide" id="slide12" data-index="12" data-duration="6000">
-      <div class="slide-image"></div>
       <div class="slide-counter"><span class="current">13</span> / 16</div>
     </div>
 
     <!-- ===== SLIDE 13: IE SLIDE 6 ===== -->
     <div class="slide" id="slide13" data-index="13" data-duration="6000">
-      <div class="slide-image"></div>
       <div class="slide-counter"><span class="current">14</span> / 16</div>
     </div>
 
     <!-- ===== SLIDE 14: IE SLIDE 7 ===== -->
     <div class="slide" id="slide14" data-index="14" data-duration="6000">
-      <div class="slide-image"></div>
       <div class="slide-counter"><span class="current">15</span> / 16</div>
     </div>
 
     <!-- ===== SLIDE 15: IE SLIDE 8 ===== -->
     <div class="slide" id="slide15" data-index="15" data-duration="6000">
-      <div class="slide-image"></div>
       <div class="slide-counter"><span class="current">16</span> / 16</div>
     </div>
 
