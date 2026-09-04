@@ -10,8 +10,8 @@
       "colour": "#3b82f6",
       "metrics": {
         "SIS": {
-          "current": 75,
-          "previous": 76,
+          "current": 0,
+          "previous": 0,
           "history": [
             76,
             77,
@@ -21,8 +21,8 @@
           ]
         },
         "IFSR": {
-          "current": 85,
-          "previous": 85,
+          "current": 0,
+          "previous": 0,
           "history": [
             86,
             87,
@@ -32,8 +32,8 @@
           ]
         },
         "CHT": {
-          "current": 847,
-          "previous": 847,
+          "current": 0,
+          "previous": 0,
           "history": [
             868,
             859,
@@ -49,8 +49,8 @@
       "colour": "#f59e0b",
       "metrics": {
         "SIS": {
-          "current": 83,
-          "previous": 83,
+          "current": 0,
+          "previous": 0,
           "history": [
             82,
             83,
@@ -60,8 +60,8 @@
           ]
         },
         "IFSR": {
-          "current": 79,
-          "previous": 79,
+          "current": 0,
+          "previous": 0,
           "history": [
             78,
             79,
@@ -71,8 +71,8 @@
           ]
         },
         "CHT": {
-          "current": 924,
-          "previous": 924,
+          "current": 0,
+          "previous": 0,
           "history": [
             920,
             910,
@@ -84,6 +84,6 @@
       }
     }
   ],
-  "lastUpdated": "2026-08-28T19:44:33.638Z",
+  "lastUpdated": "2026-09-04T19:08:43.490Z",
   "lastUpdatedBy": "admin"
 }
