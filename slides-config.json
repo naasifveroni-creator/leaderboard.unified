@@ -60,6 +60,18 @@
       "type": "data-image",
       "name": "IE Slide 1",
       "bg": "assets/slides/iex1.webp.jpg"
+    },
+    {
+      "id": 9,
+      "type": "data-image",
+      "name": "IE Slide 2",
+      "bg": "assets/slides/iex2.webp.jpg"
+    },
+    {
+      "id": 10,
+      "type": "data-image",
+      "name": "IE Slide 3",
+      "bg": "assets/slides/iex3.webp.jpg"
     }
   ]
 }
