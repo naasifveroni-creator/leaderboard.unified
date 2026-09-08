@@ -63,9 +63,9 @@
     },
     {
       "id": 9,
-      "type": "title",
-      "name": "Unnamed",
-      "bg": "assets/slides/default.jpg"
+      "type": "summary",
+      "name": "SUM",
+      "dataSource": "comparison.json"
     }
   ]
 }
