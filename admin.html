@@ -7,6 +7,7 @@
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <style>
+    /* ===== ALL ORIGINAL STYLES – KEPT INTACT ===== */
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, sans-serif; }
     body { background: #f1f5f9; padding: 1.5rem; max-width: 1300px; margin: 0 auto; }
     h1 { font-size: 2rem; color: #0f172a; margin-bottom: 0.2rem; display: flex; align-items: center; gap: 0.8rem; }
@@ -328,8 +329,13 @@
   // ============================================================
   const ADMIN_PIN = '1234';
 
-  let REPO_OWNER = 'naasifveroni-creator';
-  let REPO_NAME = 'leaderboard.unified';
+  // ============================================================
+  // REPO SETTINGS – CHANGE THESE TO YOUR ACTUAL REPO
+  // ============================================================
+  let REPO_OWNER = 'YOUR_USERNAME';   // <-- CHANGE THIS
+  let REPO_NAME = 'YOUR_REPO_NAME';   // <-- CHANGE THIS
+
+  // Optional auto-detect for GitHub Pages – works if hosted on username.github.io/repo
   try {
     const hostParts = window.location.hostname.split('.');
     const pathParts = window.location.pathname.split('/').filter(p => p);
@@ -414,7 +420,7 @@
   }
 
   // ============================================================
-  // LEADERBOARD (SIS)
+  // LEADERBOARD (SIS) – UNCHANGED
   // ============================================================
   function sisSetCurrentWeek() {
     const now = new Date();
@@ -489,7 +495,7 @@
 
   async function loadLeaderboard() {
     try {
-      const res = await fetch('data/leaderboard.json');
+      const res = await fetch('data/leaderboard.json?t=' + Date.now());
       const data = await res.json();
       document.getElementById('sisTeamsInput').value = data.teams.map(t => `${t.name}\t${t.score}`).join('\n');
       document.getElementById('sisAgentsInput').value = data.agents.map(a => `${a.name}\t${a.score}`).join('\n');
@@ -606,7 +612,7 @@
   });
 
   // ============================================================
-  // COMPARISON
+  // COMPARISON – UNCHANGED
   // ============================================================
   let compCurrentData = null;
 
@@ -684,7 +690,7 @@
 
   async function loadComparison() {
     try {
-      const res = await fetch('data/comparison.json');
+      const res = await fetch('data/comparison.json?t=' + Date.now());
       const data = await res.json();
       compBuildForms(data);
       setStatus('compStatus', '✅ Loaded comparison.json');
@@ -822,23 +828,18 @@
   });
 
   // ============================================================
-  // SLIDES – FIXED
+  // SLIDES – FULLY FIXED
   // ============================================================
   let slideConfig = null;
-  let slideConfigSha = '';
 
   async function loadSlides() {
     try {
       const res = await fetch('slides-config.json?t=' + Date.now());
       if (res.ok) {
         slideConfig = await res.json();
-        try {
-          const shaRes = await fetch('slides-config.json');
-          const data = await shaRes.json();
-          slideConfigSha = data.sha || '';
-        } catch(e) {}
         setStatus('slidesStatus', '✅ Slides loaded');
       } else {
+        // Create default config (this will be used if file doesn't exist)
         slideConfig = {
           slides: [
             { id: 0, type: 'title', name: 'SIS Title', bg: 'assets/slides/slide-title.webp.jpg' },
@@ -854,8 +855,7 @@
             { id: 10, type: 'data-image', name: 'IE Slide 3', bg: 'assets/slides/iex3.webp.jpg' }
           ]
         };
-        slideConfigSha = '';
-        setStatus('slidesStatus', '📄 Created default config');
+        setStatus('slidesStatus', '📄 No config found – using defaults');
       }
       renderSlideList();
     } catch(e) {
@@ -1048,7 +1048,7 @@
 
   document.getElementById('addSlideBtn').addEventListener('click', openAddModal);
 
-  // ---- SAVE TO GITHUB - FIXED ----
+  // ---- SAVE TO GITHUB – FIXED (SHA retrieval already correct) ----
   document.getElementById('saveSlidesBtn').addEventListener('click', async function() {
     const token = getToken();
     if (!token) {
@@ -1060,8 +1060,8 @@
     const payload = JSON.stringify(slideConfig, null, 2);
 
     try {
+      // Step 1: Always try to get the file to get the SHA
       let sha = '';
-      // Try to get the file first
       try {
         const getRes = await fetch(url, {
           headers: {
@@ -1073,9 +1073,14 @@
           const existing = await getRes.json();
           sha = existing.sha;
           console.log('✅ Got SHA:', sha);
+        } else if (getRes.status === 404) {
+          console.log('📄 File not found – will create new');
+        } else {
+          console.warn('⚠️ Failed to get file:', getRes.status);
         }
       } catch(e) {}
 
+      // Step 2: Build the request
       const body = {
         message: 'Update slides configuration via admin',
         content: btoa(unescape(encodeURIComponent(payload))),
@@ -1083,6 +1088,7 @@
       };
       if (sha) body.sha = sha;
 
+      // Step 3: Send the PUT request
       const res = await fetch(url, {
         method: 'PUT',
         headers: {
@@ -1095,9 +1101,8 @@
 
       if (res.ok) {
         const data = await res.json();
-        slideConfigSha = data.content.sha || '';
         setStatus('slidesStatus', '✅ Slides published to GitHub successfully!');
-        await loadSlides();
+        await loadSlides(); // reload to get fresh state
       } else {
         const err = await res.json();
         console.error('❌ Publish error:', err);
