@@ -828,38 +828,87 @@
   });
 
   // ============================================================
-  // SLIDES – FULLY FIXED
+  // SLIDES – FULLY FIXED WITH PROPER SHA HANDLING
   // ============================================================
   let slideConfig = null;
+  let slideConfigSha = '';
+
+  function getDefaultConfig() {
+    return {
+      slides: [
+        { id: 0, type: 'title', name: 'SIS Title', bg: 'assets/slides/slide-title.webp.jpg' },
+        { id: 1, type: 'data-image', name: 'SIS Data Image', bg: 'assets/slides/slide-data.webp.jpg' },
+        { id: 2, type: 'table', name: 'Agents – SIS', dataSource: 'leaderboard.json', dataType: 'agents', title: 'Top Performing Agents – SIS' },
+        { id: 3, type: 'table', name: 'Teams – SIS', dataSource: 'leaderboard.json', dataType: 'teams', title: 'Top Performing Teams – SIS' },
+        { id: 4, type: 'comparison-detail', name: 'SIS Detail', dataSource: 'comparison.json', metric: 'SIS' },
+        { id: 5, type: 'comparison-detail', name: 'IFSR Detail', dataSource: 'comparison.json', metric: 'IFSR' },
+        { id: 6, type: 'comparison-detail', name: 'CHT Detail', dataSource: 'comparison.json', metric: 'CHT' },
+        { id: 7, type: 'summary', name: 'Summary Report', dataSource: 'comparison.json' },
+        { id: 8, type: 'data-image', name: 'IE Slide 1', bg: 'assets/slides/iex1.webp.png' },
+        { id: 9, type: 'data-image', name: 'IE Slide 2', bg: 'assets/slides/iex2.webp.png' },
+        { id: 10, type: 'data-image', name: 'IE Slide 3', bg: 'assets/slides/iex3.webp.png' },
+        { id: 11, type: 'data-image', name: 'IE Slide 4', bg: 'assets/slides/iex4.webp.png' },
+        { id: 12, type: 'data-image', name: 'IE Slide 5', bg: 'assets/slides/iex5.webp.png' },
+        { id: 13, type: 'data-image', name: 'IE Slide 6', bg: 'assets/slides/iex6.webp.png' },
+        { id: 14, type: 'data-image', name: 'IE Slide 7', bg: 'assets/slides/iex7.webp.png' },
+        { id: 15, type: 'data-image', name: 'IE Slide 8', bg: 'assets/slides/iex8.webp.png' }
+      ]
+    };
+  }
 
   async function loadSlides() {
     try {
-      const res = await fetch('slides-config.json?t=' + Date.now());
+      const token = getToken();
+      
+      if (!token) {
+        // Try to load from local if no token
+        try {
+          const res = await fetch('slides-config.json?t=' + Date.now());
+          if (res.ok) {
+            slideConfig = await res.json();
+            setStatus('slidesStatus', '✅ Slides loaded (local)');
+            renderSlideList();
+            return;
+          }
+        } catch(e) {}
+        
+        // Fallback to default
+        slideConfig = getDefaultConfig();
+        setStatus('slidesStatus', '📄 Using default config (no token)', true);
+        renderSlideList();
+        return;
+      }
+
+      const url = `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/slides-config.json`;
+      const res = await fetch(url, {
+        headers: {
+          'Authorization': `token ${token}`,
+          'Accept': 'application/vnd.github.v3+json'
+        }
+      });
+
       if (res.ok) {
-        slideConfig = await res.json();
-        setStatus('slidesStatus', '✅ Slides loaded');
+        const data = await res.json();
+        const content = JSON.parse(atob(data.content));
+        slideConfig = content;
+        slideConfigSha = data.sha || '';
+        setStatus('slidesStatus', '✅ Slides loaded from GitHub');
+      } else if (res.status === 404) {
+        // File doesn't exist - use default
+        slideConfig = getDefaultConfig();
+        slideConfigSha = '';
+        setStatus('slidesStatus', '📄 No config file - using defaults');
       } else {
-        // Create default config (this will be used if file doesn't exist)
-        slideConfig = {
-          slides: [
-            { id: 0, type: 'title', name: 'SIS Title', bg: 'assets/slides/slide-title.webp.jpg' },
-            { id: 1, type: 'data-image', name: 'SIS Data Image', bg: 'assets/slides/slide-data.webp.jpg' },
-            { id: 2, type: 'table', name: 'Agents – SIS', dataSource: 'leaderboard.json', dataType: 'agents', title: 'Top Performing Agents – SIS' },
-            { id: 3, type: 'table', name: 'Teams – SIS', dataSource: 'leaderboard.json', dataType: 'teams', title: 'Top Performing Teams – SIS' },
-            { id: 4, type: 'comparison-detail', name: 'SIS Detail', dataSource: 'comparison.json', metric: 'SIS' },
-            { id: 5, type: 'comparison-detail', name: 'IFSR Detail', dataSource: 'comparison.json', metric: 'IFSR' },
-            { id: 6, type: 'comparison-detail', name: 'CHT Detail', dataSource: 'comparison.json', metric: 'CHT' },
-            { id: 7, type: 'summary', name: 'Summary Report', dataSource: 'comparison.json' },
-            { id: 8, type: 'data-image', name: 'IE Slide 1', bg: 'assets/slides/iex1.webp.jpg' },
-            { id: 9, type: 'data-image', name: 'IE Slide 2', bg: 'assets/slides/iex2.webp.jpg' },
-            { id: 10, type: 'data-image', name: 'IE Slide 3', bg: 'assets/slides/iex3.webp.jpg' }
-          ]
-        };
-        setStatus('slidesStatus', '📄 No config found – using defaults');
+        throw new Error(`Failed to load: ${res.status}`);
       }
       renderSlideList();
     } catch(e) {
-      setStatus('slidesStatus', '❌ Failed to load slides config', true);
+      console.error('Load slides error:', e);
+      // Use default config as fallback
+      slideConfig = getDefaultConfig();
+      slideConfigSha = '';
+      setStatus('slidesStatus', '⚠️ Using default config (error loading)', true);
+      renderSlideList();
     }
   }
 
@@ -1048,7 +1097,7 @@
 
   document.getElementById('addSlideBtn').addEventListener('click', openAddModal);
 
-  // ---- SAVE TO GITHUB – FIXED (SHA retrieval already correct) ----
+  // ---- SAVE TO GITHUB – COMPLETELY FIXED WITH PROPER SHA HANDLING ----
   document.getElementById('saveSlidesBtn').addEventListener('click', async function() {
     const token = getToken();
     if (!token) {
@@ -1056,12 +1105,19 @@
       return;
     }
 
+    if (!slideConfig) {
+      setStatus('slidesStatus', '❌ No slide config to save.', true);
+      return;
+    }
+
     const url = `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/slides-config.json`;
     const payload = JSON.stringify(slideConfig, null, 2);
 
     try {
-      // Step 1: Always try to get the file to get the SHA
-      let sha = '';
+      // Step 1: Get the current file to check if it exists and get SHA
+      let sha = null;
+      let fileExists = false;
+      
       try {
         const getRes = await fetch(url, {
           headers: {
@@ -1069,24 +1125,40 @@
             'Accept': 'application/vnd.github.v3+json'
           }
         });
+        
         if (getRes.ok) {
           const existing = await getRes.json();
           sha = existing.sha;
-          console.log('✅ Got SHA:', sha);
+          fileExists = true;
+          console.log('✅ File exists, SHA:', sha);
         } else if (getRes.status === 404) {
-          console.log('📄 File not found – will create new');
+          console.log('📄 File does not exist - will create new');
+          fileExists = false;
         } else {
-          console.warn('⚠️ Failed to get file:', getRes.status);
+          const errText = await getRes.text();
+          console.warn('⚠️ Unexpected response:', getRes.status, errText);
+          setStatus('slidesStatus', `⚠️ Unexpected error: ${getRes.status}`, true);
+          return;
         }
-      } catch(e) {}
+      } catch (e) {
+        console.warn('⚠️ Could not check file existence:', e);
+        // Continue anyway - will try to create
+      }
 
-      // Step 2: Build the request
+      // Step 2: Build the request body
       const body = {
         message: 'Update slides configuration via admin',
         content: btoa(unescape(encodeURIComponent(payload))),
         branch: 'main'
       };
-      if (sha) body.sha = sha;
+      
+      // Only include SHA if the file exists (for updates)
+      if (fileExists && sha) {
+        body.sha = sha;
+        console.log('🔑 Using SHA for update:', sha);
+      } else {
+        console.log('📝 Creating new file (no SHA)');
+      }
 
       // Step 3: Send the PUT request
       const res = await fetch(url, {
@@ -1101,14 +1173,32 @@
 
       if (res.ok) {
         const data = await res.json();
+        console.log('✅ Save successful:', data);
         setStatus('slidesStatus', '✅ Slides published to GitHub successfully!');
-        await loadSlides(); // reload to get fresh state
+        
+        // Update the SHA for future saves
+        if (data.content && data.content.sha) {
+          slideConfigSha = data.content.sha;
+        }
+        
+        // Reload to get fresh state
+        await loadSlides();
       } else {
         const err = await res.json();
         console.error('❌ Publish error:', err);
-        setStatus('slidesStatus', `❌ Publish failed: ${err.message}`, true);
+        
+        // Handle specific error cases
+        if (err.message && err.message.includes('sha')) {
+          setStatus('slidesStatus', '❌ SHA mismatch - file was changed elsewhere. Reload and try again.', true);
+        } else if (err.message && err.message.includes('permission')) {
+          setStatus('slidesStatus', '❌ Permission denied - check token scope (needs repo).', true);
+        } else if (err.message && err.message.includes('not found')) {
+          setStatus('slidesStatus', '❌ Repository not found - check REPO_OWNER and REPO_NAME.', true);
+        } else {
+          setStatus('slidesStatus', `❌ Publish failed: ${err.message}`, true);
+        }
       }
-    } catch(e) {
+    } catch (e) {
       console.error('❌ Error:', e);
       setStatus('slidesStatus', `❌ Error: ${e.message}`, true);
     }
