@@ -7,7 +7,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <style>
-    /* ===== ALL ORIGINAL CSS – KEPT 100% INTACT ===== */
+    /* ===== ALL YOUR EXISTING CSS – KEPT 100% INTACT ===== */
     * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', 'Segoe UI', Roboto, system-ui, sans-serif; }
     html, body { width: 100%; height: 100%; background: #0b1a33; overflow: hidden; }
     body { display: flex; justify-content: center; align-items: center; padding: 0; }
@@ -23,7 +23,7 @@
     .slide { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; visibility: hidden; transition: opacity 0.8s ease, transform 0.8s ease, visibility 0.8s ease; display: flex; flex-direction: column; transform: scale(0.98); }
     .slide.active { opacity: 1; visibility: visible; position: relative; transform: scale(1); transition: opacity 0.8s ease, transform 0.8s ease, visibility 0.8s ease; }
 
-    /* Dynamic slide backgrounds will be applied via JavaScript */
+    /* ===== TITLE & DATA SLIDES - Will be applied dynamically ===== */
     .slide-title-bg { background: #0b1a33; }
     .slide-title-bg.has-bg { background: var(--slide-bg) center/cover no-repeat, #0b1a33; }
     .slide-ie-bg { background: #0b1a33; }
@@ -75,7 +75,8 @@
     .table-wrap .rank-col { width: 10%; color: #6b7f96; font-weight: 600; font-size: 2.4vh; }
     .table-wrap .name-col { font-weight: 500; text-align: left; font-size: 2.4vh; }
 
-    .table-grid .score-col { width: 45% !important; min-width: 45% !important; max-width: 45% !important; text-align: right; justify-content: flex-end; white-space: nowrap; overflow: visible !important; }
+    #slide2 .table-grid .score-col { width: 45% !important; min-width: 45% !important; max-width: 45% !important; text-align: right; justify-content: flex-end; white-space: nowrap; overflow: visible !important; }
+    #slide3 .table-grid .score-col { width: 55% !important; min-width: 55% !important; max-width: 55% !important; text-align: right !important; justify-content: flex-end !important; white-space: nowrap; padding-right: 0.3vw; overflow: visible !important; }
 
     .trend-arrow { display: inline-block; font-size: 2vh; font-weight: 300; visibility: hidden; transform: translateX(10px); transition: all 0.4s ease; margin-left: 0.2vw; pointer-events: none; }
     .trend-arrow.visible { visibility: visible; transform: translateX(0); }
@@ -118,6 +119,7 @@
     .dot { width: 1vh; height: 1vh; border-radius: 50%; background: rgba(255,255,255,0.2); border: none; cursor: pointer; transition: all 0.3s ease; padding: 0; }
     .dot.active { background: #d32f2f; transform: scale(1.4); box-shadow: 0 0 20px rgba(211,47,47,0.5); }
 
+    #slide4, #slide5, #slide6, #slide7 { background: #f2f5f9; padding: 0; }
     .comp-slide-wrapper { flex: 1; width: 100%; padding: 1vh 3vw 2vh 3vw; display: flex; flex-direction: column; gap: 2vh; min-height: 0; height: 100%; background: #f2f5f9; }
     .comp-slide-wrapper .metric-header { display: flex; align-items: center; gap: 1.2vw; flex-shrink: 0; flex-wrap: wrap; }
     .comp-delta-logo { height: 18vh; width: auto; object-fit: contain; margin-right: 0.5vw; filter: drop-shadow(0 0 20px rgba(211,47,47,0.15)); }
@@ -236,7 +238,7 @@
     <button class="fullscreen-btn" id="fullscreenBtn"><span class="icon">⛶</span> FULL</button>
     <div id="adminAccess"><a href="#" id="adminLink">⚙ ADMIN</a></div>
 
-    <!-- Slides will be dynamically generated here -->
+    <!-- Slides will be dynamically generated from slides-config.json -->
     <div id="slidesContainer"></div>
 
     <!-- ===== NAVIGATION ===== -->
@@ -250,7 +252,7 @@
 
 <script>
   // ============================================================
-  // ADMIN ACCESS
+  // ADMIN ACCESS - ORIGINAL
   // ============================================================
   (function() {
     const ADMIN_PASSWORD = 'delta2026';
@@ -272,7 +274,7 @@
   })();
 
   // ============================================================
-  // FULLSCREEN TOGGLE
+  // FULLSCREEN TOGGLE - ORIGINAL
   // ============================================================
   (function() {
     const btn = document.getElementById('fullscreenBtn');
@@ -301,7 +303,7 @@
   })();
 
   // ============================================================
-  // SLIDE ENGINE - DYNAMIC FROM CONFIG
+  // MAIN SLIDE ENGINE - DYNAMIC FROM CONFIG
   // ============================================================
   (function() {
     let slideConfig = null;
@@ -377,6 +379,8 @@
         slideDiv.id = `slide-${index}`;
         slideDiv.dataset.index = index;
         slideDiv.dataset.duration = slide.duration || 5500;
+        slideDiv.dataset.type = slide.type;
+        if (slide.dataType) slideDiv.dataset.datatype = slide.dataType;
         
         // Build slide content based on type
         slideDiv.innerHTML = buildSlideContent(slide, index);
@@ -724,7 +728,7 @@
     window.resumeSlideshow = resumeSlideshow;
 
     // ============================================================
-    // DATA RENDERING
+    // DATA RENDERING - ORIGINAL FUNCTIONS
     // ============================================================
     function buildTrendArrow(currentVal, previousVal) {
       if (previousVal === undefined || previousVal === null) return `<span class="trend-arrow neutral"></span>`;
@@ -799,7 +803,7 @@
       computedDurationSec = Math.max(AGENTS_MIN_DISPLAY, computedDurationSec);
       computedDurationSec = Math.min(MAX_DISPLAY, computedDurationSec);
       
-      // Find the agents slide (it might be at any index)
+      // Find the agents slide
       const agentsSlide = document.querySelector('.slide[data-type="table"][data-datatype="agents"]');
       if (agentsSlide) {
         agentsSlide.dataset.duration = (computedDurationSec * 1000).toString();
@@ -1093,7 +1097,6 @@
 
         // Update comparison slides
         if (comparisonData.targets && comparisonData.centres) {
-          // Find all comparison-detail and summary slides in the config
           slideConfig.slides.forEach((slide, index) => {
             if (slide.type === 'comparison-detail') {
               updateComparisonSlide(comparisonData, index, slide.metric);
@@ -1113,59 +1116,6 @@
         if (agentWrap) agentWrap.innerHTML = '<div class="empty-state">⚠️ Could not load data.</div>';
         if (teamWrap) teamWrap.innerHTML = '<div class="empty-state">⚠️ Could not load data.</div>';
       }
-    }
-
-    // ============================================================
-    // INIT
-    // ============================================================
-    async function init() {
-      await loadSlidesConfig();
-      buildSlidesFromConfig();
-      
-      // Update slides reference
-      slides = document.querySelectorAll('.slide');
-      dots = document.querySelectorAll('.dot');
-      
-      setupBehaviorTags();
-      
-      // Set up navigation
-      document.getElementById('nextSlide').addEventListener('click', nextSlide);
-      document.getElementById('prevSlide').addEventListener('click', prevSlide);
-      
-      // Keyboard controls
-      document.addEventListener('keydown', (e) => {
-        if (e.key === 'ArrowRight') nextSlide();
-        if (e.key === 'ArrowLeft') prevSlide();
-        if (e.key === ' ' || e.code === 'Space') {
-          e.preventDefault();
-          if (isPaused) resumeSlideshow(); else pauseSlideshow();
-        }
-        if (e.key === 'f' || e.key === 'F') {
-          const btn = document.getElementById('fullscreenBtn');
-          if (btn) btn.click();
-        }
-      });
-
-      // Mouse hover pause
-      const wrapper = document.getElementById('slidesWrapper');
-      wrapper.addEventListener('mouseenter', pauseSlideshow);
-      wrapper.addEventListener('mouseleave', resumeSlideshow);
-
-      // Visibility change
-      document.addEventListener('visibilitychange', () => {
-        if (document.hidden) pauseSlideshow(); else resumeSlideshow();
-      });
-
-      // Load data and start
-      await loadData();
-      
-      // Start slideshow
-      if (slides.length > 0) {
-        startSlideshowTimer(getSlideDuration(slides[0]));
-      }
-      
-      // Auto-refresh data
-      setInterval(loadData, 60000);
     }
 
     // ============================================================
@@ -1203,6 +1153,56 @@
       setTimeout(pollCommand, 500);
       console.log('📡 Remote polling started (command.txt)');
     })();
+
+    // ============================================================
+    // INIT
+    // ============================================================
+    async function init() {
+      await loadSlidesConfig();
+      buildSlidesFromConfig();
+      
+      slides = document.querySelectorAll('.slide');
+      dots = document.querySelectorAll('.dot');
+      
+      setupBehaviorTags();
+      
+      // Set up navigation
+      document.getElementById('nextSlide').addEventListener('click', nextSlide);
+      document.getElementById('prevSlide').addEventListener('click', prevSlide);
+      
+      // Keyboard controls
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowRight') nextSlide();
+        if (e.key === 'ArrowLeft') prevSlide();
+        if (e.key === ' ' || e.code === 'Space') {
+          e.preventDefault();
+          if (isPaused) resumeSlideshow(); else pauseSlideshow();
+        }
+        if (e.key === 'f' || e.key === 'F') {
+          const btn = document.getElementById('fullscreenBtn');
+          if (btn) btn.click();
+        }
+      });
+
+      // Mouse hover pause
+      const wrapper = document.getElementById('slidesWrapper');
+      wrapper.addEventListener('mouseenter', pauseSlideshow);
+      wrapper.addEventListener('mouseleave', resumeSlideshow);
+
+      // Visibility change
+      document.addEventListener('visibilitychange', () => {
+        if (document.hidden) pauseSlideshow(); else resumeSlideshow();
+      });
+
+      // Load data and start
+      await loadData();
+      
+      if (slides.length > 0) {
+        startSlideshowTimer(getSlideDuration(slides[0]));
+      }
+      
+      setInterval(loadData, 60000);
+    }
 
     // Start everything
     if (document.readyState === 'loading') {
