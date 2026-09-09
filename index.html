@@ -7,7 +7,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <style>
-    /* ===== ALL YOUR EXISTING CSS – KEPT 100% INTACT ===== */
+    /* ===== ALL YOUR ORIGINAL CSS - UNCHANGED ===== */
     * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', 'Segoe UI', Roboto, system-ui, sans-serif; }
     html, body { width: 100%; height: 100%; background: #0b1a33; overflow: hidden; }
     body { display: flex; justify-content: center; align-items: center; padding: 0; }
@@ -23,13 +23,22 @@
     .slide { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; visibility: hidden; transition: opacity 0.8s ease, transform 0.8s ease, visibility 0.8s ease; display: flex; flex-direction: column; transform: scale(0.98); }
     .slide.active { opacity: 1; visibility: visible; position: relative; transform: scale(1); transition: opacity 0.8s ease, transform 0.8s ease, visibility 0.8s ease; }
 
-    /* ===== TITLE & DATA SLIDES - Will be applied dynamically ===== */
-    .slide-title-bg { background: #0b1a33; }
-    .slide-title-bg.has-bg { background: var(--slide-bg) center/cover no-repeat, #0b1a33; }
-    .slide-ie-bg { background: #0b1a33; }
-    .slide-ie-bg.has-bg { background: #0b1a33 var(--slide-bg) center/contain no-repeat; }
-    .slide-table-bg { background: linear-gradient(145deg, #f0f3f8 0%, #e8ecf4 100%); padding: 0; }
-    .slide-comp-bg { background: #f2f5f9; padding: 0; }
+    /* ===== TITLE & DATA SLIDES ===== */
+    #slide0 { background: url('assets/slides/slide-title.webp.jpg') center/cover no-repeat, #0b1a33; }
+    #slide1 { background: url('assets/slides/slide-data.webp.jpg') center/cover no-repeat, #0b1a33; }
+
+    /* ===== IE SLIDES – CONTAIN (NO STRETCH) ===== */
+    #slide8 { background: #0b1a33 url('assets/slides/iex1.webp.png?v=2') center/contain no-repeat; }
+    #slide9 { background: #0b1a33 url('assets/slides/iex2.webp.png?v=2') center/contain no-repeat; }
+    #slide10 { background: #0b1a33 url('assets/slides/iex3.webp.png?v=2') center/contain no-repeat; }
+    #slide11 { background: #0b1a33 url('assets/slides/iex4.webp.png?v=2') center/contain no-repeat; }
+    #slide12 { background: #0b1a33 url('assets/slides/iex5.webp.png?v=2') center/contain no-repeat; }
+    #slide13 { background: #0b1a33 url('assets/slides/iex6.webp.png?v=2') center/contain no-repeat; }
+    #slide14 { background: #0b1a33 url('assets/slides/iex7.webp.png?v=2') center/contain no-repeat; }
+    #slide15 { background: #0b1a33 url('assets/slides/iex8.webp.png?v=2') center/contain no-repeat; }
+
+    /* ===== AGENTS & TEAMS SLIDES ===== */
+    #slide2, #slide3 { background: linear-gradient(145deg, #f0f3f8 0%, #e8ecf4 100%); padding: 0; }
 
     .slide-header { background: #0b1a33; backdrop-filter: blur(16px) saturate(180%); -webkit-backdrop-filter: blur(16px) saturate(180%); padding: 0.3vh 2vw; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.2vh 1vw; flex-shrink: 0; min-height: 10vh; border-bottom: 2px solid rgba(211,47,47,0.3); position: relative; overflow: hidden; box-shadow: 0 4px 30px rgba(0,0,0,0.3); border-radius: 0 0 12px 12px; margin: 0 0.5vw; }
     .slide-header::before { content: ''; position: absolute; top: 0; left: -150%; width: 300%; height: 100%; background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.02) 20%, rgba(255,255,255,0.06) 40%, rgba(255,255,255,0.02) 60%, transparent 100%); animation: shimmerWhite 10s ease-in-out infinite; pointer-events: none; z-index: 0; }
@@ -238,8 +247,200 @@
     <button class="fullscreen-btn" id="fullscreenBtn"><span class="icon">⛶</span> FULL</button>
     <div id="adminAccess"><a href="#" id="adminLink">⚙ ADMIN</a></div>
 
-    <!-- Slides will be dynamically generated from slides-config.json -->
-    <div id="slidesContainer"></div>
+    <!-- ===== SLIDE 0: TITLE ===== -->
+    <div class="slide active" id="slide0" data-index="0" data-duration="6000">
+      <div class="slide-counter"><span class="current">1</span> / 16</div>
+    </div>
+
+    <!-- ===== SLIDE 1: DATA IMAGE ===== -->
+    <div class="slide" id="slide1" data-index="1" data-duration="8000">
+      <div class="slide-counter"><span class="current">2</span> / 16</div>
+    </div>
+
+    <!-- ===== SLIDE 2: AGENTS ===== -->
+    <div class="slide" id="slide2" data-index="2" data-duration="40000">
+      <div class="slide-counter"><span class="current">3</span> / 16</div>
+      <div class="slide-header">
+        <div class="logo-area"><img src="assets/logos/delta-logo-ribbon.png?v=36" alt="Delta" /><h1><span>DELTA</span> · SIS</h1></div>
+        <div class="behavior-tags" id="tags1">
+          <span class="tag" data-delay="0">GREET ME</span><span class="divider">•</span>
+          <span class="tag" data-delay="100">RECOGNIZE ME</span><span class="divider">•</span>
+          <span class="tag" data-delay="200">BE KIND TO ME</span><span class="divider">•</span>
+          <span class="tag" data-delay="300">INFORM ME</span><span class="divider">•</span>
+          <span class="tag red" data-delay="400">CONSISTENTLY EXECUTED</span><span class="divider">•</span>
+          <span class="tag coach" data-delay="500">LEADERS AS COACHES</span>
+        </div>
+        <div class="border-line"></div>
+      </div>
+      <div class="table-wrap">
+        <div class="slide-title">Top Performing Agents – SIS <span class="week-date" id="agentsWeek">Loading...</span></div>
+        <div class="table-grid" id="agentTableWrap"><div class="empty-state">Loading agents…</div></div>
+      </div>
+      <div class="slide-footer"><div class="footer-animation"><div class="spray-fill"></div><svg class="plane" viewBox="0 0 80 50" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M15 25 L70 20 L80 25 L70 30 L15 25Z" fill="#d32f2f" stroke="#b71c1c" stroke-width="1"/><path d="M45 22 L60 10 L68 15 L52 25 L45 22Z" fill="#ffffff" stroke="#d32f2f" stroke-width="1.5"/><path d="M45 28 L60 40 L68 35 L52 25 L45 28Z" fill="#ffffff" stroke="#d32f2f" stroke-width="1.5"/><path d="M15 25 L5 15 L15 20 L15 25Z" fill="#d32f2f"/><path d="M15 25 L5 35 L15 30 L15 25Z" fill="#d32f2f"/><path d="M15 23 L8 18 L15 22 L15 23Z" fill="#ffffff" stroke="#d32f2f" stroke-width="1"/><path d="M15 27 L8 32 L15 28 L15 27Z" fill="#ffffff" stroke="#d32f2f" stroke-width="1"/><circle cx="78" cy="25" r="3" fill="#fdb913"/><ellipse cx="82" cy="25" rx="8" ry="2" fill="#fdb913" opacity="0.8"/><path d="M65 23 Q72 23 68 27 Q65 27 65 23Z" fill="#0b1a33" opacity="0.6"/></svg><div class="spray-text">DELTA</div></div></div>
+      <div class="progress-container"><div class="progress-bar" id="progressBar"></div></div>
+    </div>
+
+    <!-- ===== SLIDE 3: TEAMS ===== -->
+    <div class="slide" id="slide3" data-index="3" data-duration="45000">
+      <div class="slide-counter"><span class="current">4</span> / 16</div>
+      <div class="slide-header">
+        <div class="logo-area"><img src="assets/logos/delta-logo-ribbon.png?v=36" alt="Delta" /><h1><span>DELTA</span> · SIS</h1></div>
+        <div class="behavior-tags" id="tags2">
+          <span class="tag" data-delay="0">GREET ME</span><span class="divider">•</span>
+          <span class="tag" data-delay="100">RECOGNIZE ME</span><span class="divider">•</span>
+          <span class="tag" data-delay="200">BE KIND TO ME</span><span class="divider">•</span>
+          <span class="tag" data-delay="300">INFORM ME</span><span class="divider">•</span>
+          <span class="tag red" data-delay="400">CONSISTENTLY EXECUTED</span><span class="divider">•</span>
+          <span class="tag coach" data-delay="500">LEADERS AS COACHES</span>
+        </div>
+        <div class="border-line"></div>
+      </div>
+      <div class="table-wrap">
+        <div class="slide-title">Top Performing Teams – SIS <span class="week-date" id="teamsWeek">Loading...</span></div>
+        <div class="table-grid" id="teamTableWrap"><div class="empty-state">Loading teams…</div></div>
+      </div>
+      <div class="slide-footer"><div class="footer-animation"><div class="spray-fill"></div><svg class="plane" viewBox="0 0 80 50" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M15 25 L70 20 L80 25 L70 30 L15 25Z" fill="#d32f2f" stroke="#b71c1c" stroke-width="1"/><path d="M45 22 L60 10 L68 15 L52 25 L45 22Z" fill="#ffffff" stroke="#d32f2f" stroke-width="1.5"/><path d="M45 28 L60 40 L68 35 L52 25 L45 28Z" fill="#ffffff" stroke="#d32f2f" stroke-width="1.5"/><path d="M15 25 L5 15 L15 20 L15 25Z" fill="#d32f2f"/><path d="M15 25 L5 35 L15 30 L15 25Z" fill="#d32f2f"/><path d="M15 23 L8 18 L15 22 L15 23Z" fill="#ffffff" stroke="#d32f2f" stroke-width="1"/><path d="M15 27 L8 32 L15 28 L15 27Z" fill="#ffffff" stroke="#d32f2f" stroke-width="1"/><circle cx="78" cy="25" r="3" fill="#fdb913"/><ellipse cx="82" cy="25" rx="8" ry="2" fill="#fdb913" opacity="0.8"/><path d="M65 23 Q72 23 68 27 Q65 27 65 23Z" fill="#0b1a33" opacity="0.6"/></svg><div class="spray-text">DELTA</div></div></div>
+      <div class="progress-container"><div class="progress-bar" id="progressBar"></div></div>
+    </div>
+
+    <!-- ===== SLIDE 4: SIS COMPARISON ===== -->
+    <div class="slide" id="slide4" data-index="4" data-duration="12000">
+      <div class="slide-counter"><span class="current">5</span> / 16</div>
+      <div class="comp-slide-wrapper" id="compSlide4">
+        <div class="metric-header">
+          <img src="assets/logos/delta-logo.png" alt="Delta" class="comp-delta-logo" onerror="this.style.display='none'" />
+          <h2>SIS</h2>
+          <span class="unit-badge">Target: --</span>
+        </div>
+        <div class="card-row">
+          <div class="centre-card tp">
+            <div class="chart-area"><canvas id="chart-SIS-TP-slide4"></canvas></div>
+            <div class="details-area">
+              <div class="centre-name"><img src="assets/logos/TP-logo.png" alt="TP" class="centre-logo" onerror="this.style.display='none'" /></div>
+              <div class="main-value">-- <span class="trend">—</span></div>
+              <div class="comparison-row"><span class="prev-label">Prev: --</span><span class="gap-label">-- vs target</span></div>
+              <div class="insight-row"><span class="insight-badge">Loading...</span></div>
+            </div>
+          </div>
+          <div class="centre-card wns">
+            <div class="chart-area"><canvas id="chart-SIS-WNS-slide4"></canvas></div>
+            <div class="details-area">
+              <div class="centre-name"><img src="assets/logos/wns-logo.png" alt="WNS" class="centre-logo" onerror="this.style.display='none'" /></div>
+              <div class="main-value">-- <span class="trend">—</span></div>
+              <div class="comparison-row"><span class="prev-label">Prev: --</span><span class="gap-label">-- vs target</span></div>
+              <div class="insight-row"><span class="insight-badge">Loading...</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="progress-container"><div class="progress-bar" id="progressBar"></div></div>
+    </div>
+
+    <!-- ===== SLIDE 5: IFSR COMPARISON ===== -->
+    <div class="slide" id="slide5" data-index="5" data-duration="12000">
+      <div class="slide-counter"><span class="current">6</span> / 16</div>
+      <div class="comp-slide-wrapper" id="compSlide5">
+        <div class="metric-header">
+          <img src="assets/logos/delta-logo.png" alt="Delta" class="comp-delta-logo" onerror="this.style.display='none'" />
+          <h2>IFSR</h2>
+          <span class="unit-badge">Target: --</span>
+        </div>
+        <div class="card-row">
+          <div class="centre-card tp">
+            <div class="chart-area"><canvas id="chart-IFSR-TP-slide5"></canvas></div>
+            <div class="details-area">
+              <div class="centre-name"><img src="assets/logos/TP-logo.png" alt="TP" class="centre-logo" onerror="this.style.display='none'" /></div>
+              <div class="main-value">-- <span class="trend">—</span></div>
+              <div class="comparison-row"><span class="prev-label">Prev: --</span><span class="gap-label">-- vs target</span></div>
+              <div class="insight-row"><span class="insight-badge">Loading...</span></div>
+            </div>
+          </div>
+          <div class="centre-card wns">
+            <div class="chart-area"><canvas id="chart-IFSR-WNS-slide5"></canvas></div>
+            <div class="details-area">
+              <div class="centre-name"><img src="assets/logos/wns-logo.png" alt="WNS" class="centre-logo" onerror="this.style.display='none'" /></div>
+              <div class="main-value">-- <span class="trend">—</span></div>
+              <div class="comparison-row"><span class="prev-label">Prev: --</span><span class="gap-label">-- vs target</span></div>
+              <div class="insight-row"><span class="insight-badge">Loading...</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="progress-container"><div class="progress-bar" id="progressBar"></div></div>
+    </div>
+
+    <!-- ===== SLIDE 6: CHT COMPARISON ===== -->
+    <div class="slide" id="slide6" data-index="6" data-duration="12000">
+      <div class="slide-counter"><span class="current">7</span> / 16</div>
+      <div class="comp-slide-wrapper" id="compSlide6">
+        <div class="metric-header">
+          <img src="assets/logos/delta-logo.png" alt="Delta" class="comp-delta-logo" onerror="this.style.display='none'" />
+          <h2>CHT</h2>
+          <span class="unit-badge">Target: --</span>
+        </div>
+        <div class="card-row">
+          <div class="centre-card tp">
+            <div class="chart-area"><canvas id="chart-CHT-TP-slide6"></canvas></div>
+            <div class="details-area">
+              <div class="centre-name"><img src="assets/logos/TP-logo.png" alt="TP" class="centre-logo" onerror="this.style.display='none'" /></div>
+              <div class="main-value">-- <span class="trend">—</span></div>
+              <div class="comparison-row"><span class="prev-label">Prev: --</span><span class="gap-label">-- vs target</span></div>
+              <div class="insight-row"><span class="insight-badge">Loading...</span></div>
+            </div>
+          </div>
+          <div class="centre-card wns">
+            <div class="chart-area"><canvas id="chart-CHT-WNS-slide6"></canvas></div>
+            <div class="details-area">
+              <div class="centre-name"><img src="assets/logos/wns-logo.png" alt="WNS" class="centre-logo" onerror="this.style.display='none'" /></div>
+              <div class="main-value">-- <span class="trend">—</span></div>
+              <div class="comparison-row"><span class="prev-label">Prev: --</span><span class="gap-label">-- vs target</span></div>
+              <div class="insight-row"><span class="insight-badge">Loading...</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="progress-container"><div class="progress-bar" id="progressBar"></div></div>
+    </div>
+
+    <!-- ===== SLIDE 7: SUMMARY ===== -->
+    <div class="slide" id="slide7" data-index="7" data-duration="15000">
+      <div class="slide-counter"><span class="current">8</span> / 16</div>
+      <div class="comp-slide-wrapper" id="compSlide7">
+        <div class="metric-header">
+          <img src="assets/logos/delta-logo.png" alt="Delta" class="comp-delta-logo" onerror="this.style.display='none'" />
+          <h2>📊 Summary Report</h2>
+          <span class="unit-badge">All Metrics</span>
+        </div>
+        <div class="summary-grid-vertical" id="summaryGrid">
+          <div class="summary-card-vertical">
+            <div class="metric-title">SIS <span class="unit">Target: --</span></div>
+            <div class="summary-row-vertical"><div class="centre-info"><img src="assets/logos/TP-logo.png" alt="TP" class="centre-logo" style="height:3.5vh;width:auto;object-fit:contain;" onerror="this.style.display='none'" /></div><div class="values"><span class="current">--</span><span class="change">--</span><span class="gap-badge">--</span></div></div>
+            <div class="summary-row-vertical"><div class="centre-info"><img src="assets/logos/wns-logo.png" alt="WNS" class="centre-logo" style="height:3.5vh;width:auto;object-fit:contain;" onerror="this.style.display='none'" /></div><div class="values"><span class="current">--</span><span class="change">--</span><span class="gap-badge">--</span></div></div>
+          </div>
+          <div class="summary-card-vertical">
+            <div class="metric-title">IFSR <span class="unit">Target: --</span></div>
+            <div class="summary-row-vertical"><div class="centre-info"><img src="assets/logos/TP-logo.png" alt="TP" class="centre-logo" style="height:3.5vh;width:auto;object-fit:contain;" onerror="this.style.display='none'" /></div><div class="values"><span class="current">--</span><span class="change">--</span><span class="gap-badge">--</span></div></div>
+            <div class="summary-row-vertical"><div class="centre-info"><img src="assets/logos/wns-logo.png" alt="WNS" class="centre-logo" style="height:3.5vh;width:auto;object-fit:contain;" onerror="this.style.display='none'" /></div><div class="values"><span class="current">--</span><span class="change">--</span><span class="gap-badge">--</span></div></div>
+          </div>
+          <div class="summary-card-vertical">
+            <div class="metric-title">CHT <span class="unit">Target: --</span></div>
+            <div class="summary-row-vertical"><div class="centre-info"><img src="assets/logos/TP-logo.png" alt="TP" class="centre-logo" style="height:3.5vh;width:auto;object-fit:contain;" onerror="this.style.display='none'" /></div><div class="values"><span class="current">--</span><span class="change">--</span><span class="gap-badge">--</span></div></div>
+            <div class="summary-row-vertical"><div class="centre-info"><img src="assets/logos/wns-logo.png" alt="WNS" class="centre-logo" style="height:3.5vh;width:auto;object-fit:contain;" onerror="this.style.display='none'" /></div><div class="values"><span class="current">--</span><span class="change">--</span><span class="gap-badge">--</span></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="progress-container"><div class="progress-bar" id="progressBar"></div></div>
+    </div>
+
+    <!-- ===== SLIDE 8-15: IE SLIDES ===== -->
+    <div class="slide" id="slide8" data-index="8" data-duration="6000"><div class="slide-counter"><span class="current">9</span> / 16</div></div>
+    <div class="slide" id="slide9" data-index="9" data-duration="6000"><div class="slide-counter"><span class="current">10</span> / 16</div></div>
+    <div class="slide" id="slide10" data-index="10" data-duration="6000"><div class="slide-counter"><span class="current">11</span> / 16</div></div>
+    <div class="slide" id="slide11" data-index="11" data-duration="6000"><div class="slide-counter"><span class="current">12</span> / 16</div></div>
+    <div class="slide" id="slide12" data-index="12" data-duration="6000"><div class="slide-counter"><span class="current">13</span> / 16</div></div>
+    <div class="slide" id="slide13" data-index="13" data-duration="6000"><div class="slide-counter"><span class="current">14</span> / 16</div></div>
+    <div class="slide" id="slide14" data-index="14" data-duration="6000"><div class="slide-counter"><span class="current">15</span> / 16</div></div>
+    <div class="slide" id="slide15" data-index="15" data-duration="6000"><div class="slide-counter"><span class="current">16</span> / 16</div></div>
 
     <!-- ===== NAVIGATION ===== -->
     <div class="nav-controls">
@@ -252,7 +453,11 @@
 
 <script>
   // ============================================================
-  // ADMIN ACCESS - ORIGINAL
+  // ALL YOUR ORIGINAL JAVASCRIPT - KEPT INTACT
+  // ============================================================
+  
+  // ============================================================
+  // ADMIN ACCESS
   // ============================================================
   (function() {
     const ADMIN_PASSWORD = 'delta2026';
@@ -274,7 +479,7 @@
   })();
 
   // ============================================================
-  // FULLSCREEN TOGGLE - ORIGINAL
+  // FULLSCREEN TOGGLE
   // ============================================================
   (function() {
     const btn = document.getElementById('fullscreenBtn');
@@ -303,11 +508,46 @@
   })();
 
   // ============================================================
-  // MAIN SLIDE ENGINE - DYNAMIC FROM CONFIG
+  // BEHAVIOUR TAGS
   // ============================================================
   (function() {
-    let slideConfig = null;
-    let slides = [];
+    function animateTags(container) {
+      const tags = container.querySelectorAll('.tag');
+      tags.forEach(tag => {
+        const delay = parseInt(tag.dataset.delay) || 0;
+        setTimeout(() => tag.classList.add('visible'), delay + 300);
+      });
+    }
+    const tags1 = document.getElementById('tags1');
+    const tags2 = document.getElementById('tags2');
+    if (tags1) animateTags(tags1);
+    if (tags2) animateTags(tags2);
+    const observer = new MutationObserver(() => {
+      document.querySelectorAll('.slide.active .behavior-tags').forEach(tags => {
+        tags.querySelectorAll('.tag').forEach(t => t.classList.remove('visible'));
+        setTimeout(() => animateTags(tags), 300);
+      });
+    });
+    document.querySelectorAll('.slide').forEach(slide => {
+      observer.observe(slide, { attributes: true, attributeFilter: ['class'] });
+    });
+  })();
+
+  // ============================================================
+  // SLIDESHOW ENGINE - YOUR ORIGINAL CODE
+  // ============================================================
+  (function() {
+    const slides = document.querySelectorAll('.slide');
+    const dotsContainer = document.getElementById('dotsContainer');
+    const progressBars = document.querySelectorAll('.progress-bar');
+    const wrapper = document.getElementById('slidesWrapper');
+
+    const AGENTS_TIME_PER_ROW = 0.6;
+    const TEAMS_TIME_PER_ROW = 0.8;
+    const AGENTS_MIN_DISPLAY = 40;
+    const TEAMS_MIN_DISPLAY = 45;
+    const MAX_DISPLAY = 120;
+
     let currentIndex = 0;
     let timer = null;
     let progressInterval = null;
@@ -316,238 +556,8 @@
     let slideDuration = 5500;
     let elapsedTime = 0;
     let scrollAnimFrames = [];
-    let slideAnimInitialized = [];
-    let dots = [];
-    let leaderboardData = null;
-    let comparisonData = null;
+    let slideAnimInitialized = new Array(slides.length).fill(false);
 
-    const AGENTS_TIME_PER_ROW = 0.6;
-    const TEAMS_TIME_PER_ROW = 0.8;
-    const AGENTS_MIN_DISPLAY = 40;
-    const TEAMS_MIN_DISPLAY = 45;
-    const MAX_DISPLAY = 120;
-    const TARGET_THRESHOLD = 86.30;
-
-    // ============================================================
-    // LOAD SLIDES CONFIG
-    // ============================================================
-    async function loadSlidesConfig() {
-      try {
-        const res = await fetch('slides-config.json?t=' + Date.now());
-        if (!res.ok) throw new Error('Config not found');
-        slideConfig = await res.json();
-        console.log('✅ Loaded slides-config.json with', slideConfig.slides.length, 'slides');
-        return true;
-      } catch (e) {
-        console.warn('⚠️ Could not load slides-config.json, using defaults');
-        // Fallback config - matches your original 16 slides
-        slideConfig = {
-          slides: [
-            { id: 0, type: 'title', name: 'SIS Title', bg: 'assets/slides/slide-title.webp.jpg' },
-            { id: 1, type: 'data-image', name: 'SIS Data Image', bg: 'assets/slides/slide-data.webp.jpg' },
-            { id: 2, type: 'table', name: 'Agents – SIS', dataSource: 'leaderboard.json', dataType: 'agents', title: 'Top Performing Agents – SIS' },
-            { id: 3, type: 'table', name: 'Teams – SIS', dataSource: 'leaderboard.json', dataType: 'teams', title: 'Top Performing Teams – SIS' },
-            { id: 4, type: 'comparison-detail', name: 'SIS Detail', dataSource: 'comparison.json', metric: 'SIS' },
-            { id: 5, type: 'comparison-detail', name: 'IFSR Detail', dataSource: 'comparison.json', metric: 'IFSR' },
-            { id: 6, type: 'comparison-detail', name: 'CHT Detail', dataSource: 'comparison.json', metric: 'CHT' },
-            { id: 7, type: 'summary', name: 'Summary Report', dataSource: 'comparison.json' },
-            { id: 8, type: 'data-image', name: 'IE Slide 1', bg: 'assets/slides/iex1.webp.png' },
-            { id: 9, type: 'data-image', name: 'IE Slide 2', bg: 'assets/slides/iex2.webp.png' },
-            { id: 10, type: 'data-image', name: 'IE Slide 3', bg: 'assets/slides/iex3.webp.png' },
-            { id: 11, type: 'data-image', name: 'IE Slide 4', bg: 'assets/slides/iex4.webp.png' },
-            { id: 12, type: 'data-image', name: 'IE Slide 5', bg: 'assets/slides/iex5.webp.png' },
-            { id: 13, type: 'data-image', name: 'IE Slide 6', bg: 'assets/slides/iex6.webp.png' },
-            { id: 14, type: 'data-image', name: 'IE Slide 7', bg: 'assets/slides/iex7.webp.png' },
-            { id: 15, type: 'data-image', name: 'IE Slide 8', bg: 'assets/slides/iex8.webp.png' }
-          ]
-        };
-        return true;
-      }
-    }
-
-    // ============================================================
-    // BUILD SLIDES FROM CONFIG
-    // ============================================================
-    function buildSlidesFromConfig() {
-      const container = document.getElementById('slidesContainer');
-      container.innerHTML = '';
-      
-      slideConfig.slides.forEach((slide, index) => {
-        const slideDiv = document.createElement('div');
-        slideDiv.className = 'slide';
-        if (index === 0) slideDiv.classList.add('active');
-        slideDiv.id = `slide-${index}`;
-        slideDiv.dataset.index = index;
-        slideDiv.dataset.duration = slide.duration || 5500;
-        slideDiv.dataset.type = slide.type;
-        if (slide.dataType) slideDiv.dataset.datatype = slide.dataType;
-        
-        // Build slide content based on type
-        slideDiv.innerHTML = buildSlideContent(slide, index);
-        container.appendChild(slideDiv);
-      });
-
-      // Update slides array and dots
-      slides = document.querySelectorAll('.slide');
-      slideAnimInitialized = new Array(slides.length).fill(false);
-      
-      // Rebuild dots
-      const dotsContainer = document.getElementById('dotsContainer');
-      dotsContainer.innerHTML = '';
-      slides.forEach((_, i) => {
-        const dot = document.createElement('button');
-        dot.className = 'dot' + (i === 0 ? ' active' : '');
-        dot.dataset.index = i;
-        dot.addEventListener('click', () => goToSlide(i));
-        dotsContainer.appendChild(dot);
-      });
-      dots = dotsContainer.querySelectorAll('.dot');
-      
-      console.log('✅ Built', slides.length, 'slides from config');
-    }
-
-    function buildSlideContent(slide, index) {
-      const totalSlides = slideConfig.slides.length;
-      const counter = `<div class="slide-counter"><span class="current">${index + 1}</span> / ${totalSlides}</div>`;
-      
-      switch(slide.type) {
-        case 'title':
-          return `
-            ${counter}
-            <div class="slide-title-bg ${slide.bg ? 'has-bg' : ''}" style="${slide.bg ? `--slide-bg: url('${slide.bg}')` : ''};width:100%;height:100%;"></div>
-          `;
-          
-        case 'data-image':
-          return `
-            ${counter}
-            <div class="slide-ie-bg ${slide.bg ? 'has-bg' : ''}" style="${slide.bg ? `--slide-bg: url('${slide.bg}')` : ''};width:100%;height:100%;"></div>
-          `;
-          
-        case 'table':
-          const isAgent = slide.dataType === 'agents';
-          const tableId = isAgent ? 'agentTableWrap' : 'teamTableWrap';
-          const weekId = isAgent ? 'agentsWeek' : 'teamsWeek';
-          return `
-            ${counter}
-            <div class="slide-header">
-              <div class="logo-area"><img src="assets/logos/delta-logo-ribbon.png?v=36" alt="Delta" /><h1><span>DELTA</span> · SIS</h1></div>
-              <div class="behavior-tags" id="tags-${index}">
-                <span class="tag" data-delay="0">GREET ME</span><span class="divider">•</span>
-                <span class="tag" data-delay="100">RECOGNIZE ME</span><span class="divider">•</span>
-                <span class="tag" data-delay="200">BE KIND TO ME</span><span class="divider">•</span>
-                <span class="tag" data-delay="300">INFORM ME</span><span class="divider">•</span>
-                <span class="tag red" data-delay="400">CONSISTENTLY EXECUTED</span><span class="divider">•</span>
-                <span class="tag coach" data-delay="500">LEADERS AS COACHES</span>
-              </div>
-              <div class="border-line"></div>
-            </div>
-            <div class="table-wrap">
-              <div class="slide-title">${slide.title || 'Data'} <span class="week-date" id="${weekId}">Loading...</span></div>
-              <div class="table-grid" id="${tableId}"><div class="empty-state">Loading data…</div></div>
-            </div>
-            <div class="slide-footer"><div class="footer-animation"><div class="spray-fill"></div><svg class="plane" viewBox="0 0 80 50" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M15 25 L70 20 L80 25 L70 30 L15 25Z" fill="#d32f2f" stroke="#b71c1c" stroke-width="1"/><path d="M45 22 L60 10 L68 15 L52 25 L45 22Z" fill="#ffffff" stroke="#d32f2f" stroke-width="1.5"/><path d="M45 28 L60 40 L68 35 L52 25 L45 28Z" fill="#ffffff" stroke="#d32f2f" stroke-width="1.5"/><path d="M15 25 L5 15 L15 20 L15 25Z" fill="#d32f2f"/><path d="M15 25 L5 35 L15 30 L15 25Z" fill="#d32f2f"/><path d="M15 23 L8 18 L15 22 L15 23Z" fill="#ffffff" stroke="#d32f2f" stroke-width="1"/><path d="M15 27 L8 32 L15 28 L15 27Z" fill="#ffffff" stroke="#d32f2f" stroke-width="1"/><circle cx="78" cy="25" r="3" fill="#fdb913"/><ellipse cx="82" cy="25" rx="8" ry="2" fill="#fdb913" opacity="0.8"/><path d="M65 23 Q72 23 68 27 Q65 27 65 23Z" fill="#0b1a33" opacity="0.6"/></svg><div class="spray-text">DELTA</div></div></div>
-            <div class="progress-container"><div class="progress-bar" id="progressBar"></div></div>
-          `;
-          
-        case 'comparison-detail':
-          const metric = slide.metric || 'SIS';
-          return `
-            ${counter}
-            <div class="comp-slide-wrapper" id="compSlide-${index}">
-              <div class="metric-header">
-                <img src="assets/logos/delta-logo.png" alt="Delta" class="comp-delta-logo" onerror="this.style.display='none'" />
-                <h2>${metric}</h2>
-                <span class="unit-badge">Target: --</span>
-              </div>
-              <div class="card-row">
-                <div class="centre-card tp">
-                  <div class="chart-area"><canvas id="chart-${metric}-TP-${index}"></canvas></div>
-                  <div class="details-area">
-                    <div class="centre-name"><img src="assets/logos/TP-logo.png" alt="TP" class="centre-logo" onerror="this.style.display='none'" /></div>
-                    <div class="main-value">-- <span class="trend">—</span></div>
-                    <div class="comparison-row"><span class="prev-label">Prev: --</span><span class="gap-label">-- vs target</span></div>
-                    <div class="insight-row"><span class="insight-badge">Loading...</span></div>
-                  </div>
-                </div>
-                <div class="centre-card wns">
-                  <div class="chart-area"><canvas id="chart-${metric}-WNS-${index}"></canvas></div>
-                  <div class="details-area">
-                    <div class="centre-name"><img src="assets/logos/wns-logo.png" alt="WNS" class="centre-logo" onerror="this.style.display='none'" /></div>
-                    <div class="main-value">-- <span class="trend">—</span></div>
-                    <div class="comparison-row"><span class="prev-label">Prev: --</span><span class="gap-label">-- vs target</span></div>
-                    <div class="insight-row"><span class="insight-badge">Loading...</span></div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="progress-container"><div class="progress-bar" id="progressBar"></div></div>
-          `;
-          
-        case 'summary':
-          return `
-            ${counter}
-            <div class="comp-slide-wrapper" id="compSlide-${index}">
-              <div class="metric-header">
-                <img src="assets/logos/delta-logo.png" alt="Delta" class="comp-delta-logo" onerror="this.style.display='none'" />
-                <h2>📊 Summary Report</h2>
-                <span class="unit-badge">All Metrics</span>
-              </div>
-              <div class="summary-grid-vertical" id="summaryGrid-${index}">
-                <div class="summary-card-vertical">
-                  <div class="metric-title">SIS <span class="unit">Target: --</span></div>
-                  <div class="summary-row-vertical"><div class="centre-info"><img src="assets/logos/TP-logo.png" alt="TP" class="centre-logo" style="height:3.5vh;width:auto;object-fit:contain;" onerror="this.style.display='none'" /></div><div class="values"><span class="current">--</span><span class="change">--</span><span class="gap-badge">--</span></div></div>
-                  <div class="summary-row-vertical"><div class="centre-info"><img src="assets/logos/wns-logo.png" alt="WNS" class="centre-logo" style="height:3.5vh;width:auto;object-fit:contain;" onerror="this.style.display='none'" /></div><div class="values"><span class="current">--</span><span class="change">--</span><span class="gap-badge">--</span></div></div>
-                </div>
-                <div class="summary-card-vertical">
-                  <div class="metric-title">IFSR <span class="unit">Target: --</span></div>
-                  <div class="summary-row-vertical"><div class="centre-info"><img src="assets/logos/TP-logo.png" alt="TP" class="centre-logo" style="height:3.5vh;width:auto;object-fit:contain;" onerror="this.style.display='none'" /></div><div class="values"><span class="current">--</span><span class="change">--</span><span class="gap-badge">--</span></div></div>
-                  <div class="summary-row-vertical"><div class="centre-info"><img src="assets/logos/wns-logo.png" alt="WNS" class="centre-logo" style="height:3.5vh;width:auto;object-fit:contain;" onerror="this.style.display='none'" /></div><div class="values"><span class="current">--</span><span class="change">--</span><span class="gap-badge">--</span></div></div>
-                </div>
-                <div class="summary-card-vertical">
-                  <div class="metric-title">CHT <span class="unit">Target: --</span></div>
-                  <div class="summary-row-vertical"><div class="centre-info"><img src="assets/logos/TP-logo.png" alt="TP" class="centre-logo" style="height:3.5vh;width:auto;object-fit:contain;" onerror="this.style.display='none'" /></div><div class="values"><span class="current">--</span><span class="change">--</span><span class="gap-badge">--</span></div></div>
-                  <div class="summary-row-vertical"><div class="centre-info"><img src="assets/logos/wns-logo.png" alt="WNS" class="centre-logo" style="height:3.5vh;width:auto;object-fit:contain;" onerror="this.style.display='none'" /></div><div class="values"><span class="current">--</span><span class="change">--</span><span class="gap-badge">--</span></div></div>
-                </div>
-              </div>
-            </div>
-            <div class="progress-container"><div class="progress-bar" id="progressBar"></div></div>
-          `;
-          
-        default:
-          return `${counter}<div style="color:white;display:flex;align-items:center;justify-content:center;height:100%;font-size:3vh;">Unknown slide type: ${slide.type}</div>`;
-      }
-    }
-
-    // ============================================================
-    // BEHAVIOUR TAGS
-    // ============================================================
-    function animateTags(container) {
-      const tags = container.querySelectorAll('.tag');
-      tags.forEach(tag => {
-        const delay = parseInt(tag.dataset.delay) || 0;
-        setTimeout(() => tag.classList.add('visible'), delay + 300);
-      });
-    }
-
-    function setupBehaviorTags() {
-      document.querySelectorAll('.behavior-tags').forEach(tags => {
-        animateTags(tags);
-      });
-      
-      const observer = new MutationObserver(() => {
-        document.querySelectorAll('.slide.active .behavior-tags').forEach(tags => {
-          tags.querySelectorAll('.tag').forEach(t => t.classList.remove('visible'));
-          setTimeout(() => animateTags(tags), 300);
-        });
-      });
-      document.querySelectorAll('.slide').forEach(slide => {
-        observer.observe(slide, { attributes: true, attributeFilter: ['class'] });
-      });
-    }
-
-    // ============================================================
-    // SLIDESHOW ENGINE
-    // ============================================================
     function getSlideDuration(slide) {
       const custom = parseInt(slide.dataset.duration);
       if (!isNaN(custom) && custom > 0) return custom;
@@ -555,7 +565,6 @@
     }
 
     function startProgressBar(duration, startPercent = 0) {
-      const progressBars = document.querySelectorAll('.progress-bar');
       if (progressInterval) clearInterval(progressInterval);
       const startTime = Date.now();
       progressBars.forEach(bar => { bar.style.width = startPercent + '%'; });
@@ -574,7 +583,6 @@
 
     function stopProgressBar() {
       if (progressInterval) { clearInterval(progressInterval); progressInterval = null; }
-      const progressBars = document.querySelectorAll('.progress-bar');
       if (progressBars.length > 0) {
         const currentWidth = parseFloat(progressBars[0].style.width) || 0;
         elapsedTime = (currentWidth / 100) * slideDuration;
@@ -727,9 +735,45 @@
     window.pauseSlideshow = pauseSlideshow;
     window.resumeSlideshow = resumeSlideshow;
 
+    slides.forEach((_, i) => {
+      const dot = document.createElement('button');
+      dot.className = 'dot' + (i === 0 ? ' active' : '');
+      dot.dataset.index = i;
+      dot.addEventListener('click', () => goToSlide(i));
+      dotsContainer.appendChild(dot);
+    });
+    const dots = dotsContainer.querySelectorAll('.dot');
+
+    document.getElementById('nextSlide').addEventListener('click', nextSlide);
+    document.getElementById('prevSlide').addEventListener('click', prevSlide);
+
+    wrapper.addEventListener('mouseenter', pauseSlideshow);
+    wrapper.addEventListener('mouseleave', resumeSlideshow);
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight') nextSlide();
+      if (e.key === 'ArrowLeft') prevSlide();
+      if (e.key === ' ' || e.code === 'Space') {
+        e.preventDefault();
+        if (isPaused) resumeSlideshow(); else pauseSlideshow();
+      }
+      if (e.key === 'f' || e.key === 'F') {
+        const btn = document.getElementById('fullscreenBtn');
+        if (btn) btn.click();
+      }
+    });
+
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) pauseSlideshow(); else resumeSlideshow();
+    });
+
+    window.getCurrentIndex = () => currentIndex;
+
     // ============================================================
-    // DATA RENDERING - ORIGINAL FUNCTIONS
+    // DATA RENDERING - YOUR ORIGINAL FUNCTIONS
     // ============================================================
+    const TARGET_THRESHOLD = 86.30;
+
     function buildTrendArrow(currentVal, previousVal) {
       if (previousVal === undefined || previousVal === null) return `<span class="trend-arrow neutral"></span>`;
       const diff = currentVal - previousVal;
@@ -751,7 +795,6 @@
 
     function renderAgents(containerId, items, previousData) {
       const container = document.getElementById(containerId);
-      if (!container) return;
       if (!items || items.length === 0) {
         container.innerHTML = `<div class="empty-state">No data available.</div>`;
         return;
@@ -802,15 +845,13 @@
       let computedDurationSec = rowCount * AGENTS_TIME_PER_ROW;
       computedDurationSec = Math.max(AGENTS_MIN_DISPLAY, computedDurationSec);
       computedDurationSec = Math.min(MAX_DISPLAY, computedDurationSec);
-      
-      // Find the agents slide
-      const agentsSlide = document.querySelector('.slide[data-type="table"][data-datatype="agents"]');
+      const agentsSlide = document.getElementById('slide2');
       if (agentsSlide) {
         agentsSlide.dataset.duration = (computedDurationSec * 1000).toString();
-        if (currentIndex === parseInt(agentsSlide.dataset.index) && !isTransitioning) {
+        if (currentIndex === 2 && !isTransitioning) {
           clearSlideshowTimer();
-          slideAnimInitialized[currentIndex] = false;
-          resetEntranceAnimations(currentIndex);
+          slideAnimInitialized[2] = false;
+          resetEntranceAnimations(2);
           startSlideshowTimer(computedDurationSec * 1000);
         }
       }
@@ -818,7 +859,6 @@
 
     function renderTeams(containerId, items, previousData) {
       const container = document.getElementById(containerId);
-      if (!container) return;
       if (!items || items.length === 0) {
         container.innerHTML = `<div class="empty-state">No data available.</div>`;
         return;
@@ -864,15 +904,13 @@
       let computedDurationSec = rowCount * TEAMS_TIME_PER_ROW;
       computedDurationSec = Math.max(TEAMS_MIN_DISPLAY, computedDurationSec);
       computedDurationSec = Math.min(MAX_DISPLAY, computedDurationSec);
-      
-      // Find the teams slide
-      const teamsSlide = document.querySelector('.slide[data-type="table"][data-datatype="teams"]');
+      const teamsSlide = document.getElementById('slide3');
       if (teamsSlide) {
         teamsSlide.dataset.duration = (computedDurationSec * 1000).toString();
-        if (currentIndex === parseInt(teamsSlide.dataset.index) && !isTransitioning) {
+        if (currentIndex === 3 && !isTransitioning) {
           clearSlideshowTimer();
-          slideAnimInitialized[currentIndex] = false;
-          resetEntranceAnimations(currentIndex);
+          slideAnimInitialized[3] = false;
+          resetEntranceAnimations(3);
           startSlideshowTimer(computedDurationSec * 1000);
         }
       }
@@ -923,14 +961,12 @@
       return (d > 0 ? '📈' : '📉') + ' ' + dir + ' (' + sign + pct.toFixed(1) + '%)';
     }
 
-    function updateComparisonSlide(data, slideIndex, metric) {
-      const slideWrapper = document.getElementById(`compSlide-${slideIndex}`);
-      if (!slideWrapper) return;
-      
+    function updateComparisonSlide(data, metric, slideId) {
       const target = data.targets[metric];
       const isHigher = metric !== 'CHT';
       const unit = metric === 'CHT' ? 's' : '%';
 
+      const slideWrapper = document.getElementById(slideId);
       const headerH2 = slideWrapper.querySelector('.metric-header h2');
       const unitBadge = slideWrapper.querySelector('.unit-badge');
       if (headerH2) headerH2.textContent = metric;
@@ -981,7 +1017,7 @@
           }
         }
 
-        const canvasId = `chart-${metric}-${centre.name}-${slideIndex}`;
+        const canvasId = `chart-${metric}-${centre.name}-${slideId}`;
         const canvas = document.getElementById(canvasId);
         if (canvas) {
           const ctx = canvas.getContext('2d');
@@ -1009,10 +1045,8 @@
       });
     }
 
-    function updateSummarySlide(data, slideIndex) {
-      const summaryGrid = document.getElementById(`summaryGrid-${slideIndex}`);
-      if (!summaryGrid) return;
-      
+    function updateSummarySlide(data) {
+      const summaryGrid = document.getElementById('summaryGrid');
       const cards = summaryGrid.querySelectorAll('.summary-card-vertical');
       const metrics = ['SIS', 'IFSR', 'CHT'];
 
@@ -1066,9 +1100,8 @@
       return null;
     }
 
-    // ============================================================
-    // LOAD DATA
-    // ============================================================
+    let lastDataHash = '';
+
     async function loadData() {
       try {
         const [lbRes, compRes] = await Promise.all([
@@ -1079,138 +1112,124 @@
         if (!lbRes.ok) throw new Error('Leaderboard data not found');
         if (!compRes.ok) throw new Error('Comparison data not found');
 
-        leaderboardData = await lbRes.json();
-        comparisonData = await compRes.json();
+        const leaderboardData = await lbRes.json();
+        const comparisonData = await compRes.json();
 
-        // Update week labels
         const weekText = leaderboardData.week || 'Week of Jul 20 – Jul 26, 2026';
-        const weekElements = document.querySelectorAll('#agentsWeek, #teamsWeek');
-        weekElements.forEach(el => { if (el) el.textContent = weekText; });
+        document.getElementById('agentsWeek').textContent = weekText;
+        document.getElementById('teamsWeek').textContent = weekText;
 
         const prevData = getPreviousData();
 
-        // Render tables
         renderAgents('agentTableWrap', leaderboardData.agents, prevData);
         renderTeams('teamTableWrap', leaderboardData.teams, prevData);
 
         storeSnapshot(leaderboardData);
 
-        // Update comparison slides
         if (comparisonData.targets && comparisonData.centres) {
-          slideConfig.slides.forEach((slide, index) => {
-            if (slide.type === 'comparison-detail') {
-              updateComparisonSlide(comparisonData, index, slide.metric);
-            } else if (slide.type === 'summary') {
-              updateSummarySlide(comparisonData, index);
-            }
-          });
+          updateComparisonSlide(comparisonData, 'SIS', 'compSlide4');
+          updateComparisonSlide(comparisonData, 'IFSR', 'compSlide5');
+          updateComparisonSlide(comparisonData, 'CHT', 'compSlide6');
+          updateSummarySlide(comparisonData);
         }
 
-        if (!timer && !isPaused && slides[currentIndex] && slides[currentIndex].classList.contains('active')) {
+        if (!timer && !isPaused && slides[currentIndex].classList.contains('active')) {
           startSlideshowTimer(getSlideDuration(slides[currentIndex]));
         }
       } catch (e) {
         console.warn('Data load error:', e);
-        const agentWrap = document.getElementById('agentTableWrap');
-        const teamWrap = document.getElementById('teamTableWrap');
-        if (agentWrap) agentWrap.innerHTML = '<div class="empty-state">⚠️ Could not load data.</div>';
-        if (teamWrap) teamWrap.innerHTML = '<div class="empty-state">⚠️ Could not load data.</div>';
+        document.getElementById('agentTableWrap').innerHTML = '<div class="empty-state">⚠️ Could not load data.</div>';
+        document.getElementById('teamTableWrap').innerHTML = '<div class="empty-state">⚠️ Could not load data.</div>';
       }
     }
 
-    // ============================================================
-    // REMOTE CONTROL
-    // ============================================================
-    (function() {
-      let lastExecutedCommand = '';
-      const POLL_INTERVAL = 2000;
+    loadData();
+    setInterval(loadData, 60000);
+  })();
 
-      async function pollCommand() {
-        try {
-          const res = await fetch('command.txt?' + Date.now());
-          if (!res.ok) return;
-          const command = await res.text();
-          const trimmed = command.trim();
-          if (!trimmed || trimmed === 'none' || trimmed === lastExecutedCommand) return;
-          lastExecutedCommand = trimmed;
-          console.log('📡 Remote command:', trimmed);
+  // ============================================================
+  // REMOTE CONTROL
+  // ============================================================
+  (function() {
+    let lastExecutedCommand = '';
+    const POLL_INTERVAL = 2000;
 
-          if (trimmed === 'next') { if (window.nextSlide) window.nextSlide(); }
-          else if (trimmed === 'prev') { if (window.prevSlide) window.prevSlide(); }
-          else if (trimmed.startsWith('slide:')) {
-            const index = parseInt(trimmed.split(':')[1]);
-            if (!isNaN(index) && window.goToSlide) window.goToSlide(index);
-          } else if (trimmed === 'fullscreen') {
-            const btn = document.getElementById('fullscreenBtn');
-            if (btn) btn.click();
-          } else if (trimmed === 'refresh') { window.location.reload(); }
-          else if (trimmed === 'play') { if (window.resumeSlideshow) window.resumeSlideshow(); }
-          else if (trimmed === 'pause') { if (window.pauseSlideshow) window.pauseSlideshow(); }
-        } catch (e) { /* ignore */ }
-      }
+    async function pollCommand() {
+      try {
+        const res = await fetch('command.txt?' + Date.now());
+        if (!res.ok) return;
+        const command = await res.text();
+        const trimmed = command.trim();
+        if (!trimmed || trimmed === 'none' || trimmed === lastExecutedCommand) return;
+        lastExecutedCommand = trimmed;
+        console.log('📡 Remote command:', trimmed);
 
-      setInterval(pollCommand, POLL_INTERVAL);
-      setTimeout(pollCommand, 500);
-      console.log('📡 Remote polling started (command.txt)');
-    })();
-
-    // ============================================================
-    // INIT
-    // ============================================================
-    async function init() {
-      await loadSlidesConfig();
-      buildSlidesFromConfig();
-      
-      slides = document.querySelectorAll('.slide');
-      dots = document.querySelectorAll('.dot');
-      
-      setupBehaviorTags();
-      
-      // Set up navigation
-      document.getElementById('nextSlide').addEventListener('click', nextSlide);
-      document.getElementById('prevSlide').addEventListener('click', prevSlide);
-      
-      // Keyboard controls
-      document.addEventListener('keydown', (e) => {
-        if (e.key === 'ArrowRight') nextSlide();
-        if (e.key === 'ArrowLeft') prevSlide();
-        if (e.key === ' ' || e.code === 'Space') {
-          e.preventDefault();
-          if (isPaused) resumeSlideshow(); else pauseSlideshow();
-        }
-        if (e.key === 'f' || e.key === 'F') {
+        if (trimmed === 'next') { if (window.nextSlide) window.nextSlide(); }
+        else if (trimmed === 'prev') { if (window.prevSlide) window.prevSlide(); }
+        else if (trimmed.startsWith('slide:')) {
+          const index = parseInt(trimmed.split(':')[1]);
+          if (!isNaN(index) && window.goToSlide) window.goToSlide(index);
+        } else if (trimmed === 'fullscreen') {
           const btn = document.getElementById('fullscreenBtn');
           if (btn) btn.click();
-        }
-      });
+        } else if (trimmed === 'refresh') { window.location.reload(); }
+        else if (trimmed === 'play') { if (window.resumeSlideshow) window.resumeSlideshow(); }
+        else if (trimmed === 'pause') { if (window.pauseSlideshow) window.pauseSlideshow(); }
+      } catch (e) { /* ignore */ }
+    }
 
-      // Mouse hover pause
-      const wrapper = document.getElementById('slidesWrapper');
-      wrapper.addEventListener('mouseenter', pauseSlideshow);
-      wrapper.addEventListener('mouseleave', resumeSlideshow);
+    setInterval(pollCommand, POLL_INTERVAL);
+    setTimeout(pollCommand, 500);
+    console.log('📡 Remote polling started (command.txt)');
+  })();
 
-      // Visibility change
-      document.addEventListener('visibilitychange', () => {
-        if (document.hidden) pauseSlideshow(); else resumeSlideshow();
-      });
-
-      // Load data and start
-      await loadData();
-      
-      if (slides.length > 0) {
-        startSlideshowTimer(getSlideDuration(slides[0]));
+  // ============================================================
+  // SIMPLE CONFIG LOADER - This is the ONLY new addition
+  // It applies slides-config.json to your existing slides
+  // ============================================================
+  (function() {
+    async function applySlideConfig() {
+      try {
+        const res = await fetch('slides-config.json?' + Date.now());
+        if (!res.ok) return;
+        
+        const config = await res.json();
+        console.log('📋 Applying slide config from admin tool');
+        
+        config.slides.forEach((slideData, index) => {
+          const slide = document.getElementById(`slide${index}`);
+          if (!slide) return;
+          
+          // Update background for title slides
+          if (slideData.type === 'title' && slideData.bg) {
+            slide.style.background = `url('${slideData.bg}') center/cover no-repeat, #0b1a33`;
+          }
+          
+          // Update background for data-image slides
+          if (slideData.type === 'data-image' && slideData.bg) {
+            slide.style.background = `#0b1a33 url('${slideData.bg}') center/contain no-repeat`;
+          }
+          
+          // Update duration
+          if (slideData.duration) {
+            slide.dataset.duration = slideData.duration;
+          }
+        });
+        
+        console.log('✅ Applied slide config successfully');
+      } catch(e) {
+        // Silently fail - use hardcoded slides
       }
-      
-      setInterval(loadData, 60000);
     }
-
-    // Start everything
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', init);
+    
+    // Run after page loads
+    if (document.readyState === 'complete') {
+      setTimeout(applySlideConfig, 1000);
     } else {
-      init();
+      window.addEventListener('load', function() {
+        setTimeout(applySlideConfig, 1000);
+      });
     }
-
   })();
 </script>
 </body>
