@@ -310,7 +310,6 @@
     let elapsedTime = 0;
     let scrollAnimFrames = [];
     let slideAnimInitialized = [];
-    let remoteControlEnabled = false;
 
     const AGENTS_TIME_PER_ROW = 0.6;
     const TEAMS_TIME_PER_ROW = 0.8;
@@ -990,7 +989,7 @@
     }
 
     // ============================================================
-    // REMOTE CONTROL — only polls if command.txt exists (no 404 spam)
+    // REMOTE CONTROL — HEAD probe first, disables if command.txt missing
     // ============================================================
     (async function initRemoteControl() {
       try {
@@ -999,7 +998,6 @@
           console.log('📡 Remote control disabled (command.txt not found)');
           return;
         }
-        remoteControlEnabled = true;
         console.log('📡 Remote control enabled');
       } catch (e) {
         console.log('📡 Remote control disabled (command.txt not reachable)');
