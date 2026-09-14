@@ -15,18 +15,18 @@
     {
       "id": 2,
       "type": "table",
-      "name": "Agents Ã¢ÂÂ SIS",
+      "name": "Agents - SIS",
       "dataSource": "leaderboard.json",
       "dataType": "agents",
-      "title": "Top Performing Agents Ã¢ÂÂ SIS"
+      "title": "Top Performing Agents - SIS"
     },
     {
       "id": 3,
       "type": "table",
-      "name": "Teams Ã¢ÂÂ SIS",
+      "name": "Teams-SIS",
       "dataSource": "leaderboard.json",
       "dataType": "teams",
-      "title": "Top Performing Teams Ã¢ÂÂ SIS"
+      "title": "Top Performing Teams-SIS"
     },
     {
       "id": 4,
