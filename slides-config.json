@@ -64,8 +64,32 @@
     {
       "id": 9,
       "type": "data-image",
-      "name": "Unnamed",
-      "bg": "assets/slides/iex3.webp.jpg"
+      "name": "IE Slide 2",
+      "bg": "assets/slides/iex2.webp.png"
+    },
+    {
+      "id": 10,
+      "type": "data-image",
+      "name": "IE Slide 4",
+      "bg": "assets/slides/iex4.webp.png"
+    },
+    {
+      "id": 11,
+      "type": "data-image",
+      "name": "IE Slide 5",
+      "bg": "assets/slides/iex5.webp.png"
+    },
+    {
+      "id": 12,
+      "type": "data-image",
+      "name": "IE Slide 6",
+      "bg": "assets/slides/iex6.webp.png"
+    },
+    {
+      "id": 13,
+      "type": "data-image",
+      "name": "IE Slide 7",
+      "bg": "assets/slides/iex7.webp.png"
     }
   ]
 }
