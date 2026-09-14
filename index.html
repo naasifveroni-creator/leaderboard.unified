@@ -4,10 +4,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Δ Unified Dashboard</title>
+  <link rel="icon" href="data:," />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <style>
-    /* ===== ALL YOUR EXISTING CSS – KEPT 100% INTACT ===== */
     * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', 'Segoe UI', Roboto, system-ui, sans-serif; }
     html, body { width: 100%; height: 100%; background: #0b1a33; overflow: hidden; }
     body { display: flex; justify-content: center; align-items: center; padding: 0; }
@@ -23,11 +23,8 @@
     .slide { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; visibility: hidden; transition: opacity 0.8s ease, transform 0.8s ease, visibility 0.8s ease; display: flex; flex-direction: column; transform: scale(0.98); }
     .slide.active { opacity: 1; visibility: visible; position: relative; transform: scale(1); transition: opacity 0.8s ease, transform 0.8s ease, visibility 0.8s ease; }
 
-    /* ===== TITLE & DATA SLIDES (dynamic backgrounds applied via inline style) ===== */
     .slide[data-type="title"] { background: #0b1a33; }
     .slide[data-type="data-image"] { background: #0b1a33; }
-
-    /* ===== AGENTS & TEAMS SLIDES ===== */
     .slide[data-type="table"] { background: linear-gradient(145deg, #f0f3f8 0%, #e8ecf4 100%); padding: 0; }
 
     .slide-header { background: #0b1a33; backdrop-filter: blur(16px) saturate(180%); -webkit-backdrop-filter: blur(16px) saturate(180%); padding: 0.3vh 2vw; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.2vh 1vw; flex-shrink: 0; min-height: 10vh; border-bottom: 2px solid rgba(211,47,47,0.3); position: relative; overflow: hidden; box-shadow: 0 4px 30px rgba(0,0,0,0.3); border-radius: 0 0 12px 12px; margin: 0 0.5vw; }
@@ -74,7 +71,6 @@
     .table-wrap .rank-col { width: 10%; color: #6b7f96; font-weight: 600; font-size: 2.4vh; }
     .table-wrap .name-col { font-weight: 500; text-align: left; font-size: 2.4vh; }
 
-    /* Per-type score column sizing - preserved from original #slide2/#slide3 rules */
     .slide[data-type="table"][data-datatype="agents"] .table-grid .score-col { width: 45% !important; min-width: 45% !important; max-width: 45% !important; text-align: right; justify-content: flex-end; white-space: nowrap; overflow: visible !important; }
     .slide[data-type="table"][data-datatype="teams"] .table-grid .score-col { width: 55% !important; min-width: 55% !important; max-width: 55% !important; text-align: right !important; justify-content: flex-end !important; white-space: nowrap; padding-right: 0.3vw; overflow: visible !important; }
 
@@ -119,7 +115,6 @@
     .dot { width: 1vh; height: 1vh; border-radius: 50%; background: rgba(255,255,255,0.2); border: none; cursor: pointer; transition: all 0.3s ease; padding: 0; }
     .dot.active { background: #d32f2f; transform: scale(1.4); box-shadow: 0 0 20px rgba(211,47,47,0.5); }
 
-    /* Comparison & summary slides */
     .slide[data-type="comparison-detail"], .slide[data-type="summary"] { background: #f2f5f9; padding: 0; }
     .comp-slide-wrapper { flex: 1; width: 100%; padding: 1vh 3vw 2vh 3vw; display: flex; flex-direction: column; gap: 2vh; min-height: 0; height: 100%; background: #f2f5f9; }
     .comp-slide-wrapper .metric-header { display: flex; align-items: center; gap: 1.2vw; flex-shrink: 0; flex-wrap: wrap; }
@@ -238,11 +233,7 @@
   <div class="slides-wrapper" id="slidesWrapper">
     <button class="fullscreen-btn" id="fullscreenBtn"><span class="icon">⛶</span> FULL</button>
     <div id="adminAccess"><a href="#" id="adminLink">⚙ ADMIN</a></div>
-
-    <!-- Slides are generated here from slides-config.json -->
     <div id="slidesContainer"></div>
-
-    <!-- ===== NAVIGATION ===== -->
     <div class="nav-controls">
       <button class="arrow" id="prevSlide">◀</button>
       <div class="dots" id="dotsContainer"></div>
@@ -319,6 +310,7 @@
     let elapsedTime = 0;
     let scrollAnimFrames = [];
     let slideAnimInitialized = [];
+    let remoteControlEnabled = false;
 
     const AGENTS_TIME_PER_ROW = 0.6;
     const TEAMS_TIME_PER_ROW = 0.8;
@@ -327,9 +319,6 @@
     const MAX_DISPLAY = 120;
     const TARGET_THRESHOLD = 86.30;
 
-    // ============================================================
-    // FALLBACK CONFIG (matches original 16 slides)
-    // ============================================================
     function getDefaultConfig() {
       return {
         slides: [
@@ -353,9 +342,6 @@
       };
     }
 
-    // ============================================================
-    // LOAD CONFIG
-    // ============================================================
     async function loadSlidesConfig() {
       try {
         const res = await fetch('slides-config.json?t=' + Date.now());
@@ -370,9 +356,6 @@
       }
     }
 
-    // ============================================================
-    // BUILD SLIDES
-    // ============================================================
     function buildSlidesFromConfig() {
       const container = document.getElementById('slidesContainer');
       container.innerHTML = '';
@@ -394,7 +377,6 @@
       slides = Array.from(document.querySelectorAll('.slide'));
       slideAnimInitialized = new Array(slides.length).fill(false);
 
-      // Build dots
       const dotsContainer = document.getElementById('dotsContainer');
       dotsContainer.innerHTML = '';
       slides.forEach((_, i) => {
@@ -415,17 +397,13 @@
 
       switch (type) {
         case 'title': {
-          // Cover
           const style = slide.bg ? `background: url('${slide.bg}') center/cover no-repeat, #0b1a33;` : '';
           return counter + `<div style="width:100%;height:100%;${style}"></div>`;
         }
-
         case 'data-image': {
-          // Contain, no stretch
           const style = slide.bg ? `background: #0b1a33 url('${slide.bg}') center/contain no-repeat;` : '';
           return counter + `<div style="width:100%;height:100%;${style}"></div>`;
         }
-
         case 'table': {
           const isAgent = slide.dataType === 'agents';
           const tableId = isAgent ? 'agentTableWrap' : 'teamTableWrap';
@@ -470,7 +448,6 @@
             <div class="progress-container"><div class="progress-bar"></div></div>
           `;
         }
-
         case 'comparison-detail': {
           const metric = slide.metric || 'SIS';
           return `
@@ -483,7 +460,7 @@
               </div>
               <div class="card-row">
                 <div class="centre-card tp">
-                  <div class="chart-area"><canvas data-chart="comparison" data-metric="${metric}" data-centre="TP"></canvas></div>
+                  <div class="chart-area"><canvas></canvas></div>
                   <div class="details-area">
                     <div class="centre-name"><img src="assets/logos/TP-logo.png" alt="TP" class="centre-logo" onerror="this.style.display='none'" /></div>
                     <div class="main-value">-- <span class="trend">—</span></div>
@@ -492,7 +469,7 @@
                   </div>
                 </div>
                 <div class="centre-card wns">
-                  <div class="chart-area"><canvas data-chart="comparison" data-metric="${metric}" data-centre="WNS"></canvas></div>
+                  <div class="chart-area"><canvas></canvas></div>
                   <div class="details-area">
                     <div class="centre-name"><img src="assets/logos/wns-logo.png" alt="WNS" class="centre-logo" onerror="this.style.display='none'" /></div>
                     <div class="main-value">-- <span class="trend">—</span></div>
@@ -505,7 +482,6 @@
             <div class="progress-container"><div class="progress-bar"></div></div>
           `;
         }
-
         case 'summary': {
           return `
             ${counter}
@@ -536,15 +512,11 @@
             <div class="progress-container"><div class="progress-bar"></div></div>
           `;
         }
-
         default:
           return counter + `<div style="color:white;display:flex;align-items:center;justify-content:center;height:100%;font-size:3vh;">Unknown slide type: ${type}</div>`;
       }
     }
 
-    // ============================================================
-    // BEHAVIOUR TAGS
-    // ============================================================
     function animateTags(container) {
       const tags = container.querySelectorAll('.tag');
       tags.forEach(tag => {
@@ -565,9 +537,6 @@
       });
     }
 
-    // ============================================================
-    // SLIDESHOW ENGINE
-    // ============================================================
     function getSlideDuration(slide) {
       const custom = parseInt(slide.dataset.duration);
       if (!isNaN(custom) && custom > 0) return custom;
@@ -718,9 +687,6 @@
     window.pauseSlideshow = pauseSlideshow;
     window.resumeSlideshow = resumeSlideshow;
 
-    // ============================================================
-    // DATA RENDERING
-    // ============================================================
     function buildTrendArrow(currentVal, previousVal) {
       if (previousVal === undefined || previousVal === null) return `<span class="trend-arrow neutral"></span>`;
       const diff = currentVal - previousVal;
@@ -868,7 +834,6 @@
     }
 
     function updateComparisonSlides(data) {
-      // Find every comparison-detail slide and populate it
       document.querySelectorAll('.slide[data-type="comparison-detail"]').forEach(slide => {
         const metric = slide.dataset.metric;
         if (!metric || !data.targets[metric]) return;
@@ -987,9 +952,6 @@
       return null;
     }
 
-    // ============================================================
-    // LOAD DATA
-    // ============================================================
     async function loadData() {
       try {
         const [lbRes, compRes] = await Promise.all([
@@ -1028,9 +990,22 @@
     }
 
     // ============================================================
-    // REMOTE CONTROL
+    // REMOTE CONTROL — only polls if command.txt exists (no 404 spam)
     // ============================================================
-    (function() {
+    (async function initRemoteControl() {
+      try {
+        const probe = await fetch('command.txt?probe=' + Date.now(), { method: 'HEAD' });
+        if (!probe.ok) {
+          console.log('📡 Remote control disabled (command.txt not found)');
+          return;
+        }
+        remoteControlEnabled = true;
+        console.log('📡 Remote control enabled');
+      } catch (e) {
+        console.log('📡 Remote control disabled (command.txt not reachable)');
+        return;
+      }
+
       let lastExecutedCommand = '';
       const POLL_INTERVAL = 2000;
       async function pollCommand() {
@@ -1056,13 +1031,9 @@
       setTimeout(pollCommand, 500);
     })();
 
-    // ============================================================
-    // INIT
-    // ============================================================
     async function init() {
       await loadSlidesConfig();
       buildSlidesFromConfig();
-
       setupBehaviorTags();
 
       document.getElementById('nextSlide').addEventListener('click', nextSlide);
