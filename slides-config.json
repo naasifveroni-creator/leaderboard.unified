@@ -15,18 +15,18 @@
     {
       "id": 2,
       "type": "table",
-      "name": "Agents â SIS",
+      "name": "Agents Ã¢ÂÂ SIS",
       "dataSource": "leaderboard.json",
       "dataType": "agents",
-      "title": "Top Performing Agents â SIS"
+      "title": "Top Performing Agents Ã¢ÂÂ SIS"
     },
     {
       "id": 3,
       "type": "table",
-      "name": "Teams â SIS",
+      "name": "Teams Ã¢ÂÂ SIS",
       "dataSource": "leaderboard.json",
       "dataType": "teams",
-      "title": "Top Performing Teams â SIS"
+      "title": "Top Performing Teams Ã¢ÂÂ SIS"
     },
     {
       "id": 4,
@@ -60,6 +60,12 @@
       "type": "data-image",
       "name": "IE Slide 1",
       "bg": "assets/slides/iex1.webp.jpg"
+    },
+    {
+      "id": 9,
+      "type": "data-image",
+      "name": "Unnamed",
+      "bg": "assets/slides/iex3.webp.jpg"
     }
   ]
 }
