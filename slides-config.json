@@ -102,6 +102,12 @@
       "type": "data-image",
       "name": "IE Slide 8",
       "bg": "assets/slides/iex8.webp.png"
+    },
+    {
+      "id": 16,
+      "type": "data-image",
+      "name": "slide5",
+      "bg": "assets/slides/.jpg"
     }
   ]
 }
