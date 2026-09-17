@@ -23,10 +23,10 @@
     {
       "id": 3,
       "type": "table",
-      "name": "Teams-SIS",
+      "name": "Teams - SIS",
       "dataSource": "leaderboard.json",
       "dataType": "teams",
-      "title": "Top Performing Teams-SIS"
+      "title": "Top Performing Teams - SIS"
     },
     {
       "id": 4,
@@ -58,32 +58,50 @@
     {
       "id": 8,
       "type": "data-image",
+      "name": "IE Slide 1",
+      "bg": "assets/slides/iex1.webp.png"
+    },
+    {
+      "id": 9,
+      "type": "data-image",
       "name": "IE Slide 2",
       "bg": "assets/slides/iex2.webp.png"
     },
     {
-      "id": 9,
+      "id": 10,
+      "type": "data-image",
+      "name": "IE Slide 3",
+      "bg": "assets/slides/iex3.webp.png"
+    },
+    {
+      "id": 11,
       "type": "data-image",
       "name": "IE Slide 4",
       "bg": "assets/slides/iex4.webp.png"
     },
     {
-      "id": 10,
+      "id": 12,
       "type": "data-image",
       "name": "IE Slide 5",
       "bg": "assets/slides/iex5.webp.png"
     },
     {
-      "id": 11,
+      "id": 13,
       "type": "data-image",
       "name": "IE Slide 6",
       "bg": "assets/slides/iex6.webp.png"
     },
     {
-      "id": 12,
+      "id": 14,
       "type": "data-image",
       "name": "IE Slide 7",
       "bg": "assets/slides/iex7.webp.png"
+    },
+    {
+      "id": 15,
+      "type": "data-image",
+      "name": "IE Slide 8",
+      "bg": "assets/slides/iex8.webp.png"
     }
   ]
 }
