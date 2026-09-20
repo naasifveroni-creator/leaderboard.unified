@@ -322,6 +322,23 @@
     let elapsedTime = 0;
     let scrollAnimFrames = [];
     let slideAnimInitialized = [];
+    let userHovering = false;
+
+    // ============================================================
+    // HELPERS
+    // ============================================================
+    function parseScore(raw) {
+      if (raw === null || raw === undefined) return NaN;
+      // Strip "%", arrows, whitespace
+      const cleaned = String(raw).replace(/[%\s↑↓→]/g, '');
+      return parseFloat(cleaned);
+    }
+
+    function formatScore(score) {
+      const num = typeof score === 'number' ? score : parseScore(score);
+      if (isNaN(num)) return '–';
+      return num.toFixed(2) + '%';
+    }
 
     function animateTags(container) {
       const tags = container.querySelectorAll('.tag');
@@ -330,6 +347,7 @@
         setTimeout(() => tag.classList.add('visible'), delay + 300);
       });
     }
+
     function setupBehaviorTags() {
       document.querySelectorAll('.behavior-tags').forEach(tags => animateTags(tags));
       const observer = new MutationObserver(() => {
@@ -343,6 +361,9 @@
       });
     }
 
+    // ============================================================
+    // SLIDE TEMPLATES
+    // ============================================================
     function buildTableSlide(counter, opts) {
       const isAgent = opts.dataType === 'agents';
       const tableId = isAgent ? 'agentTableWrap' : 'teamTableWrap';
@@ -506,7 +527,6 @@
       slides = Array.from(slidesContainer.querySelectorAll('.slide'));
       slideAnimInitialized = new Array(slides.length).fill(false);
 
-      // FIX: force the first slide to be the active one, reset currentIndex
       currentIndex = 0;
       isTransitioning = false;
       isPaused = false;
@@ -568,7 +588,7 @@
       const remaining = slideDuration - elapsedTime;
       if (remaining <= 0) { nextSlide(); return; }
       startProgressBar(slideDuration, (elapsedTime / slideDuration) * 100);
-      timer = setTimeout(() => { if (!isPaused) nextSlide(); }, remaining);
+      timer = setTimeout(() => { if (!isPaused && !userHovering) nextSlide(); }, remaining);
     }
 
     function pauseSlideshow() {
@@ -583,7 +603,12 @@
       if (!isPaused) return;
       isPaused = false;
       startSlideshowTimer(slideDuration, elapsedTime);
-      if (slides[currentIndex]) startInfiniteScroll(slides[currentIndex]);
+      if (slides[currentIndex]) {
+        // Only restart scroll if the slide has scrollable tables and scrollTop is already 0
+        const slide = slides[currentIndex];
+        const wrap = slide.querySelector('.table-grid .scroll-wrapper');
+        if (wrap && wrap.scrollTop === 0) startInfiniteScroll(slide);
+      }
     }
 
     function cancelAllScrollAnimations() {
@@ -594,8 +619,8 @@
     function startInfiniteScroll(slide) {
       cancelAllScrollAnimations();
       const durationMs = parseFloat(slide.dataset.duration) || 5500;
-      const wrappers = slide.querySelectorAll('.table-grid .scroll-wrapper');
-      wrappers.forEach(wrap => {
+      const wraps = slide.querySelectorAll('.table-grid .scroll-wrapper');
+      wraps.forEach(wrap => {
         const inner = wrap.querySelector('.scroll-inner');
         if (!inner) return;
         const contentHeight = inner.scrollHeight;
@@ -625,7 +650,10 @@
         row.style.opacity = '0';
         row.style.transform = 'translateY(10px)';
         const scoreCell = row.querySelector('.score-col');
-        if (scoreCell && !row.dataset.targetScore) row.dataset.targetScore = scoreCell.textContent.trim();
+        if (scoreCell && !row.dataset.targetScore) {
+          // Store the FINAL score string so we can restore it (with arrow) after animation
+          row.dataset.targetScore = scoreCell.textContent.trim();
+        }
       });
       rows.forEach((row, i) => {
         setTimeout(() => {
@@ -633,19 +661,26 @@
           row.style.opacity = '1';
           row.style.transform = 'translateY(0)';
           const scoreCell = row.querySelector('.score-col');
-          if (scoreCell && row.dataset.targetScore) animateCounter(scoreCell, row.dataset.targetScore);
+          if (scoreCell && row.dataset.targetScore) {
+            animateCounter(scoreCell, row.dataset.targetScore);
+          }
           const arrow = row.querySelector('.trend-arrow');
-          if (arrow) setTimeout(() => arrow.classList.add('visible'), 300 + (i * 80));
+          if (arrow && !arrow.classList.contains('neutral')) {
+            setTimeout(() => arrow.classList.add('visible'), 300 + (i * 80));
+          }
         }, 120 + (i * 80));
       });
       slideAnimInitialized[index] = true;
       startInfiniteScroll(activeSlide);
     }
 
-    function animateCounter(element, target) {
-      const targetValue = parseFloat(target);
+    function animateCounter(element, fullText) {
+      // fullText looks like "95.20% ↑" — extract just the numeric part
+      const match = fullText.match(/(\d+(?:\.\d+)?)/);
+      if (!match) return;
+      const targetValue = parseFloat(match[1]);
       if (isNaN(targetValue)) return;
-      const suffix = target.includes('%') ? '%' : '';
+      const suffix = fullText.includes('%') ? '%' : '';
       const duration = 1200;
       const startTime = performance.now();
       function updateCounter(currentTime) {
@@ -655,13 +690,17 @@
         const currentValue = eased * targetValue;
         element.textContent = currentValue.toFixed(2) + suffix;
         if (progress < 1) requestAnimationFrame(updateCounter);
-        else element.textContent = target;
+        else {
+          // Restore the ORIGINAL full text (with arrow) when done
+          element.textContent = fullText;
+        }
       }
       requestAnimationFrame(updateCounter);
     }
 
     function goToSlide(index) {
-      if (isTransitioning || index === currentIndex) return;
+      if (isTransitioning) return;
+      if (index === currentIndex) return;
       if (index < 0) index = slides.length - 1;
       if (index >= slides.length) index = 0;
       isTransitioning = true;
@@ -687,31 +726,28 @@
     window.goToSlide = goToSlide;
     window.pauseSlideshow = pauseSlideshow;
     window.resumeSlideshow = resumeSlideshow;
+    window.getCurrentIndex = () => currentIndex;
 
     function buildTrendArrow(currentVal, previousVal) {
-      if (previousVal === undefined || previousVal === null) return `<span class="trend-arrow neutral"></span>`;
+      if (previousVal === undefined || previousVal === null || isNaN(previousVal)) {
+        return `<span class="trend-arrow neutral"></span>`;
+      }
       const diff = currentVal - previousVal;
-      if (diff > 0.01) return `<span class="trend-arrow up visible">↑</span>`;
-      if (diff < -0.01) return `<span class="trend-arrow down visible">↓</span>`;
+      if (diff > 0.01) return `<span class="trend-arrow up">↑</span>`;
+      if (diff < -0.01) return `<span class="trend-arrow down">↓</span>`;
       return `<span class="trend-arrow neutral"></span>`;
     }
 
     function autoRank(items) {
-      const sorted = [...items].sort((a, b) => parseFloat(b.score) - parseFloat(a.score));
+      const sorted = [...items].sort((a, b) => parseScore(b.score) - parseScore(a.score));
       return sorted.map((item, index) => ({ ...item, rank: index + 1 }));
-    }
-
-    function formatScore(score) {
-      const num = parseFloat(score);
-      if (isNaN(num)) return '–';
-      return num.toFixed(2) + '%';
     }
 
     function renderAgents(containerId, items, previousData) {
       const container = document.getElementById(containerId);
       if (!container) return;
       if (!items || items.length === 0) { container.innerHTML = `<div class="empty-state">No data available.</div>`; return; }
-      const validItems = items.filter(item => !isNaN(parseFloat(item.score)));
+      const validItems = items.filter(item => !isNaN(parseScore(item.score)));
       if (validItems.length === 0) { container.innerHTML = `<div class="empty-state">No valid agent data.</div>`; return; }
       const ranked = autoRank(validItems);
       const half = Math.ceil(ranked.length / 2);
@@ -722,17 +758,17 @@
         const doubled = [...dataArray, ...dataArray];
         let html = `<table><thead><tr><th class="rank-col">RANK</th><th class="name-col">AGENT NAME</th><th class="score-col">SIS</th></tr></thead><tbody>`;
         doubled.forEach(item => {
-          const scoreVal = parseFloat(item.score);
+          const scoreVal = parseScore(item.score);
           let rowClass = (scoreVal >= TARGET_THRESHOLD) ? 'top1' : 'amber';
           let prevScore;
           if (previousData && previousData.agents) {
             const p = previousData.agents.find(a => a.name === item.name);
-            if (p) prevScore = parseFloat(p.score);
+            if (p) prevScore = parseScore(p.score);
           }
           html += `<tr class="${rowClass}">
             <td class="rank-col">${item.rank}</td>
             <td class="name-col">${item.name}</td>
-            <td class="score-col">${formatScore(item.score)} ${buildTrendArrow(scoreVal, prevScore)}</td>
+            <td class="score-col">${formatScore(scoreVal)} ${buildTrendArrow(scoreVal, prevScore)}</td>
           </tr>`;
         });
         return html + `</tbody></table>`;
@@ -761,24 +797,26 @@
       const container = document.getElementById(containerId);
       if (!container) return;
       if (!items || items.length === 0) { container.innerHTML = `<div class="empty-state">No data available.</div>`; return; }
-      const validItems = items.filter(item => !isNaN(parseFloat(item.score)));
+      const validItems = items.filter(item => !isNaN(parseScore(item.score)));
       if (validItems.length === 0) { container.innerHTML = `<div class="empty-state">No valid team data.</div>`; return; }
       const ranked = autoRank(validItems);
-      const firstCol = ranked.slice(0, 10);
-      const secondCol = ranked.slice(10);
+      // Split teams in half, not fixed at 10
+      const half = Math.ceil(ranked.length / 2);
+      const firstCol = ranked.slice(0, half);
+      const secondCol = ranked.slice(half);
 
       function buildTable(dataArray) {
         const doubled = [...dataArray, ...dataArray];
         let html = `<table><thead><tr><th>#</th><th class="name-col">TEAM LEADER</th><th class="score-col">SIS</th></tr></thead><tbody>`;
         doubled.forEach(item => {
-          const scoreVal = parseFloat(item.score);
+          const scoreVal = parseScore(item.score);
           let rowClass = (scoreVal >= TARGET_THRESHOLD) ? 'top1' : 'amber';
           let prevScore;
           if (previousData && previousData.teams) {
             const p = previousData.teams.find(t => t.name === item.name);
-            if (p) prevScore = parseFloat(p.score);
+            if (p) prevScore = parseScore(p.score);
           }
-          html += `<tr class="${rowClass}"><td class="rank-col">${item.rank}</td><td class="name-col">${item.name}</td><td class="score-col">${formatScore(item.score)} ${buildTrendArrow(scoreVal, prevScore)}</td></tr>`;
+          html += `<tr class="${rowClass}"><td class="rank-col">${item.rank}</td><td class="name-col">${item.name}</td><td class="score-col">${formatScore(scoreVal)} ${buildTrendArrow(scoreVal, prevScore)}</td></tr>`;
         });
         return html + `</tbody></table>`;
       }
@@ -974,7 +1012,7 @@
           updateSummarySlides(comparisonData);
         }
 
-        if (!timer && !isPaused && slides[currentIndex] && slides[currentIndex].classList.contains('active')) {
+        if (!timer && !isPaused && !userHovering && slides[currentIndex] && slides[currentIndex].classList.contains('active')) {
           startSlideshowTimer(getSlideDuration(slides[currentIndex]));
         }
       } catch (e) {
@@ -990,10 +1028,11 @@
       await loadSlidesConfig();
       buildSlidesFromConfig();
 
-      // FIX: hard reset the slideshow state before starting
+      // HARD reset to slide 0
       currentIndex = 0;
       isTransitioning = false;
       isPaused = false;
+      userHovering = false;
       slides.forEach((s, i) => s.classList.toggle('active', i === 0));
       dots.forEach((d, i) => d.classList.toggle('active', i === 0));
 
@@ -1002,8 +1041,12 @@
       document.getElementById('nextSlide').addEventListener('click', nextSlide);
       document.getElementById('prevSlide').addEventListener('click', prevSlide);
 
-      wrapper.addEventListener('mouseenter', pauseSlideshow);
-      wrapper.addEventListener('mouseleave', resumeSlideshow);
+      // Only pause on the nav area, not the whole viewport
+      const navControls = document.querySelector('.nav-controls');
+      if (navControls) {
+        navControls.addEventListener('mouseenter', () => { userHovering = true; pauseSlideshow(); });
+        navControls.addEventListener('mouseleave', () => { userHovering = false; resumeSlideshow(); });
+      }
 
       document.addEventListener('keydown', (e) => {
         if (e.key === 'ArrowRight') nextSlide();
@@ -1024,9 +1067,10 @@
 
       await loadData();
 
-      // FIX: clear any leftover timer, then start fresh on slide 0
+      // Kick off the slideshow
       clearSlideshowTimer();
       currentIndex = 0;
+      isPaused = false;
       if (slides.length > 0) {
         startSlideshowTimer(getSlideDuration(slides[0]));
       }
