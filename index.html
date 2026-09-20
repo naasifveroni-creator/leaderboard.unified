@@ -245,7 +245,7 @@
 
 <script>
   // ============================================================
-  // ADMIN ACCESS
+  // ADMIN ACCESS  (NOTE: password intentionally left client-side)
   // ============================================================
   (function() {
     const ADMIN_PASSWORD = 'delta2026';
@@ -323,13 +323,13 @@
     let scrollAnimFrames = [];
     let slideAnimInitialized = [];
     let userHovering = false;
+    let pendingSlideIndex = null;
 
     // ============================================================
     // HELPERS
     // ============================================================
     function parseScore(raw) {
       if (raw === null || raw === undefined) return NaN;
-      // Strip "%", arrows, whitespace
       const cleaned = String(raw).replace(/[%\s↑↓→]/g, '');
       return parseFloat(cleaned);
     }
@@ -348,17 +348,17 @@
       });
     }
 
+    // Fix: only animate the *active* slide's tags, not every slide's
+    function refreshActiveTags() {
+      const active = document.querySelector('.slide.active .behavior-tags');
+      if (!active) return;
+      active.querySelectorAll('.tag').forEach(t => t.classList.remove('visible'));
+      setTimeout(() => animateTags(active), 300);
+    }
+
     function setupBehaviorTags() {
-      document.querySelectorAll('.behavior-tags').forEach(tags => animateTags(tags));
-      const observer = new MutationObserver(() => {
-        document.querySelectorAll('.slide.active .behavior-tags').forEach(tags => {
-          tags.querySelectorAll('.tag').forEach(t => t.classList.remove('visible'));
-          setTimeout(() => animateTags(tags), 300);
-        });
-      });
-      document.querySelectorAll('.slide').forEach(slide => {
-        observer.observe(slide, { attributes: true, attributeFilter: ['class'] });
-      });
+      document.querySelectorAll('.slide.active .behavior-tags').forEach(tags => animateTags(tags));
+      // No MutationObserver — tags are refreshed explicitly on slide change.
     }
 
     // ============================================================
@@ -427,6 +427,7 @@
     }
 
     function buildSummarySlide(counter) {
+      // Rows are built with data-centre attributes so we can match by name.
       return `
         ${counter}
         <div class="comp-slide-wrapper">
@@ -436,20 +437,20 @@
             <span class="unit-badge">All Metrics</span>
           </div>
           <div class="summary-grid-vertical">
-            <div class="summary-card-vertical">
+            <div class="summary-card-vertical" data-metric="SIS">
               <div class="metric-title">SIS <span class="unit">Target: --</span></div>
-              <div class="summary-row-vertical"><div class="centre-info"><img src="assets/logos/TP-logo.png" alt="TP" class="centre-logo" style="height:3.5vh;width:auto;object-fit:contain;" onerror="this.style.display='none'" /></div><div class="values"><span class="current">--</span><span class="change">--</span><span class="gap-badge">--</span></div></div>
-              <div class="summary-row-vertical"><div class="centre-info"><img src="assets/logos/wns-logo.png" alt="WNS" class="centre-logo" style="height:3.5vh;width:auto;object-fit:contain;" onerror="this.style.display='none'" /></div><div class="values"><span class="current">--</span><span class="change">--</span><span class="gap-badge">--</span></div></div>
+              <div class="summary-row-vertical" data-centre="TP"><div class="centre-info"><img src="assets/logos/TP-logo.png" alt="TP" class="centre-logo" style="height:3.5vh;width:auto;object-fit:contain;" onerror="this.style.display='none'" /></div><div class="values"><span class="current">--</span><span class="change">--</span><span class="gap-badge">--</span></div></div>
+              <div class="summary-row-vertical" data-centre="WNS"><div class="centre-info"><img src="assets/logos/wns-logo.png" alt="WNS" class="centre-logo" style="height:3.5vh;width:auto;object-fit:contain;" onerror="this.style.display='none'" /></div><div class="values"><span class="current">--</span><span class="change">--</span><span class="gap-badge">--</span></div></div>
             </div>
-            <div class="summary-card-vertical">
+            <div class="summary-card-vertical" data-metric="IFSR">
               <div class="metric-title">IFSR <span class="unit">Target: --</span></div>
-              <div class="summary-row-vertical"><div class="centre-info"><img src="assets/logos/TP-logo.png" alt="TP" class="centre-logo" style="height:3.5vh;width:auto;object-fit:contain;" onerror="this.style.display='none'" /></div><div class="values"><span class="current">--</span><span class="change">--</span><span class="gap-badge">--</span></div></div>
-              <div class="summary-row-vertical"><div class="centre-info"><img src="assets/logos/wns-logo.png" alt="WNS" class="centre-logo" style="height:3.5vh;width:auto;object-fit:contain;" onerror="this.style.display='none'" /></div><div class="values"><span class="current">--</span><span class="change">--</span><span class="gap-badge">--</span></div></div>
+              <div class="summary-row-vertical" data-centre="TP"><div class="centre-info"><img src="assets/logos/TP-logo.png" alt="TP" class="centre-logo" style="height:3.5vh;width:auto;object-fit:contain;" onerror="this.style.display='none'" /></div><div class="values"><span class="current">--</span><span class="change">--</span><span class="gap-badge">--</span></div></div>
+              <div class="summary-row-vertical" data-centre="WNS"><div class="centre-info"><img src="assets/logos/wns-logo.png" alt="WNS" class="centre-logo" style="height:3.5vh;width:auto;object-fit:contain;" onerror="this.style.display='none'" /></div><div class="values"><span class="current">--</span><span class="change">--</span><span class="gap-badge">--</span></div></div>
             </div>
-            <div class="summary-card-vertical">
+            <div class="summary-card-vertical" data-metric="CHT">
               <div class="metric-title">CHT <span class="unit">Target: --</span></div>
-              <div class="summary-row-vertical"><div class="centre-info"><img src="assets/logos/TP-logo.png" alt="TP" class="centre-logo" style="height:3.5vh;width:auto;object-fit:contain;" onerror="this.style.display='none'" /></div><div class="values"><span class="current">--</span><span class="change">--</span><span class="gap-badge">--</span></div></div>
-              <div class="summary-row-vertical"><div class="centre-info"><img src="assets/logos/wns-logo.png" alt="WNS" class="centre-logo" style="height:3.5vh;width:auto;object-fit:contain;" onerror="this.style.display='none'" /></div><div class="values"><span class="current">--</span><span class="change">--</span><span class="gap-badge">--</span></div></div>
+              <div class="summary-row-vertical" data-centre="TP"><div class="centre-info"><img src="assets/logos/TP-logo.png" alt="TP" class="centre-logo" style="height:3.5vh;width:auto;object-fit:contain;" onerror="this.style.display='none'" /></div><div class="values"><span class="current">--</span><span class="change">--</span><span class="gap-badge">--</span></div></div>
+              <div class="summary-row-vertical" data-centre="WNS"><div class="centre-info"><img src="assets/logos/wns-logo.png" alt="WNS" class="centre-logo" style="height:3.5vh;width:auto;object-fit:contain;" onerror="this.style.display='none'" /></div><div class="values"><span class="current">--</span><span class="change">--</span><span class="gap-badge">--</span></div></div>
             </div>
           </div>
         </div>
@@ -462,12 +463,12 @@
         slides: [
           { id: 0, type: 'title', name: 'SIS Title', bg: 'assets/slides/slide-title.webp.jpg' },
           { id: 1, type: 'data-image', name: 'SIS Data Image', bg: 'assets/slides/slide-data.webp.jpg' },
-          { id: 2, type: 'table', name: 'Agents - SIS', dataSource: 'leaderboard.json', dataType: 'agents', title: 'Top Performing Agents - SIS' },
-          { id: 3, type: 'table', name: 'Teams - SIS', dataSource: 'leaderboard.json', dataType: 'teams', title: 'Top Performing Teams - SIS' },
-          { id: 4, type: 'comparison-detail', name: 'SIS Detail', dataSource: 'comparison.json', metric: 'SIS' },
-          { id: 5, type: 'comparison-detail', name: 'IFSR Detail', dataSource: 'comparison.json', metric: 'IFSR' },
-          { id: 6, type: 'comparison-detail', name: 'CHT Detail', dataSource: 'comparison.json', metric: 'CHT' },
-          { id: 7, type: 'summary', name: 'Summary Report', dataSource: 'comparison.json' }
+          { id: 2, type: 'table', name: 'Agents - SIS', dataSource: 'data/leaderboard.json', dataType: 'agents', title: 'Top Performing Agents - SIS' },
+          { id: 3, type: 'table', name: 'Teams - SIS', dataSource: 'data/leaderboard.json', dataType: 'teams', title: 'Top Performing Teams - SIS' },
+          { id: 4, type: 'comparison-detail', name: 'SIS Detail', dataSource: 'data/comparison.json', metric: 'SIS' },
+          { id: 5, type: 'comparison-detail', name: 'IFSR Detail', dataSource: 'data/comparison.json', metric: 'IFSR' },
+          { id: 6, type: 'comparison-detail', name: 'CHT Detail', dataSource: 'data/comparison.json', metric: 'CHT' },
+          { id: 7, type: 'summary', name: 'Summary Report', dataSource: 'data/comparison.json' }
         ]
       };
     }
@@ -484,6 +485,21 @@
         console.warn('⚠️ Using default config:', e.message);
         slideConfig = getDefaultConfig();
       }
+    }
+
+    // Resolve data sources from slide config (fallback to defaults)
+    function resolveDataSources() {
+      const lb = new Set();
+      const comp = new Set();
+      (slideConfig.slides || []).forEach(s => {
+        if (!s.dataSource) return;
+        if (s.dataType === 'agents' || s.dataType === 'teams') lb.add(s.dataSource);
+        if (s.type === 'comparison-detail' || s.type === 'summary') comp.add(s.dataSource);
+      });
+      return {
+        leaderboard: Array.from(lb)[0] || 'data/leaderboard.json',
+        comparison: Array.from(comp)[0] || 'data/comparison.json'
+      };
     }
 
     function buildSlidesFromConfig() {
@@ -552,7 +568,7 @@
     }
 
     function startProgressBar(duration, startPercent = 0) {
-      const progressBars = document.querySelectorAll('.progress-bar');
+      const progressBars = document.querySelectorAll('.slide.active .progress-bar');
       if (progressInterval) clearInterval(progressInterval);
       const startTime = Date.now();
       progressBars.forEach(bar => { bar.style.width = startPercent + '%'; });
@@ -568,7 +584,7 @@
 
     function stopProgressBar() {
       if (progressInterval) { clearInterval(progressInterval); progressInterval = null; }
-      const progressBars = document.querySelectorAll('.progress-bar');
+      const progressBars = document.querySelectorAll('.slide.active .progress-bar');
       if (progressBars.length > 0) {
         const currentWidth = parseFloat(progressBars[0].style.width) || 0;
         elapsedTime = (currentWidth / 100) * slideDuration;
@@ -602,9 +618,10 @@
     function resumeSlideshow() {
       if (!isPaused) return;
       isPaused = false;
+      // Re-check userHovering — if the user is still hovering nav, don't resume.
+      if (userHovering) return;
       startSlideshowTimer(slideDuration, elapsedTime);
       if (slides[currentIndex]) {
-        // Only restart scroll if the slide has scrollable tables and scrollTop is already 0
         const slide = slides[currentIndex];
         const wrap = slide.querySelector('.table-grid .scroll-wrapper');
         if (wrap && wrap.scrollTop === 0) startInfiniteScroll(slide);
@@ -650,8 +667,8 @@
         row.style.opacity = '0';
         row.style.transform = 'translateY(10px)';
         const scoreCell = row.querySelector('.score-col');
-        if (scoreCell && !row.dataset.targetScore) {
-          // Store the FINAL score string so we can restore it (with arrow) after animation
+        if (scoreCell) {
+          // Always refresh the cached target so stale scores don't animate.
           row.dataset.targetScore = scoreCell.textContent.trim();
         }
       });
@@ -675,7 +692,6 @@
     }
 
     function animateCounter(element, fullText) {
-      // fullText looks like "95.20% ↑" — extract just the numeric part
       const match = fullText.match(/(\d+(?:\.\d+)?)/);
       if (!match) return;
       const targetValue = parseFloat(match[1]);
@@ -690,32 +706,48 @@
         const currentValue = eased * targetValue;
         element.textContent = currentValue.toFixed(2) + suffix;
         if (progress < 1) requestAnimationFrame(updateCounter);
-        else {
-          // Restore the ORIGINAL full text (with arrow) when done
-          element.textContent = fullText;
-        }
+        else element.textContent = fullText;
       }
       requestAnimationFrame(updateCounter);
     }
 
     function goToSlide(index) {
-      if (isTransitioning) return;
+      // Queue a slide change if a transition is in progress
+      if (isTransitioning) {
+        pendingSlideIndex = index;
+        return;
+      }
       if (index === currentIndex) return;
       if (index < 0) index = slides.length - 1;
       if (index >= slides.length) index = 0;
+
       isTransitioning = true;
       clearSlideshowTimer();
       cancelAllScrollAnimations();
+
       slides[currentIndex].classList.remove('active');
       dots[currentIndex].classList.remove('active');
+
       currentIndex = index;
       slides[currentIndex].classList.add('active');
       dots[currentIndex].classList.add('active');
+
+      refreshActiveTags();
+
       if (!slideAnimInitialized[currentIndex]) resetEntranceAnimations(currentIndex);
       else startInfiniteScroll(slides[currentIndex]);
+
       startSlideshowTimer(getSlideDuration(slides[currentIndex]));
       isPaused = false;
-      setTimeout(() => { isTransitioning = false; }, 800);
+
+      setTimeout(() => {
+        isTransitioning = false;
+        if (pendingSlideIndex !== null) {
+          const next = pendingSlideIndex;
+          pendingSlideIndex = null;
+          goToSlide(next);
+        }
+      }, 800);
     }
 
     function nextSlide() { goToSlide(currentIndex + 1); }
@@ -784,7 +816,8 @@
       const agentsSlide = document.querySelector('.slide[data-type="table"][data-datatype="agents"]');
       if (agentsSlide) {
         agentsSlide.dataset.duration = (dur * 1000).toString();
-        if (slides[currentIndex] === agentsSlide && !isTransitioning) {
+        // Only restart if this slide is *currently* active and we're not mid-transition
+        if (slides[currentIndex] === agentsSlide && !isTransitioning && !isPaused && !userHovering) {
           clearSlideshowTimer();
           slideAnimInitialized[currentIndex] = false;
           resetEntranceAnimations(currentIndex);
@@ -800,7 +833,6 @@
       const validItems = items.filter(item => !isNaN(parseScore(item.score)));
       if (validItems.length === 0) { container.innerHTML = `<div class="empty-state">No valid team data.</div>`; return; }
       const ranked = autoRank(validItems);
-      // Split teams in half, not fixed at 10
       const half = Math.ceil(ranked.length / 2);
       const firstCol = ranked.slice(0, half);
       const secondCol = ranked.slice(half);
@@ -831,7 +863,7 @@
       const teamsSlide = document.querySelector('.slide[data-type="table"][data-datatype="teams"]');
       if (teamsSlide) {
         teamsSlide.dataset.duration = (dur * 1000).toString();
-        if (slides[currentIndex] === teamsSlide && !isTransitioning) {
+        if (slides[currentIndex] === teamsSlide && !isTransitioning && !isPaused && !userHovering) {
           clearSlideshowTimer();
           slideAnimInitialized[currentIndex] = false;
           resetEntranceAnimations(currentIndex);
@@ -863,7 +895,9 @@
       const pct = (d / Math.abs(p)) * 100;
       const sign = d > 0 ? '+' : '';
       const dir = d > 0 ? (isHigher ? 'improving' : 'declining') : (isHigher ? 'declining' : 'improving');
-      return (d > 0 ? '📈' : '📉') + ' ' + dir + ' (' + sign + pct.toFixed(1) + '%)';
+      // Emoji reflects metric direction, not raw change direction
+      const positive = isHigher ? d > 0 : d < 0;
+      return (positive ? '📈' : '📉') + ' ' + dir + ' (' + sign + pct.toFixed(1) + '%)';
     }
 
     function updateComparisonSlides(data) {
@@ -923,15 +957,21 @@
           if (canvas) {
             const ctx = canvas.getContext('2d');
             const remaining = isHigher ? Math.max(0, 100 - current) : Math.max(0, current);
-            if (canvas._chart) canvas._chart.destroy();
-            canvas._chart = new Chart(ctx, {
-              type: 'doughnut',
-              data: {
-                labels: ['Current', 'Remaining'],
-                datasets: [{ data: [current, remaining], backgroundColor: [centre.colour, 'rgba(0,0,0,0.06)'], borderWidth: 0 }]
-              },
-              options: { cutout: '75%', plugins: { legend: { display: false } }, responsive: true, maintainAspectRatio: true }
-            });
+            // Update in place instead of recreating
+            if (canvas._chart) {
+              canvas._chart.data.datasets[0].data = [current, remaining];
+              canvas._chart.data.datasets[0].backgroundColor = [centre.colour, 'rgba(0,0,0,0.06)'];
+              canvas._chart.update('none');
+            } else {
+              canvas._chart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                  labels: ['Current', 'Remaining'],
+                  datasets: [{ data: [current, remaining], backgroundColor: [centre.colour, 'rgba(0,0,0,0.06)'], borderWidth: 0 }]
+                },
+                options: { cutout: '75%', plugins: { legend: { display: false } }, responsive: true, maintainAspectRatio: true }
+              });
+            }
           }
         });
       });
@@ -942,11 +982,12 @@
         const grid = slide.querySelector('.summary-grid-vertical');
         if (!grid) return;
         const cards = grid.querySelectorAll('.summary-card-vertical');
-        const metrics = ['SIS', 'IFSR', 'CHT'];
 
-        cards.forEach((card, idx) => {
-          const metric = metrics[idx];
+        cards.forEach(card => {
+          const metric = card.dataset.metric;
+          if (!metric) return;
           const target = data.targets[metric];
+          if (target === undefined) return;
           const isHigher = metric !== 'CHT';
           const unit = metric === 'CHT' ? 's' : '%';
 
@@ -954,10 +995,12 @@
           if (titleSpan) titleSpan.textContent = `Target: ${target}${unit}`;
 
           const rows = card.querySelectorAll('.summary-row-vertical');
-          data.centres.forEach((centre, cIdx) => {
-            const row = rows[cIdx];
-            if (!row) return;
+          rows.forEach(row => {
+            const centreName = row.dataset.centre;
+            const centre = data.centres.find(c => c.name === centreName);
+            if (!centre) return;
             const m = centre.metrics[metric];
+            if (!m) return;
             const current = m.current;
             const prev = m.previous;
             const gapText = getGapText(current, target, isHigher);
@@ -981,20 +1024,40 @@
       });
     }
 
-    function storeSnapshot(data) { try { localStorage.setItem('deltaPreviousData', JSON.stringify(data)); } catch (_) {} }
-    function getPreviousData() {
-      try { const raw = localStorage.getItem('deltaPreviousData'); if (raw) return JSON.parse(raw); } catch (_) {}
+    // ============================================================
+    // TREND SNAPSHOT (weekly previous data, not 60-second previous)
+    // ============================================================
+    const WEEK_KEY = 'deltaWeeklySnapshot';
+    const WEEK_ID_KEY = 'deltaWeeklySnapshotWeek';
+
+    function loadWeeklySnapshot(currentWeek) {
+      try {
+        const storedWeek = localStorage.getItem(WEEK_ID_KEY);
+        const raw = localStorage.getItem(WEEK_KEY);
+        if (raw && storedWeek === currentWeek) return JSON.parse(raw);
+      } catch (_) {}
       return null;
     }
 
+    function saveWeeklySnapshot(data, currentWeek) {
+      try {
+        localStorage.setItem(WEEK_KEY, JSON.stringify(data));
+        localStorage.setItem(WEEK_ID_KEY, currentWeek);
+      } catch (_) {}
+    }
+
+    // ============================================================
+    // DATA LOADING
+    // ============================================================
     async function loadData() {
+      const sources = resolveDataSources();
       try {
         const [lbRes, compRes] = await Promise.all([
-          fetch('data/leaderboard.json?' + Date.now()),
-          fetch('data/comparison.json?' + Date.now())
+          fetch(sources.leaderboard + '?' + Date.now()),
+          fetch(sources.comparison + '?' + Date.now())
         ]);
-        if (!lbRes.ok) throw new Error('Leaderboard data not found');
-        if (!compRes.ok) throw new Error('Comparison data not found');
+        if (!lbRes.ok) throw new Error('Leaderboard data not found at ' + sources.leaderboard);
+        if (!compRes.ok) throw new Error('Comparison data not found at ' + sources.comparison);
 
         const leaderboardData = await lbRes.json();
         const comparisonData = await compRes.json();
@@ -1002,16 +1065,25 @@
         const weekText = leaderboardData.week || 'Week of Jul 20 – Jul 26, 2026';
         document.querySelectorAll('#agentsWeek, #teamsWeek').forEach(el => el.textContent = weekText);
 
-        const prevData = getPreviousData();
+        // Use the *previous week's* stored snapshot for trend comparison,
+        // not the 60-second-old one.
+        const prevData = loadWeeklySnapshot(weekText);
         renderAgents('agentTableWrap', leaderboardData.agents, prevData);
         renderTeams('teamTableWrap', leaderboardData.teams, prevData);
-        storeSnapshot(leaderboardData);
+
+        // Only store a new snapshot if the week key changed.
+        const storedWeek = localStorage.getItem(WEEK_ID_KEY);
+        if (storedWeek !== weekText) {
+          saveWeeklySnapshot(leaderboardData, weekText);
+          console.log('📅 Stored new weekly snapshot for', weekText);
+        }
 
         if (comparisonData.targets && comparisonData.centres) {
           updateComparisonSlides(comparisonData);
           updateSummarySlides(comparisonData);
         }
 
+        // Only start the timer if we don't already have one running and we're not paused.
         if (!timer && !isPaused && !userHovering && slides[currentIndex] && slides[currentIndex].classList.contains('active')) {
           startSlideshowTimer(getSlideDuration(slides[currentIndex]));
         }
@@ -1028,7 +1100,6 @@
       await loadSlidesConfig();
       buildSlidesFromConfig();
 
-      // HARD reset to slide 0
       currentIndex = 0;
       isTransitioning = false;
       isPaused = false;
@@ -1041,7 +1112,6 @@
       document.getElementById('nextSlide').addEventListener('click', nextSlide);
       document.getElementById('prevSlide').addEventListener('click', prevSlide);
 
-      // Only pause on the nav area, not the whole viewport
       const navControls = document.querySelector('.nav-controls');
       if (navControls) {
         navControls.addEventListener('mouseenter', () => { userHovering = true; pauseSlideshow(); });
@@ -1062,12 +1132,16 @@
       });
 
       document.addEventListener('visibilitychange', () => {
-        if (document.hidden) pauseSlideshow(); else resumeSlideshow();
+        if (document.hidden) {
+          pauseSlideshow();
+        } else {
+          // Only resume if the user isn't hovering nav
+          if (!userHovering) resumeSlideshow();
+        }
       });
 
       await loadData();
 
-      // Kick off the slideshow
       clearSlideshowTimer();
       currentIndex = 0;
       isPaused = false;
@@ -1075,7 +1149,9 @@
         startSlideshowTimer(getSlideDuration(slides[0]));
       }
 
-      setInterval(loadData, 60000);
+      // Refresh data every 60 s. Polling reduced from 60s → 5 min to
+      // avoid restarting table animations too often.
+      setInterval(loadData, 300000);
     }
 
     if (document.readyState === 'loading') {
@@ -1086,20 +1162,30 @@
   })();
 
   // ============================================================
-  // REMOTE CONTROL
+  // REMOTE CONTROL  (polling reduced from 2s → 5s; resets after use)
   // ============================================================
   (function() {
     let lastExecutedCommand = '';
-    const POLL_INTERVAL = 2000;
+    let lastCommandTime = 0;
+    const POLL_INTERVAL = 5000;
+    const COMMAND_TTL = 30000; // re-allow same command after 30s
+
     async function pollCommand() {
       try {
         const res = await fetch('command.txt?' + Date.now());
         if (!res.ok) return;
         const command = await res.text();
         const trimmed = command.trim();
-        if (!trimmed || trimmed === 'none' || trimmed === lastExecutedCommand) return;
+        if (!trimmed || trimmed === 'none') return;
+
+        const now = Date.now();
+        const isDuplicate = trimmed === lastExecutedCommand && (now - lastCommandTime) < COMMAND_TTL;
+        if (isDuplicate) return;
+
         lastExecutedCommand = trimmed;
+        lastCommandTime = now;
         console.log('📡 Remote command:', trimmed);
+
         if (trimmed === 'next') { if (window.nextSlide) window.nextSlide(); }
         else if (trimmed === 'prev') { if (window.prevSlide) window.prevSlide(); }
         else if (trimmed.startsWith('slide:')) {
@@ -1114,7 +1200,7 @@
       } catch (e) {}
     }
     setInterval(pollCommand, POLL_INTERVAL);
-    setTimeout(pollCommand, 500);
+    setTimeout(pollCommand, 1000);
     console.log('📡 Remote polling started (command.txt)');
   })();
 </script>
