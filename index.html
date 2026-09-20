@@ -998,4 +998,239 @@
           const prevLabel = compRow.querySelector('.prev-label');
           const gapLabel = compRow.querySelector('.gap-label');
           const gapText = getGapText(current, target, isHigher);
-          co
+          const gapClass = getGapClass(current, target, isHigher);
+          if (prevLabel) prevLabel.textContent = `Prev: ${previous}${unit}`;
+          if (gapLabel) {
+            gapLabel.className = 'gap-label ' + gapClass;
+            gapLabel.textContent = gapText + ' vs target';
+          }
+        }
+
+        const insightRow = card.querySelector('.insight-row');
+        if (insightRow) {
+          const badge = insightRow.querySelector('.insight-badge');
+          const insight = getInsightText(current, previous, isHigher, unit);
+          const statusClass = getStatusClass(current, target, isHigher);
+          if (badge) {
+            badge.className = 'insight-badge ' + statusClass;
+            badge.textContent = insight;
+          }
+        }
+
+        const canvasId = `chart-${metric}-${centre.name}-${slideId}`;
+        const canvas = document.getElementById(canvasId);
+        if (canvas) {
+          const ctx = canvas.getContext('2d');
+          const remaining = isHigher ? Math.max(0, 100 - current) : Math.max(0, current);
+          if (canvas._chart) canvas._chart.destroy();
+          const chart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+              labels: ['Current', 'Remaining'],
+              datasets: [{
+                data: [current, remaining],
+                backgroundColor: [centre.colour, 'rgba(0,0,0,0.06)'],
+                borderWidth: 0
+              }]
+            },
+            options: {
+              cutout: '75%',
+              plugins: { legend: { display: false } },
+              responsive: true,
+              maintainAspectRatio: true
+            }
+          });
+          canvas._chart = chart;
+        }
+      });
+    }
+
+    function updateSummarySlide(data) {
+      const summaryGrid = document.getElementById('summaryGrid');
+      const cards = summaryGrid.querySelectorAll('.summary-card-vertical');
+      const metrics = ['SIS', 'IFSR', 'CHT'];
+
+      cards.forEach((card, idx) => {
+        const metric = metrics[idx];
+        const target = data.targets[metric];
+        const isHigher = metric !== 'CHT';
+        const unit = metric === 'CHT' ? 's' : '%';
+
+        const titleSpan = card.querySelector('.metric-title .unit');
+        if (titleSpan) titleSpan.textContent = `Target: ${target}${unit}`;
+
+        const rows = card.querySelectorAll('.summary-row-vertical');
+        data.centres.forEach((centre, centreIdx) => {
+          const row = rows[centreIdx];
+          if (!row) return;
+          const m = centre.metrics[metric];
+          const current = m.current;
+          const prev = m.previous;
+          const gapText = getGapText(current, target, isHigher);
+          const gapClass = getGapClass(current, target, isHigher);
+          const change = current - prev;
+          const changeClass = change > 0 ? 'up' : (change < 0 ? 'down' : 'flat');
+          const sym = change > 0 ? '↑' : (change < 0 ? '↓' : '→');
+          const pct = prev !== 0 ? (change / Math.abs(prev)) * 100 : 0;
+
+          const valuesDiv = row.querySelector('.values');
+          if (valuesDiv) {
+            const currentSpan = valuesDiv.querySelector('.current');
+            const changeSpan = valuesDiv.querySelector('.change');
+            const gapSpan = valuesDiv.querySelector('.gap-badge');
+            if (currentSpan) currentSpan.textContent = current + unit;
+            if (changeSpan) {
+              changeSpan.className = 'change ' + changeClass;
+              changeSpan.textContent = sym + ' ' + Math.abs(pct).toFixed(1) + '%';
+            }
+            if (gapSpan) {
+              gapSpan.className = 'gap-badge ' + gapClass;
+              gapSpan.textContent = gapText;
+            }
+          }
+        });
+      });
+    }
+
+    function storeSnapshot(data) {
+      try { localStorage.setItem('deltaPreviousData', JSON.stringify(data)); } catch (_) {}
+    }
+    function getPreviousData() {
+      try { const raw = localStorage.getItem('deltaPreviousData'); if (raw) return JSON.parse(raw); } catch (_) {}
+      return null;
+    }
+
+    let lastDataHash = '';
+
+    async function loadData() {
+      try {
+        const [lbRes, compRes] = await Promise.all([
+          fetch('data/leaderboard.json?' + Date.now()),
+          fetch('data/comparison.json?' + Date.now())
+        ]);
+
+        if (!lbRes.ok) throw new Error('Leaderboard data not found');
+        if (!compRes.ok) throw new Error('Comparison data not found');
+
+        const leaderboardData = await lbRes.json();
+        const comparisonData = await compRes.json();
+
+        const weekText = leaderboardData.week || 'Week of Jul 20 – Jul 26, 2026';
+        document.getElementById('agentsWeek').textContent = weekText;
+        document.getElementById('teamsWeek').textContent = weekText;
+
+        const prevData = getPreviousData();
+
+        renderAgents('agentTableWrap', leaderboardData.agents, prevData);
+        renderTeams('teamTableWrap', leaderboardData.teams, prevData);
+
+        storeSnapshot(leaderboardData);
+
+        if (comparisonData.targets && comparisonData.centres) {
+          updateComparisonSlide(comparisonData, 'SIS', 'compSlide4');
+          updateComparisonSlide(comparisonData, 'IFSR', 'compSlide5');
+          updateComparisonSlide(comparisonData, 'CHT', 'compSlide6');
+          updateSummarySlide(comparisonData);
+        }
+
+        if (!timer && !isPaused && slides[currentIndex].classList.contains('active')) {
+          startSlideshowTimer(getSlideDuration(slides[currentIndex]));
+        }
+      } catch (e) {
+        console.warn('Data load error:', e);
+        document.getElementById('agentTableWrap').innerHTML = '<div class="empty-state">⚠️ Could not load data.</div>';
+        document.getElementById('teamTableWrap').innerHTML = '<div class="empty-state">⚠️ Could not load data.</div>';
+      }
+    }
+
+    loadData();
+    setInterval(loadData, 60000);
+  })();
+
+  // ============================================================
+  // REMOTE CONTROL
+  // ============================================================
+  (function() {
+    let lastExecutedCommand = '';
+    const POLL_INTERVAL = 2000;
+
+    async function pollCommand() {
+      try {
+        const res = await fetch('command.txt?' + Date.now());
+        if (!res.ok) return;
+        const command = await res.text();
+        const trimmed = command.trim();
+        if (!trimmed || trimmed === 'none' || trimmed === lastExecutedCommand) return;
+        lastExecutedCommand = trimmed;
+        console.log('📡 Remote command:', trimmed);
+
+        if (trimmed === 'next') { if (window.nextSlide) window.nextSlide(); }
+        else if (trimmed === 'prev') { if (window.prevSlide) window.prevSlide(); }
+        else if (trimmed.startsWith('slide:')) {
+          const index = parseInt(trimmed.split(':')[1]);
+          if (!isNaN(index) && window.goToSlide) window.goToSlide(index);
+        } else if (trimmed === 'fullscreen') {
+          const btn = document.getElementById('fullscreenBtn');
+          if (btn) btn.click();
+        } else if (trimmed === 'refresh') { window.location.reload(); }
+        else if (trimmed === 'play') { if (window.resumeSlideshow) window.resumeSlideshow(); }
+        else if (trimmed === 'pause') { if (window.pauseSlideshow) window.pauseSlideshow(); }
+      } catch (e) { /* ignore */ }
+    }
+
+    setInterval(pollCommand, POLL_INTERVAL);
+    setTimeout(pollCommand, 500);
+    console.log('📡 Remote polling started (command.txt)');
+  })();
+
+  // ============================================================
+  // SIMPLE CONFIG LOADER - This is the ONLY new addition
+  // It applies slides-config.json to your existing slides
+  // ============================================================
+  (function() {
+    async function applySlideConfig() {
+      try {
+        const res = await fetch('slides-config.json?' + Date.now());
+        if (!res.ok) return;
+        
+        const config = await res.json();
+        console.log('📋 Applying slide config from admin tool');
+        
+        config.slides.forEach((slideData, index) => {
+          const slide = document.getElementById(`slide${index}`);
+          if (!slide) return;
+          
+          // Update background for title slides
+          if (slideData.type === 'title' && slideData.bg) {
+            slide.style.background = `url('${slideData.bg}') center/cover no-repeat, #0b1a33`;
+          }
+          
+          // Update background for data-image slides
+          if (slideData.type === 'data-image' && slideData.bg) {
+            slide.style.background = `#0b1a33 url('${slideData.bg}') center/contain no-repeat`;
+          }
+          
+          // Update duration
+          if (slideData.duration) {
+            slide.dataset.duration = slideData.duration;
+          }
+        });
+        
+        console.log('✅ Applied slide config successfully');
+      } catch(e) {
+        // Silently fail - use hardcoded slides
+      }
+    }
+    
+    // Run after page loads
+    if (document.readyState === 'complete') {
+      setTimeout(applySlideConfig, 1000);
+    } else {
+      window.addEventListener('load', function() {
+        setTimeout(applySlideConfig, 1000);
+      });
+    }
+  })();
+</script>
+</body>
+</html>
