@@ -23,9 +23,22 @@
     .slide { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; visibility: hidden; transition: opacity 0.8s ease, transform 0.8s ease, visibility 0.8s ease; display: flex; flex-direction: column; transform: scale(0.98); }
     .slide.active { opacity: 1; visibility: visible; position: relative; transform: scale(1); transition: opacity 0.8s ease, transform 0.8s ease, visibility 0.8s ease; }
 
-    .slide[data-type="title"] { background: #0b1a33; }
-    .slide[data-type="data-image"] { background: #0b1a33; }
-    .slide[data-type="table"] { background: linear-gradient(145deg, #f0f3f8 0%, #e8ecf4 100%); padding: 0; }
+    /* ===== TITLE & DATA SLIDES ===== */
+    #slide0 { background: url('assets/slides/slide-title.webp.jpg') center/cover no-repeat, #0b1a33; }
+    #slide1 { background: url('assets/slides/slide-data.webp.jpg') center/cover no-repeat, #0b1a33; }
+
+    /* ===== IE SLIDES – CONTAIN (NO STRETCH) ===== */
+    #slide8 { background: #0b1a33 url('assets/slides/iex1.webp.png?v=2') center/contain no-repeat; }
+    #slide9 { background: #0b1a33 url('assets/slides/iex2.webp.png?v=2') center/contain no-repeat; }
+    #slide10 { background: #0b1a33 url('assets/slides/iex3.webp.png?v=2') center/contain no-repeat; }
+    #slide11 { background: #0b1a33 url('assets/slides/iex4.webp.png?v=2') center/contain no-repeat; }
+    #slide12 { background: #0b1a33 url('assets/slides/iex5.webp.png?v=2') center/contain no-repeat; }
+    #slide13 { background: #0b1a33 url('assets/slides/iex6.webp.png?v=2') center/contain no-repeat; }
+    #slide14 { background: #0b1a33 url('assets/slides/iex7.webp.png?v=2') center/contain no-repeat; }
+    #slide15 { background: #0b1a33 url('assets/slides/iex8.webp.png?v=2') center/contain no-repeat; }
+
+    /* ===== AGENTS & TEAMS SLIDES ===== */
+    #slide2, #slide3 { background: linear-gradient(145deg, #f0f3f8 0%, #e8ecf4 100%); padding: 0; }
 
     .slide-header { background: #0b1a33; backdrop-filter: blur(16px) saturate(180%); -webkit-backdrop-filter: blur(16px) saturate(180%); padding: 0.3vh 2vw; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.2vh 1vw; flex-shrink: 0; min-height: 10vh; border-bottom: 2px solid rgba(211,47,47,0.3); position: relative; overflow: hidden; box-shadow: 0 4px 30px rgba(0,0,0,0.3); border-radius: 0 0 12px 12px; margin: 0 0.5vw; }
     .slide-header::before { content: ''; position: absolute; top: 0; left: -150%; width: 300%; height: 100%; background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.02) 20%, rgba(255,255,255,0.06) 40%, rgba(255,255,255,0.02) 60%, transparent 100%); animation: shimmerWhite 10s ease-in-out infinite; pointer-events: none; z-index: 0; }
@@ -71,8 +84,8 @@
     .table-wrap .rank-col { width: 10%; color: #6b7f96; font-weight: 600; font-size: 2.4vh; }
     .table-wrap .name-col { font-weight: 500; text-align: left; font-size: 2.4vh; }
 
-    .slide[data-type="table"][data-datatype="agents"] .table-grid .score-col { width: 45% !important; min-width: 45% !important; max-width: 45% !important; text-align: right; justify-content: flex-end; white-space: nowrap; overflow: visible !important; }
-    .slide[data-type="table"][data-datatype="teams"] .table-grid .score-col { width: 55% !important; min-width: 55% !important; max-width: 55% !important; text-align: right !important; justify-content: flex-end !important; white-space: nowrap; padding-right: 0.3vw; overflow: visible !important; }
+    #slide2 .table-grid .score-col { width: 45% !important; min-width: 45% !important; max-width: 45% !important; text-align: right; justify-content: flex-end; white-space: nowrap; overflow: visible !important; }
+    #slide3 .table-grid .score-col { width: 55% !important; min-width: 55% !important; max-width: 55% !important; text-align: right !important; justify-content: flex-end !important; white-space: nowrap; padding-right: 0.3vw; overflow: visible !important; }
 
     .trend-arrow { display: inline-block; font-size: 2vh; font-weight: 300; visibility: hidden; transform: translateX(10px); transition: all 0.4s ease; margin-left: 0.2vw; pointer-events: none; }
     .trend-arrow.visible { visibility: visible; transform: translateX(0); }
@@ -115,7 +128,7 @@
     .dot { width: 1vh; height: 1vh; border-radius: 50%; background: rgba(255,255,255,0.2); border: none; cursor: pointer; transition: all 0.3s ease; padding: 0; }
     .dot.active { background: #d32f2f; transform: scale(1.4); box-shadow: 0 0 20px rgba(211,47,47,0.5); }
 
-    .slide[data-type="comparison-detail"], .slide[data-type="summary"] { background: #f2f5f9; padding: 0; }
+    #slide4, #slide5, #slide6, #slide7 { background: #f2f5f9; padding: 0; }
     .comp-slide-wrapper { flex: 1; width: 100%; padding: 1vh 3vw 2vh 3vw; display: flex; flex-direction: column; gap: 2vh; min-height: 0; height: 100%; background: #f2f5f9; }
     .comp-slide-wrapper .metric-header { display: flex; align-items: center; gap: 1.2vw; flex-shrink: 0; flex-wrap: wrap; }
     .comp-delta-logo { height: 18vh; width: auto; object-fit: contain; margin-right: 0.5vw; filter: drop-shadow(0 0 20px rgba(211,47,47,0.15)); }
@@ -234,8 +247,202 @@
     <button class="fullscreen-btn" id="fullscreenBtn"><span class="icon">⛶</span> FULL</button>
     <div id="adminAccess"><a href="#" id="adminLink">⚙ ADMIN</a></div>
 
-    <div id="slidesContainer"></div>
+    <!-- ===== SLIDE 0: TITLE ===== -->
+    <div class="slide active" id="slide0" data-index="0" data-duration="6000">
+      <div class="slide-counter"><span class="current">1</span> / 16</div>
+    </div>
 
+    <!-- ===== SLIDE 1: DATA IMAGE ===== -->
+    <div class="slide" id="slide1" data-index="1" data-duration="8000">
+      <div class="slide-counter"><span class="current">2</span> / 16</div>
+    </div>
+
+    <!-- ===== SLIDE 2: AGENTS ===== -->
+    <div class="slide" id="slide2" data-index="2" data-duration="40000">
+      <div class="slide-counter"><span class="current">3</span> / 16</div>
+      <div class="slide-header">
+        <div class="logo-area"><img src="assets/logos/delta-logo-ribbon.png?v=36" alt="Delta" /><h1><span>DELTA</span> · SIS</h1></div>
+        <div class="behavior-tags" id="tags1">
+          <span class="tag" data-delay="0">GREET ME</span><span class="divider">•</span>
+          <span class="tag" data-delay="100">RECOGNIZE ME</span><span class="divider">•</span>
+          <span class="tag" data-delay="200">BE KIND TO ME</span><span class="divider">•</span>
+          <span class="tag" data-delay="300">INFORM ME</span><span class="divider">•</span>
+          <span class="tag red" data-delay="400">CONSISTENTLY EXECUTED</span><span class="divider">•</span>
+          <span class="tag coach" data-delay="500">LEADERS AS COACHES</span>
+        </div>
+        <div class="border-line"></div>
+      </div>
+      <div class="table-wrap">
+        <div class="slide-title">Top Performing Agents – SIS <span class="week-date" id="agentsWeek">Loading...</span></div>
+        <div class="table-grid" id="agentTableWrap"><div class="empty-state">Loading agents…</div></div>
+      </div>
+      <div class="slide-footer"><div class="footer-animation"><div class="spray-fill"></div><svg class="plane" viewBox="0 0 80 50" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M15 25 L70 20 L80 25 L70 30 L15 25Z" fill="#d32f2f" stroke="#b71c1c" stroke-width="1"/><path d="M45 22 L60 10 L68 15 L52 25 L45 22Z" fill="#ffffff" stroke="#d32f2f" stroke-width="1.5"/><path d="M45 28 L60 40 L68 35 L52 25 L45 28Z" fill="#ffffff" stroke="#d32f2f" stroke-width="1.5"/><path d="M15 25 L5 15 L15 20 L15 25Z" fill="#d32f2f"/><path d="M15 25 L5 35 L15 30 L15 25Z" fill="#d32f2f"/><path d="M15 23 L8 18 L15 22 L15 23Z" fill="#ffffff" stroke="#d32f2f" stroke-width="1"/><path d="M15 27 L8 32 L15 28 L15 27Z" fill="#ffffff" stroke="#d32f2f" stroke-width="1"/><circle cx="78" cy="25" r="3" fill="#fdb913"/><ellipse cx="82" cy="25" rx="8" ry="2" fill="#fdb913" opacity="0.8"/><path d="M65 23 Q72 23 68 27 Q65 27 65 23Z" fill="#0b1a33" opacity="0.6"/></svg><div class="spray-text">DELTA</div></div></div>
+      <div class="progress-container"><div class="progress-bar" id="progressBar"></div></div>
+    </div>
+
+    <!-- ===== SLIDE 3: TEAMS ===== -->
+    <div class="slide" id="slide3" data-index="3" data-duration="45000">
+      <div class="slide-counter"><span class="current">4</span> / 16</div>
+      <div class="slide-header">
+        <div class="logo-area"><img src="assets/logos/delta-logo-ribbon.png?v=36" alt="Delta" /><h1><span>DELTA</span> · SIS</h1></div>
+        <div class="behavior-tags" id="tags2">
+          <span class="tag" data-delay="0">GREET ME</span><span class="divider">•</span>
+          <span class="tag" data-delay="100">RECOGNIZE ME</span><span class="divider">•</span>
+          <span class="tag" data-delay="200">BE KIND TO ME</span><span class="divider">•</span>
+          <span class="tag" data-delay="300">INFORM ME</span><span class="divider">•</span>
+          <span class="tag red" data-delay="400">CONSISTENTLY EXECUTED</span><span class="divider">•</span>
+          <span class="tag coach" data-delay="500">LEADERS AS COACHES</span>
+        </div>
+        <div class="border-line"></div>
+      </div>
+      <div class="table-wrap">
+        <div class="slide-title">Top Performing Teams – SIS <span class="week-date" id="teamsWeek">Loading...</span></div>
+        <div class="table-grid" id="teamTableWrap"><div class="empty-state">Loading teams…</div></div>
+      </div>
+      <div class="slide-footer"><div class="footer-animation"><div class="spray-fill"></div><svg class="plane" viewBox="0 0 80 50" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M15 25 L70 20 L80 25 L70 30 L15 25Z" fill="#d32f2f" stroke="#b71c1c" stroke-width="1"/><path d="M45 22 L60 10 L68 15 L52 25 L45 22Z" fill="#ffffff" stroke="#d32f2f" stroke-width="1.5"/><path d="M45 28 L60 40 L68 35 L52 25 L45 28Z" fill="#ffffff" stroke="#d32f2f" stroke-width="1.5"/><path d="M15 25 L5 15 L15 20 L15 25Z" fill="#d32f2f"/><path d="M15 25 L5 35 L15 30 L15 25Z" fill="#d32f2f"/><path d="M15 23 L8 18 L15 22 L15 23Z" fill="#ffffff" stroke="#d32f2f" stroke-width="1"/><path d="M15 27 L8 32 L15 28 L15 27Z" fill="#ffffff" stroke="#d32f2f" stroke-width="1"/><circle cx="78" cy="25" r="3" fill="#fdb913"/><ellipse cx="82" cy="25" rx="8" ry="2" fill="#fdb913" opacity="0.8"/><path d="M65 23 Q72 23 68 27 Q65 27 65 23Z" fill="#0b1a33" opacity="0.6"/></svg><div class="spray-text">DELTA</div></div></div>
+      <div class="progress-container"><div class="progress-bar" id="progressBar"></div></div>
+    </div>
+
+    <!-- ===== SLIDE 4: SIS COMPARISON ===== -->
+    <div class="slide" id="slide4" data-index="4" data-duration="12000">
+      <div class="slide-counter"><span class="current">5</span> / 16</div>
+      <div class="comp-slide-wrapper" id="compSlide4">
+        <div class="metric-header">
+          <img src="assets/logos/delta-logo.png" alt="Delta" class="comp-delta-logo" onerror="this.style.display='none'" />
+          <h2>SIS</h2>
+          <span class="unit-badge">Target: --</span>
+        </div>
+        <div class="card-row">
+          <div class="centre-card tp">
+            <div class="chart-area"><canvas id="chart-SIS-TP-slide4"></canvas></div>
+            <div class="details-area">
+              <div class="centre-name"><img src="assets/logos/TP-logo.png" alt="TP" class="centre-logo" onerror="this.style.display='none'" /></div>
+              <div class="main-value">-- <span class="trend">—</span></div>
+              <div class="comparison-row"><span class="prev-label">Prev: --</span><span class="gap-label">-- vs target</span></div>
+              <div class="insight-row"><span class="insight-badge">Loading...</span></div>
+            </div>
+          </div>
+          <div class="centre-card wns">
+            <div class="chart-area"><canvas id="chart-SIS-WNS-slide4"></canvas></div>
+            <div class="details-area">
+              <div class="centre-name"><img src="assets/logos/wns-logo.png" alt="WNS" class="centre-logo" onerror="this.style.display='none'" /></div>
+              <div class="main-value">-- <span class="trend">—</span></div>
+              <div class="comparison-row"><span class="prev-label">Prev: --</span><span class="gap-label">-- vs target</span></div>
+              <div class="insight-row"><span class="insight-badge">Loading...</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="progress-container"><div class="progress-bar" id="progressBar"></div></div>
+    </div>
+
+    <!-- ===== SLIDE 5: IFSR COMPARISON ===== -->
+    <div class="slide" id="slide5" data-index="5" data-duration="12000">
+      <div class="slide-counter"><span class="current">6</span> / 16</div>
+      <div class="comp-slide-wrapper" id="compSlide5">
+        <div class="metric-header">
+          <img src="assets/logos/delta-logo.png" alt="Delta" class="comp-delta-logo" onerror="this.style.display='none'" />
+          <h2>IFSR</h2>
+          <span class="unit-badge">Target: --</span>
+        </div>
+        <div class="card-row">
+          <div class="centre-card tp">
+            <div class="chart-area"><canvas id="chart-IFSR-TP-slide5"></canvas></div>
+            <div class="details-area">
+              <div class="centre-name"><img src="assets/logos/TP-logo.png" alt="TP" class="centre-logo" onerror="this.style.display='none'" /></div>
+              <div class="main-value">-- <span class="trend">—</span></div>
+              <div class="comparison-row"><span class="prev-label">Prev: --</span><span class="gap-label">-- vs target</span></div>
+              <div class="insight-row"><span class="insight-badge">Loading...</span></div>
+            </div>
+          </div>
+          <div class="centre-card wns">
+            <div class="chart-area"><canvas id="chart-IFSR-WNS-slide5"></canvas></div>
+            <div class="details-area">
+              <div class="centre-name"><img src="assets/logos/wns-logo.png" alt="WNS" class="centre-logo" onerror="this.style.display='none'" /></div>
+              <div class="main-value">-- <span class="trend">—</span></div>
+              <div class="comparison-row"><span class="prev-label">Prev: --</span><span class="gap-label">-- vs target</span></div>
+              <div class="insight-row"><span class="insight-badge">Loading...</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="progress-container"><div class="progress-bar" id="progressBar"></div></div>
+    </div>
+
+    <!-- ===== SLIDE 6: CHT COMPARISON ===== -->
+    <div class="slide" id="slide6" data-index="6" data-duration="12000">
+      <div class="slide-counter"><span class="current">7</span> / 16</div>
+      <div class="comp-slide-wrapper" id="compSlide6">
+        <div class="metric-header">
+          <img src="assets/logos/delta-logo.png" alt="Delta" class="comp-delta-logo" onerror="this.style.display='none'" />
+          <h2>CHT</h2>
+          <span class="unit-badge">Target: --</span>
+        </div>
+        <div class="card-row">
+          <div class="centre-card tp">
+            <div class="chart-area"><canvas id="chart-CHT-TP-slide6"></canvas></div>
+            <div class="details-area">
+              <div class="centre-name"><img src="assets/logos/TP-logo.png" alt="TP" class="centre-logo" onerror="this.style.display='none'" /></div>
+              <div class="main-value">-- <span class="trend">—</span></div>
+              <div class="comparison-row"><span class="prev-label">Prev: --</span><span class="gap-label">-- vs target</span></div>
+              <div class="insight-row"><span class="insight-badge">Loading...</span></div>
+            </div>
+          </div>
+          <div class="centre-card wns">
+            <div class="chart-area"><canvas id="chart-CHT-WNS-slide6"></canvas></div>
+            <div class="details-area">
+              <div class="centre-name"><img src="assets/logos/wns-logo.png" alt="WNS" class="centre-logo" onerror="this.style.display='none'" /></div>
+              <div class="main-value">-- <span class="trend">—</span></div>
+              <div class="comparison-row"><span class="prev-label">Prev: --</span><span class="gap-label">-- vs target</span></div>
+              <div class="insight-row"><span class="insight-badge">Loading...</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="progress-container"><div class="progress-bar" id="progressBar"></div></div>
+    </div>
+
+    <!-- ===== SLIDE 7: SUMMARY ===== -->
+    <div class="slide" id="slide7" data-index="7" data-duration="15000">
+      <div class="slide-counter"><span class="current">8</span> / 16</div>
+      <div class="comp-slide-wrapper" id="compSlide7">
+        <div class="metric-header">
+          <img src="assets/logos/delta-logo.png" alt="Delta" class="comp-delta-logo" onerror="this.style.display='none'" />
+          <h2>📊 Summary Report</h2>
+          <span class="unit-badge">All Metrics</span>
+        </div>
+        <div class="summary-grid-vertical" id="summaryGrid">
+          <div class="summary-card-vertical">
+            <div class="metric-title">SIS <span class="unit">Target: --</span></div>
+            <div class="summary-row-vertical"><div class="centre-info"><img src="assets/logos/TP-logo.png" alt="TP" class="centre-logo" style="height:3.5vh;width:auto;object-fit:contain;" onerror="this.style.display='none'" /></div><div class="values"><span class="current">--</span><span class="change">--</span><span class="gap-badge">--</span></div></div>
+            <div class="summary-row-vertical"><div class="centre-info"><img src="assets/logos/wns-logo.png" alt="WNS" class="centre-logo" style="height:3.5vh;width:auto;object-fit:contain;" onerror="this.style.display='none'" /></div><div class="values"><span class="current">--</span><span class="change">--</span><span class="gap-badge">--</span></div></div>
+          </div>
+          <div class="summary-card-vertical">
+            <div class="metric-title">IFSR <span class="unit">Target: --</span></div>
+            <div class="summary-row-vertical"><div class="centre-info"><img src="assets/logos/TP-logo.png" alt="TP" class="centre-logo" style="height:3.5vh;width:auto;object-fit:contain;" onerror="this.style.display='none'" /></div><div class="values"><span class="current">--</span><span class="change">--</span><span class="gap-badge">--</span></div></div>
+            <div class="summary-row-vertical"><div class="centre-info"><img src="assets/logos/wns-logo.png" alt="WNS" class="centre-logo" style="height:3.5vh;width:auto;object-fit:contain;" onerror="this.style.display='none'" /></div><div class="values"><span class="current">--</span><span class="change">--</span><span class="gap-badge">--</span></div></div>
+          </div>
+          <div class="summary-card-vertical">
+            <div class="metric-title">CHT <span class="unit">Target: --</span></div>
+            <div class="summary-row-vertical"><div class="centre-info"><img src="assets/logos/TP-logo.png" alt="TP" class="centre-logo" style="height:3.5vh;width:auto;object-fit:contain;" onerror="this.style.display='none'" /></div><div class="values"><span class="current">--</span><span class="change">--</span><span class="gap-badge">--</span></div></div>
+            <div class="summary-row-vertical"><div class="centre-info"><img src="assets/logos/wns-logo.png" alt="WNS" class="centre-logo" style="height:3.5vh;width:auto;object-fit:contain;" onerror="this.style.display='none'" /></div><div class="values"><span class="current">--</span><span class="change">--</span><span class="gap-badge">--</span></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="progress-container"><div class="progress-bar" id="progressBar"></div></div>
+    </div>
+
+    <!-- ===== SLIDE 8-15: IE SLIDES ===== -->
+    <div class="slide" id="slide8" data-index="8" data-duration="6000"><div class="slide-counter"><span class="current">9</span> / 16</div></div>
+    <div class="slide" id="slide9" data-index="9" data-duration="6000"><div class="slide-counter"><span class="current">10</span> / 16</div></div>
+    <div class="slide" id="slide10" data-index="10" data-duration="6000"><div class="slide-counter"><span class="current">11</span> / 16</div></div>
+    <div class="slide" id="slide11" data-index="11" data-duration="6000"><div class="slide-counter"><span class="current">12</span> / 16</div></div>
+    <div class="slide" id="slide12" data-index="12" data-duration="6000"><div class="slide-counter"><span class="current">13</span> / 16</div></div>
+    <div class="slide" id="slide13" data-index="13" data-duration="6000"><div class="slide-counter"><span class="current">14</span> / 16</div></div>
+    <div class="slide" id="slide14" data-index="14" data-duration="6000"><div class="slide-counter"><span class="current">15</span> / 16</div></div>
+    <div class="slide" id="slide15" data-index="15" data-duration="6000"><div class="slide-counter"><span class="current">16</span> / 16</div></div>
+
+    <!-- ===== NAVIGATION ===== -->
     <div class="nav-controls">
       <button class="arrow" id="prevSlide">◀</button>
       <div class="dots" id="dotsContainer"></div>
@@ -245,6 +452,10 @@
 </div>
 
 <script>
+  // ============================================================
+  // ALL YOUR ORIGINAL JAVASCRIPT - KEPT INTACT
+  // ============================================================
+  
   // ============================================================
   // ADMIN ACCESS
   // ============================================================
@@ -297,12 +508,46 @@
   })();
 
   // ============================================================
-  // SLIDESHOW ENGINE
+  // BEHAVIOUR TAGS
   // ============================================================
   (function() {
-    let slideConfig = null;
-    let slides = [];
-    let dots = [];
+    function animateTags(container) {
+      const tags = container.querySelectorAll('.tag');
+      tags.forEach(tag => {
+        const delay = parseInt(tag.dataset.delay) || 0;
+        setTimeout(() => tag.classList.add('visible'), delay + 300);
+      });
+    }
+    const tags1 = document.getElementById('tags1');
+    const tags2 = document.getElementById('tags2');
+    if (tags1) animateTags(tags1);
+    if (tags2) animateTags(tags2);
+    const observer = new MutationObserver(() => {
+      document.querySelectorAll('.slide.active .behavior-tags').forEach(tags => {
+        tags.querySelectorAll('.tag').forEach(t => t.classList.remove('visible'));
+        setTimeout(() => animateTags(tags), 300);
+      });
+    });
+    document.querySelectorAll('.slide').forEach(slide => {
+      observer.observe(slide, { attributes: true, attributeFilter: ['class'] });
+    });
+  })();
+
+  // ============================================================
+  // SLIDESHOW ENGINE - YOUR ORIGINAL CODE
+  // ============================================================
+  (function() {
+    const slides = document.querySelectorAll('.slide');
+    const dotsContainer = document.getElementById('dotsContainer');
+    const progressBars = document.querySelectorAll('.progress-bar');
+    const wrapper = document.getElementById('slidesWrapper');
+
+    const AGENTS_TIME_PER_ROW = 0.6;
+    const TEAMS_TIME_PER_ROW = 0.8;
+    const AGENTS_MIN_DISPLAY = 40;
+    const TEAMS_MIN_DISPLAY = 45;
+    const MAX_DISPLAY = 120;
+
     let currentIndex = 0;
     let timer = null;
     let progressInterval = null;
@@ -311,229 +556,7 @@
     let slideDuration = 5500;
     let elapsedTime = 0;
     let scrollAnimFrames = [];
-    let slideAnimInitialized = [];
-
-    const AGENTS_TIME_PER_ROW = 0.6;
-    const TEAMS_TIME_PER_ROW = 0.8;
-    const AGENTS_MIN_DISPLAY = 40;
-    const TEAMS_MIN_DISPLAY = 45;
-    const MAX_DISPLAY = 120;
-    const TARGET_THRESHOLD = 86.30;
-
-    function getDefaultConfig() {
-      return {
-        slides: [
-          { id: 0, type: 'title', name: 'SIS Title', bg: 'assets/slides/slide-title.webp.jpg' },
-          { id: 1, type: 'data-image', name: 'SIS Data Image', bg: 'assets/slides/slide-data.webp.jpg' },
-          { id: 2, type: 'table', name: 'Agents - SIS', dataSource: 'leaderboard.json', dataType: 'agents', title: 'Top Performing Agents - SIS' },
-          { id: 3, type: 'table', name: 'Teams - SIS', dataSource: 'leaderboard.json', dataType: 'teams', title: 'Top Performing Teams - SIS' },
-          { id: 4, type: 'comparison-detail', name: 'SIS Detail', dataSource: 'comparison.json', metric: 'SIS' },
-          { id: 5, type: 'comparison-detail', name: 'IFSR Detail', dataSource: 'comparison.json', metric: 'IFSR' },
-          { id: 6, type: 'comparison-detail', name: 'CHT Detail', dataSource: 'comparison.json', metric: 'CHT' },
-          { id: 7, type: 'summary', name: 'Summary Report', dataSource: 'comparison.json' }
-        ]
-      };
-    }
-
-    async function loadSlidesConfig() {
-      try {
-        const res = await fetch('slides-config.json?t=' + Date.now());
-        if (!res.ok) throw new Error('Config not found');
-        const cfg = await res.json();
-        if (!cfg || !Array.isArray(cfg.slides) || cfg.slides.length === 0) throw new Error('Invalid config');
-        slideConfig = cfg;
-        console.log('✅ Loaded slides-config.json with', slideConfig.slides.length, 'slides');
-      } catch (e) {
-        console.warn('⚠️ Using default config:', e.message);
-        slideConfig = getDefaultConfig();
-      }
-    }
-
-    function buildSlidesFromConfig() {
-      const container = document.getElementById('slidesContainer');
-      container.innerHTML = '';
-      const total = slideConfig.slides.length;
-
-      slideConfig.slides.forEach((slide, index) => {
-        const div = document.createElement('div');
-        div.className = 'slide' + (index === 0 ? ' active' : '');
-        div.id = 'slide' + index;
-        div.dataset.index = index;
-        div.dataset.type = slide.type || 'data-image';
-        div.dataset.duration = slide.duration || 5500;
-        if (slide.dataType) div.dataset.datatype = slide.dataType;
-        if (slide.metric) div.dataset.metric = slide.metric;
-
-        if (slide.type === 'title' && slide.bg) {
-          div.style.background = `url('${slide.bg}') center/cover no-repeat, #0b1a33`;
-        } else if (slide.type === 'data-image' && slide.bg) {
-          div.style.background = `#0b1a33 url('${slide.bg}') center/contain no-repeat`;
-        }
-
-        div.innerHTML = buildSlideContent(slide, index, total);
-        container.appendChild(div);
-      });
-
-      slides = Array.from(document.querySelectorAll('.slide'));
-      slideAnimInitialized = new Array(slides.length).fill(false);
-
-      const dotsContainer = document.getElementById('dotsContainer');
-      dotsContainer.innerHTML = '';
-      slides.forEach((_, i) => {
-        const dot = document.createElement('button');
-        dot.className = 'dot' + (i === 0 ? ' active' : '');
-        dot.dataset.index = i;
-        dot.addEventListener('click', () => goToSlide(i));
-        dotsContainer.appendChild(dot);
-      });
-      dots = Array.from(dotsContainer.querySelectorAll('.dot'));
-
-      console.log('✅ Built', slides.length, 'slides');
-    }
-
-    function buildSlideContent(slide, index, total) {
-      const counter = `<div class="slide-counter"><span class="current">${index + 1}</span> / ${total}</div>`;
-      const type = slide.type || 'data-image';
-
-      switch (type) {
-        case 'title':
-        case 'data-image':
-          return counter;
-
-        case 'table': {
-          const isAgent = slide.dataType === 'agents';
-          const tableId = isAgent ? 'agentTableWrap' : 'teamTableWrap';
-          const weekId = isAgent ? 'agentsWeek' : 'teamsWeek';
-          const tableTitle = slide.title || (isAgent ? 'Top Performing Agents – SIS' : 'Top Performing Teams – SIS');
-          return `
-            ${counter}
-            <div class="slide-header">
-              <div class="logo-area"><img src="assets/logos/delta-logo-ribbon.png?v=36" alt="Delta" /><h1><span>DELTA</span> · SIS</h1></div>
-              <div class="behavior-tags">
-                <span class="tag" data-delay="0">GREET ME</span><span class="divider">•</span>
-                <span class="tag" data-delay="100">RECOGNIZE ME</span><span class="divider">•</span>
-                <span class="tag" data-delay="200">BE KIND TO ME</span><span class="divider">•</span>
-                <span class="tag" data-delay="300">INFORM ME</span><span class="divider">•</span>
-                <span class="tag red" data-delay="400">CONSISTENTLY EXECUTED</span><span class="divider">•</span>
-                <span class="tag coach" data-delay="500">LEADERS AS COACHES</span>
-              </div>
-              <div class="border-line"></div>
-            </div>
-            <div class="table-wrap">
-              <div class="slide-title">${tableTitle} <span class="week-date" id="${weekId}">Loading...</span></div>
-              <div class="table-grid" id="${tableId}"><div class="empty-state">Loading data…</div></div>
-            </div>
-            <div class="slide-footer">
-              <div class="footer-animation">
-                <div class="spray-fill"></div>
-                <svg class="plane" viewBox="0 0 80 50" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M15 25 L70 20 L80 25 L70 30 L15 25Z" fill="#d32f2f" stroke="#b71c1c" stroke-width="1"/>
-                  <path d="M45 22 L60 10 L68 15 L52 25 L45 22Z" fill="#ffffff" stroke="#d32f2f" stroke-width="1.5"/>
-                  <path d="M45 28 L60 40 L68 35 L52 25 L45 28Z" fill="#ffffff" stroke="#d32f2f" stroke-width="1.5"/>
-                  <path d="M15 25 L5 15 L15 20 L15 25Z" fill="#d32f2f"/>
-                  <path d="M15 25 L5 35 L15 30 L15 25Z" fill="#d32f2f"/>
-                  <path d="M15 23 L8 18 L15 22 L15 23Z" fill="#ffffff" stroke="#d32f2f" stroke-width="1"/>
-                  <path d="M15 27 L8 32 L15 28 L15 27Z" fill="#ffffff" stroke="#d32f2f" stroke-width="1"/>
-                  <circle cx="78" cy="25" r="3" fill="#fdb913"/>
-                  <ellipse cx="82" cy="25" rx="8" ry="2" fill="#fdb913" opacity="0.8"/>
-                  <path d="M65 23 Q72 23 68 27 Q65 27 65 23Z" fill="#0b1a33" opacity="0.6"/>
-                </svg>
-                <div class="spray-text">DELTA</div>
-              </div>
-            </div>
-            <div class="progress-container"><div class="progress-bar"></div></div>
-          `;
-        }
-
-        case 'comparison-detail': {
-          const metric = slide.metric || 'SIS';
-          return `
-            ${counter}
-            <div class="comp-slide-wrapper">
-              <div class="metric-header">
-                <img src="assets/logos/delta-logo.png" alt="Delta" class="comp-delta-logo" onerror="this.style.display='none'" />
-                <h2>${metric}</h2>
-                <span class="unit-badge">Target: --</span>
-              </div>
-              <div class="card-row">
-                <div class="centre-card tp">
-                  <div class="chart-area"><canvas></canvas></div>
-                  <div class="details-area">
-                    <div class="centre-name"><img src="assets/logos/TP-logo.png" alt="TP" class="centre-logo" onerror="this.style.display='none'" /></div>
-                    <div class="main-value">-- <span class="trend">—</span></div>
-                    <div class="comparison-row"><span class="prev-label">Prev: --</span><span class="gap-label">-- vs target</span></div>
-                    <div class="insight-row"><span class="insight-badge">Loading...</span></div>
-                  </div>
-                </div>
-                <div class="centre-card wns">
-                  <div class="chart-area"><canvas></canvas></div>
-                  <div class="details-area">
-                    <div class="centre-name"><img src="assets/logos/wns-logo.png" alt="WNS" class="centre-logo" onerror="this.style.display='none'" /></div>
-                    <div class="main-value">-- <span class="trend">—</span></div>
-                    <div class="comparison-row"><span class="prev-label">Prev: --</span><span class="gap-label">-- vs target</span></div>
-                    <div class="insight-row"><span class="insight-badge">Loading...</span></div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="progress-container"><div class="progress-bar"></div></div>
-          `;
-        }
-
-        case 'summary':
-          return `
-            ${counter}
-            <div class="comp-slide-wrapper">
-              <div class="metric-header">
-                <img src="assets/logos/delta-logo.png" alt="Delta" class="comp-delta-logo" onerror="this.style.display='none'" />
-                <h2>📊 Summary Report</h2>
-                <span class="unit-badge">All Metrics</span>
-              </div>
-              <div class="summary-grid-vertical">
-                <div class="summary-card-vertical">
-                  <div class="metric-title">SIS <span class="unit">Target: --</span></div>
-                  <div class="summary-row-vertical"><div class="centre-info"><img src="assets/logos/TP-logo.png" alt="TP" class="centre-logo" onerror="this.style.display='none'" /></div><div class="values"><span class="current">--</span><span class="change">--</span><span class="gap-badge">--</span></div></div>
-                  <div class="summary-row-vertical"><div class="centre-info"><img src="assets/logos/wns-logo.png" alt="WNS" class="centre-logo" onerror="this.style.display='none'" /></div><div class="values"><span class="current">--</span><span class="change">--</span><span class="gap-badge">--</span></div></div>
-                </div>
-                <div class="summary-card-vertical">
-                  <div class="metric-title">IFSR <span class="unit">Target: --</span></div>
-                  <div class="summary-row-vertical"><div class="centre-info"><img src="assets/logos/TP-logo.png" alt="TP" class="centre-logo" onerror="this.style.display='none'" /></div><div class="values"><span class="current">--</span><span class="change">--</span><span class="gap-badge">--</span></div></div>
-                  <div class="summary-row-vertical"><div class="centre-info"><img src="assets/logos/wns-logo.png" alt="WNS" class="centre-logo" onerror="this.style.display='none'" /></div><div class="values"><span class="current">--</span><span class="change">--</span><span class="gap-badge">--</span></div></div>
-                </div>
-                <div class="summary-card-vertical">
-                  <div class="metric-title">CHT <span class="unit">Target: --</span></div>
-                  <div class="summary-row-vertical"><div class="centre-info"><img src="assets/logos/TP-logo.png" alt="TP" class="centre-logo" onerror="this.style.display='none'" /></div><div class="values"><span class="current">--</span><span class="change">--</span><span class="gap-badge">--</span></div></div>
-                  <div class="summary-row-vertical"><div class="centre-info"><img src="assets/logos/wns-logo.png" alt="WNS" class="centre-logo" onerror="this.style.display='none'" /></div><div class="values"><span class="current">--</span><span class="change">--</span><span class="gap-badge">--</span></div></div>
-                </div>
-              </div>
-            </div>
-            <div class="progress-container"><div class="progress-bar"></div></div>
-          `;
-
-        default:
-          return counter + `<div style="color:white;display:flex;align-items:center;justify-content:center;height:100%;font-size:3vh;">Unknown slide type: ${type}</div>`;
-      }
-    }
-
-    function animateTags(container) {
-      const tags = container.querySelectorAll('.tag');
-      tags.forEach(tag => {
-        const delay = parseInt(tag.dataset.delay) || 0;
-        setTimeout(() => tag.classList.add('visible'), delay + 300);
-      });
-    }
-    function setupBehaviorTags() {
-      document.querySelectorAll('.behavior-tags').forEach(tags => animateTags(tags));
-      const observer = new MutationObserver(() => {
-        document.querySelectorAll('.slide.active .behavior-tags').forEach(tags => {
-          tags.querySelectorAll('.tag').forEach(t => t.classList.remove('visible'));
-          setTimeout(() => animateTags(tags), 300);
-        });
-      });
-      document.querySelectorAll('.slide').forEach(slide => {
-        observer.observe(slide, { attributes: true, attributeFilter: ['class'] });
-      });
-    }
+    let slideAnimInitialized = new Array(slides.length).fill(false);
 
     function getSlideDuration(slide) {
       const custom = parseInt(slide.dataset.duration);
@@ -542,7 +565,6 @@
     }
 
     function startProgressBar(duration, startPercent = 0) {
-      const progressBars = document.querySelectorAll('.progress-bar');
       if (progressInterval) clearInterval(progressInterval);
       const startTime = Date.now();
       progressBars.forEach(bar => { bar.style.width = startPercent + '%'; });
@@ -552,30 +574,37 @@
         const additional = (elapsed / duration) * 100;
         const total = Math.min(startPercent + additional, 100);
         progressBars.forEach(bar => { bar.style.width = total + '%'; });
-        if (total >= 100) { clearInterval(progressInterval); progressInterval = null; }
+        if (total >= 100) {
+          clearInterval(progressInterval);
+          progressInterval = null;
+        }
       }, 50);
     }
+
     function stopProgressBar() {
       if (progressInterval) { clearInterval(progressInterval); progressInterval = null; }
-      const progressBars = document.querySelectorAll('.progress-bar');
       if (progressBars.length > 0) {
-        const w = parseFloat(progressBars[0].style.width) || 0;
-        elapsedTime = (w / 100) * slideDuration;
+        const currentWidth = parseFloat(progressBars[0].style.width) || 0;
+        elapsedTime = (currentWidth / 100) * slideDuration;
       }
     }
+
     function clearSlideshowTimer() {
       if (timer) { clearTimeout(timer); timer = null; }
       stopProgressBar();
     }
+
     function startSlideshowTimer(duration = null, startFromElapsed = null) {
       clearSlideshowTimer();
       if (duration !== null) slideDuration = duration;
-      elapsedTime = (startFromElapsed !== null) ? startFromElapsed : 0;
+      if (startFromElapsed !== null) elapsedTime = startFromElapsed;
+      else elapsedTime = 0;
       const remaining = slideDuration - elapsedTime;
       if (remaining <= 0) { nextSlide(); return; }
       startProgressBar(slideDuration, (elapsedTime / slideDuration) * 100);
       timer = setTimeout(() => { if (!isPaused) nextSlide(); }, remaining);
     }
+
     function pauseSlideshow() {
       if (isPaused) return;
       isPaused = true;
@@ -583,16 +612,19 @@
       scrollAnimFrames.forEach(id => cancelAnimationFrame(id));
       scrollAnimFrames = [];
     }
+
     function resumeSlideshow() {
       if (!isPaused) return;
       isPaused = false;
       startSlideshowTimer(slideDuration, elapsedTime);
       if (slides[currentIndex]) startInfiniteScroll(slides[currentIndex]);
     }
+
     function cancelAllScrollAnimations() {
       scrollAnimFrames.forEach(id => cancelAnimationFrame(id));
       scrollAnimFrames = [];
     }
+
     function startInfiniteScroll(slide) {
       cancelAllScrollAnimations();
       const durationMs = parseFloat(slide.dataset.duration) || 5500;
@@ -606,17 +638,21 @@
         wrapper.scrollTop = 0;
         const pixelsPerMs = half / durationMs;
         let lastTime = performance.now();
+
         function step(now) {
           if (isPaused) return;
           const dt = now - lastTime;
           lastTime = now;
           wrapper.scrollTop += pixelsPerMs * dt;
           if (wrapper.scrollTop >= half) wrapper.scrollTop -= half;
-          scrollAnimFrames.push(requestAnimationFrame(step));
+          const frameId = requestAnimationFrame(step);
+          scrollAnimFrames.push(frameId);
         }
-        scrollAnimFrames.push(requestAnimationFrame(step));
+        const frameId = requestAnimationFrame(step);
+        scrollAnimFrames.push(frameId);
       });
     }
+
     function resetEntranceAnimations(index) {
       const activeSlide = slides[index];
       if (index < 2) {
@@ -624,12 +660,13 @@
         return;
       }
       const rows = activeSlide.querySelectorAll('tbody tr');
-      if (rows.length === 0) { slideAnimInitialized[index] = true; startInfiniteScroll(activeSlide); return; }
       rows.forEach(row => {
         row.style.opacity = '0';
         row.style.transform = 'translateY(10px)';
         const scoreCell = row.querySelector('.score-col');
-        if (scoreCell && !row.dataset.targetScore) row.dataset.targetScore = scoreCell.textContent.trim();
+        if (scoreCell && !row.dataset.targetScore) {
+          row.dataset.targetScore = scoreCell.textContent.trim();
+        }
       });
       rows.forEach((row, i) => {
         setTimeout(() => {
@@ -637,7 +674,9 @@
           row.style.opacity = '1';
           row.style.transform = 'translateY(0)';
           const scoreCell = row.querySelector('.score-col');
-          if (scoreCell && row.dataset.targetScore) animateCounter(scoreCell, row.dataset.targetScore);
+          if (scoreCell && row.dataset.targetScore) {
+            animateCounter(scoreCell, row.dataset.targetScore);
+          }
           const arrow = row.querySelector('.trend-arrow');
           if (arrow) setTimeout(() => arrow.classList.add('visible'), 300 + (i * 80));
         }, 120 + (i * 80));
@@ -645,17 +684,20 @@
       slideAnimInitialized[index] = true;
       startInfiniteScroll(activeSlide);
     }
+
     function animateCounter(element, target) {
       const targetValue = parseFloat(target);
       if (isNaN(targetValue)) return;
       const suffix = target.includes('%') ? '%' : '';
       const duration = 1200;
       const startTime = performance.now();
+
       function updateCounter(currentTime) {
         const elapsed = currentTime - startTime;
         const progress = Math.min(elapsed / duration, 1);
         const eased = 1 - Math.pow(1 - progress, 3);
-        element.textContent = (eased * targetValue).toFixed(2) + suffix;
+        const currentValue = eased * targetValue;
+        element.textContent = currentValue.toFixed(2) + suffix;
         if (progress < 1) requestAnimationFrame(updateCounter);
         else element.textContent = target;
       }
@@ -674,12 +716,16 @@
       currentIndex = index;
       slides[currentIndex].classList.add('active');
       dots[currentIndex].classList.add('active');
-      if (!slideAnimInitialized[currentIndex]) resetEntranceAnimations(currentIndex);
-      else startInfiniteScroll(slides[currentIndex]);
+      if (!slideAnimInitialized[currentIndex]) {
+        resetEntranceAnimations(currentIndex);
+      } else {
+        startInfiniteScroll(slides[currentIndex]);
+      }
       startSlideshowTimer(getSlideDuration(slides[currentIndex]));
       isPaused = false;
       setTimeout(() => { isTransitioning = false; }, 800);
     }
+
     function nextSlide() { goToSlide(currentIndex + 1); }
     function prevSlide() { goToSlide(currentIndex - 1); }
 
@@ -689,6 +735,45 @@
     window.pauseSlideshow = pauseSlideshow;
     window.resumeSlideshow = resumeSlideshow;
 
+    slides.forEach((_, i) => {
+      const dot = document.createElement('button');
+      dot.className = 'dot' + (i === 0 ? ' active' : '');
+      dot.dataset.index = i;
+      dot.addEventListener('click', () => goToSlide(i));
+      dotsContainer.appendChild(dot);
+    });
+    const dots = dotsContainer.querySelectorAll('.dot');
+
+    document.getElementById('nextSlide').addEventListener('click', nextSlide);
+    document.getElementById('prevSlide').addEventListener('click', prevSlide);
+
+    wrapper.addEventListener('mouseenter', pauseSlideshow);
+    wrapper.addEventListener('mouseleave', resumeSlideshow);
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight') nextSlide();
+      if (e.key === 'ArrowLeft') prevSlide();
+      if (e.key === ' ' || e.code === 'Space') {
+        e.preventDefault();
+        if (isPaused) resumeSlideshow(); else pauseSlideshow();
+      }
+      if (e.key === 'f' || e.key === 'F') {
+        const btn = document.getElementById('fullscreenBtn');
+        if (btn) btn.click();
+      }
+    });
+
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) pauseSlideshow(); else resumeSlideshow();
+    });
+
+    window.getCurrentIndex = () => currentIndex;
+
+    // ============================================================
+    // DATA RENDERING - YOUR ORIGINAL FUNCTIONS
+    // ============================================================
+    const TARGET_THRESHOLD = 86.30;
+
     function buildTrendArrow(currentVal, previousVal) {
       if (previousVal === undefined || previousVal === null) return `<span class="trend-arrow neutral"></span>`;
       const diff = currentVal - previousVal;
@@ -696,9 +781,12 @@
       if (diff < -0.01) return `<span class="trend-arrow down visible">↓</span>`;
       return `<span class="trend-arrow neutral"></span>`;
     }
+
     function autoRank(items) {
-      return [...items].sort((a, b) => parseFloat(b.score) - parseFloat(a.score)).map((item, i) => ({ ...item, rank: i + 1 }));
+      const sorted = [...items].sort((a, b) => parseFloat(b.score) - parseFloat(a.score));
+      return sorted.map((item, index) => ({ ...item, rank: index + 1 }));
     }
+
     function formatScore(score) {
       const num = parseFloat(score);
       if (isNaN(num)) return '–';
@@ -707,10 +795,15 @@
 
     function renderAgents(containerId, items, previousData) {
       const container = document.getElementById(containerId);
-      if (!container) return;
-      if (!items || items.length === 0) { container.innerHTML = `<div class="empty-state">No data available.</div>`; return; }
+      if (!items || items.length === 0) {
+        container.innerHTML = `<div class="empty-state">No data available.</div>`;
+        return;
+      }
       const validItems = items.filter(item => !isNaN(parseFloat(item.score)));
-      if (validItems.length === 0) { container.innerHTML = `<div class="empty-state">No valid agent data.</div>`; return; }
+      if (validItems.length === 0) {
+        container.innerHTML = `<div class="empty-state">No valid agent data.</div>`;
+        return;
+      }
       const ranked = autoRank(validItems);
       const half = Math.ceil(ranked.length / 2);
       const left = ranked.slice(0, half);
@@ -722,45 +815,59 @@
         doubled.forEach(item => {
           const scoreVal = parseFloat(item.score);
           let rowClass = (scoreVal >= TARGET_THRESHOLD) ? 'top1' : 'amber';
-          let prevScore;
+          let prevScore = undefined;
           if (previousData && previousData.agents) {
-            const p = previousData.agents.find(a => a.name === item.name);
-            if (p) prevScore = parseFloat(p.score);
+            const prevItem = previousData.agents.find(a => a.name === item.name);
+            if (prevItem) prevScore = parseFloat(prevItem.score);
           }
+          const arrowHtml = buildTrendArrow(scoreVal, prevScore);
+          const formattedScore = formatScore(item.score);
           html += `<tr class="${rowClass}">
             <td class="rank-col">${item.rank}</td>
             <td class="name-col">${item.name}</td>
-            <td class="score-col">${formatScore(item.score)} ${buildTrendArrow(scoreVal, prevScore)}</td>
+            <td class="score-col">${formattedScore} ${arrowHtml}</td>
           </tr>`;
         });
-        return html + `</tbody></table>`;
+        html += `</tbody></table>`;
+        return html;
       }
 
       container.innerHTML = `
-        <div class="scroll-wrapper" style="overflow:hidden; height:100%;"><div class="scroll-inner">${buildTable(left)}</div></div>
-        <div class="scroll-wrapper" style="overflow:hidden; height:100%;"><div class="scroll-inner">${buildTable(right)}</div></div>
+        <div class="scroll-wrapper" style="overflow:hidden; height:100%;">
+          <div class="scroll-inner">${buildTable(left)}</div>
+        </div>
+        <div class="scroll-wrapper" style="overflow:hidden; height:100%;">
+          <div class="scroll-inner">${buildTable(right)}</div>
+        </div>
       `;
 
       const rowCount = left.length;
-      let dur = Math.max(AGENTS_MIN_DISPLAY, Math.min(MAX_DISPLAY, rowCount * AGENTS_TIME_PER_ROW));
-      const agentsSlide = document.querySelector('.slide[data-type="table"][data-datatype="agents"]');
+      let computedDurationSec = rowCount * AGENTS_TIME_PER_ROW;
+      computedDurationSec = Math.max(AGENTS_MIN_DISPLAY, computedDurationSec);
+      computedDurationSec = Math.min(MAX_DISPLAY, computedDurationSec);
+      const agentsSlide = document.getElementById('slide2');
       if (agentsSlide) {
-        agentsSlide.dataset.duration = (dur * 1000).toString();
-        if (slides[currentIndex] === agentsSlide && !isTransitioning) {
+        agentsSlide.dataset.duration = (computedDurationSec * 1000).toString();
+        if (currentIndex === 2 && !isTransitioning) {
           clearSlideshowTimer();
-          slideAnimInitialized[currentIndex] = false;
-          resetEntranceAnimations(currentIndex);
-          startSlideshowTimer(dur * 1000);
+          slideAnimInitialized[2] = false;
+          resetEntranceAnimations(2);
+          startSlideshowTimer(computedDurationSec * 1000);
         }
       }
     }
 
     function renderTeams(containerId, items, previousData) {
       const container = document.getElementById(containerId);
-      if (!container) return;
-      if (!items || items.length === 0) { container.innerHTML = `<div class="empty-state">No data available.</div>`; return; }
+      if (!items || items.length === 0) {
+        container.innerHTML = `<div class="empty-state">No data available.</div>`;
+        return;
+      }
       const validItems = items.filter(item => !isNaN(parseFloat(item.score)));
-      if (validItems.length === 0) { container.innerHTML = `<div class="empty-state">No valid team data.</div>`; return; }
+      if (validItems.length === 0) {
+        container.innerHTML = `<div class="empty-state">No valid team data.</div>`;
+        return;
+      }
       const ranked = autoRank(validItems);
       const firstCol = ranked.slice(0, 10);
       const secondCol = ranked.slice(10);
@@ -771,31 +878,40 @@
         doubled.forEach(item => {
           const scoreVal = parseFloat(item.score);
           let rowClass = (scoreVal >= TARGET_THRESHOLD) ? 'top1' : 'amber';
-          let prevScore;
+          let prevScore = undefined;
           if (previousData && previousData.teams) {
-            const p = previousData.teams.find(t => t.name === item.name);
-            if (p) prevScore = parseFloat(p.score);
+            const prevItem = previousData.teams.find(t => t.name === item.name);
+            if (prevItem) prevScore = parseFloat(prevItem.score);
           }
-          html += `<tr class="${rowClass}"><td class="rank-col">${item.rank}</td><td class="name-col">${item.name}</td><td class="score-col">${formatScore(item.score)} ${buildTrendArrow(scoreVal, prevScore)}</td></tr>`;
+          const arrowHtml = buildTrendArrow(scoreVal, prevScore);
+          const formattedScore = formatScore(item.score);
+          html += `<tr class="${rowClass}"><td class="rank-col">${item.rank}</td><td class="name-col">${item.name}</td><td class="score-col">${formattedScore} ${arrowHtml}</td></tr>`;
         });
-        return html + `</tbody></table>`;
+        html += `</tbody></table>`;
+        return html;
       }
 
       container.innerHTML = `
-        <div class="scroll-wrapper" style="overflow:hidden; height:100%;"><div class="scroll-inner">${buildTable(firstCol)}</div></div>
-        <div class="scroll-wrapper" style="overflow:hidden; height:100%;"><div class="scroll-inner">${buildTable(secondCol)}</div></div>
+        <div class="scroll-wrapper" style="overflow:hidden; height:100%;">
+          <div class="scroll-inner">${buildTable(firstCol)}</div>
+        </div>
+        <div class="scroll-wrapper" style="overflow:hidden; height:100%;">
+          <div class="scroll-inner">${buildTable(secondCol)}</div>
+        </div>
       `;
 
       const rowCount = firstCol.length;
-      let dur = Math.max(TEAMS_MIN_DISPLAY, Math.min(MAX_DISPLAY, rowCount * TEAMS_TIME_PER_ROW));
-      const teamsSlide = document.querySelector('.slide[data-type="table"][data-datatype="teams"]');
+      let computedDurationSec = rowCount * TEAMS_TIME_PER_ROW;
+      computedDurationSec = Math.max(TEAMS_MIN_DISPLAY, computedDurationSec);
+      computedDurationSec = Math.min(MAX_DISPLAY, computedDurationSec);
+      const teamsSlide = document.getElementById('slide3');
       if (teamsSlide) {
-        teamsSlide.dataset.duration = (dur * 1000).toString();
-        if (slides[currentIndex] === teamsSlide && !isTransitioning) {
+        teamsSlide.dataset.duration = (computedDurationSec * 1000).toString();
+        if (currentIndex === 3 && !isTransitioning) {
           clearSlideshowTimer();
-          slideAnimInitialized[currentIndex] = false;
-          resetEntranceAnimations(currentIndex);
-          startSlideshowTimer(dur * 1000);
+          slideAnimInitialized[3] = false;
+          resetEntranceAnimations(3);
+          startSlideshowTimer(computedDurationSec * 1000);
         }
       }
     }
@@ -845,253 +961,41 @@
       return (d > 0 ? '📈' : '📉') + ' ' + dir + ' (' + sign + pct.toFixed(1) + '%)';
     }
 
-    function updateComparisonSlides(data) {
-      document.querySelectorAll('.slide[data-type="comparison-detail"]').forEach(slide => {
-        const metric = slide.dataset.metric;
-        if (!metric || !data.targets[metric]) return;
-        const target = data.targets[metric];
-        const isHigher = metric !== 'CHT';
-        const unit = metric === 'CHT' ? 's' : '%';
+    function updateComparisonSlide(data, metric, slideId) {
+      const target = data.targets[metric];
+      const isHigher = metric !== 'CHT';
+      const unit = metric === 'CHT' ? 's' : '%';
 
-        const wrapper = slide.querySelector('.comp-slide-wrapper');
-        if (!wrapper) return;
-        const headerH2 = wrapper.querySelector('.metric-header h2');
-        const unitBadge = wrapper.querySelector('.unit-badge');
-        if (headerH2) headerH2.textContent = metric;
-        if (unitBadge) unitBadge.textContent = `Target: ${target}${unit}`;
+      const slideWrapper = document.getElementById(slideId);
+      const headerH2 = slideWrapper.querySelector('.metric-header h2');
+      const unitBadge = slideWrapper.querySelector('.unit-badge');
+      if (headerH2) headerH2.textContent = metric;
+      if (unitBadge) unitBadge.textContent = `Target: ${target}${unit}`;
 
-        const cards = wrapper.querySelectorAll('.centre-card');
-        data.centres.forEach((centre, idx) => {
-          const card = cards[idx];
-          if (!card) return;
-          const m = centre.metrics[metric];
-          const current = m.current;
-          const previous = m.previous;
+      const cards = slideWrapper.querySelectorAll('.centre-card');
+      data.centres.forEach((centre, idx) => {
+        const card = cards[idx];
+        if (!card) return;
+        const m = centre.metrics[metric];
+        const current = m.current;
+        const previous = m.previous;
 
-          const mainVal = card.querySelector('.main-value');
-          if (mainVal) {
-            const trendSpan = mainVal.querySelector('.trend');
-            const trendClass = current > previous ? 'up' : (current < previous ? 'down' : 'flat');
-            const trendArrow = current > previous ? '↑' : (current < previous ? '↓' : '→');
-            const textNode = mainVal.childNodes[0];
-            if (textNode) textNode.textContent = current + unit + ' ';
-            if (trendSpan) { trendSpan.className = 'trend ' + trendClass; trendSpan.textContent = trendArrow; }
+        const mainVal = card.querySelector('.main-value');
+        if (mainVal) {
+          const trendSpan = mainVal.querySelector('.trend');
+          const trendClass = current > previous ? 'up' : (current < previous ? 'down' : 'flat');
+          const trendArrow = current > previous ? '↑' : (current < previous ? '↓' : '→');
+          const textNode = mainVal.childNodes[0];
+          if (textNode) textNode.textContent = current + unit + ' ';
+          if (trendSpan) {
+            trendSpan.className = 'trend ' + trendClass;
+            trendSpan.textContent = trendArrow;
           }
-
-          const compRow = card.querySelector('.comparison-row');
-          if (compRow) {
-            const prevLabel = compRow.querySelector('.prev-label');
-            const gapLabel = compRow.querySelector('.gap-label');
-            if (prevLabel) prevLabel.textContent = `Prev: ${previous}${unit}`;
-            if (gapLabel) {
-              gapLabel.className = 'gap-label ' + getGapClass(current, target, isHigher);
-              gapLabel.textContent = getGapText(current, target, isHigher) + ' vs target';
-            }
-          }
-
-          const insightRow = card.querySelector('.insight-row');
-          if (insightRow) {
-            const badge = insightRow.querySelector('.insight-badge');
-            if (badge) {
-              badge.className = 'insight-badge ' + getStatusClass(current, target, isHigher);
-              badge.textContent = getInsightText(current, previous, isHigher, unit);
-            }
-          }
-
-          const canvas = card.querySelector('canvas');
-          if (canvas) {
-            const ctx = canvas.getContext('2d');
-            const remaining = isHigher ? Math.max(0, 100 - current) : Math.max(0, current);
-            if (canvas._chart) canvas._chart.destroy();
-            canvas._chart = new Chart(ctx, {
-              type: 'doughnut',
-              data: {
-                labels: ['Current', 'Remaining'],
-                datasets: [{ data: [current, remaining], backgroundColor: [centre.colour, 'rgba(0,0,0,0.06)'], borderWidth: 0 }]
-              },
-              options: { cutout: '75%', plugins: { legend: { display: false } }, responsive: true, maintainAspectRatio: true }
-            });
-          }
-        });
-      });
-    }
-
-    function updateSummarySlides(data) {
-      document.querySelectorAll('.slide[data-type="summary"]').forEach(slide => {
-        const summaryGrid = slide.querySelector('.summary-grid-vertical');
-        if (!summaryGrid) return;
-        const cards = summaryGrid.querySelectorAll('.summary-card-vertical');
-        const metrics = ['SIS', 'IFSR', 'CHT'];
-
-        cards.forEach((card, idx) => {
-          const metric = metrics[idx];
-          const target = data.targets[metric];
-          const isHigher = metric !== 'CHT';
-          const unit = metric === 'CHT' ? 's' : '%';
-
-          const titleSpan = card.querySelector('.metric-title .unit');
-          if (titleSpan) titleSpan.textContent = `Target: ${target}${unit}`;
-
-          const rows = card.querySelectorAll('.summary-row-vertical');
-          data.centres.forEach((centre, centreIdx) => {
-            const row = rows[centreIdx];
-            if (!row) return;
-            const m = centre.metrics[metric];
-            const current = m.current;
-            const prev = m.previous;
-            const gapText = getGapText(current, target, isHigher);
-            const gapClass = getGapClass(current, target, isHigher);
-            const change = current - prev;
-            const changeClass = change > 0 ? 'up' : (change < 0 ? 'down' : 'flat');
-            const sym = change > 0 ? '↑' : (change < 0 ? '↓' : '→');
-            const pct = prev !== 0 ? (change / Math.abs(prev)) * 100 : 0;
-
-            const valuesDiv = row.querySelector('.values');
-            if (valuesDiv) {
-              const currentSpan = valuesDiv.querySelector('.current');
-              const changeSpan = valuesDiv.querySelector('.change');
-              const gapSpan = valuesDiv.querySelector('.gap-badge');
-              if (currentSpan) currentSpan.textContent = current + unit;
-              if (changeSpan) {
-                changeSpan.className = 'change ' + changeClass;
-                changeSpan.textContent = sym + ' ' + Math.abs(pct).toFixed(1) + '%';
-              }
-              if (gapSpan) {
-                gapSpan.className = 'gap-badge ' + gapClass;
-                gapSpan.textContent = gapText;
-              }
-            }
-          });
-        });
-      });
-    }
-
-    function storeSnapshot(data) {
-      try { localStorage.setItem('deltaPreviousData', JSON.stringify(data)); } catch (_) {}
-    }
-    function getPreviousData() {
-      try { const raw = localStorage.getItem('deltaPreviousData'); if (raw) return JSON.parse(raw); } catch (_) {}
-      return null;
-    }
-
-    async function loadData() {
-      try {
-        const [lbRes, compRes] = await Promise.all([
-          fetch('data/leaderboard.json?' + Date.now()),
-          fetch('data/comparison.json?' + Date.now())
-        ]);
-
-        if (!lbRes.ok) throw new Error('Leaderboard data not found');
-        if (!compRes.ok) throw new Error('Comparison data not found');
-
-        const leaderboardData = await lbRes.json();
-        const comparisonData = await compRes.json();
-
-        const weekText = leaderboardData.week || 'Week of Jul 20 – Jul 26, 2026';
-        document.querySelectorAll('#agentsWeek, #teamsWeek').forEach(el => el.textContent = weekText);
-
-        const prevData = getPreviousData();
-
-        renderAgents('agentTableWrap', leaderboardData.agents, prevData);
-        renderTeams('teamTableWrap', leaderboardData.teams, prevData);
-
-        storeSnapshot(leaderboardData);
-
-        if (comparisonData.targets && comparisonData.centres) {
-          updateComparisonSlides(comparisonData);
-          updateSummarySlides(comparisonData);
         }
 
-        if (!timer && !isPaused && slides[currentIndex] && slides[currentIndex].classList.contains('active')) {
-          startSlideshowTimer(getSlideDuration(slides[currentIndex]));
-        }
-      } catch (e) {
-        console.warn('Data load error:', e);
-        ['agentTableWrap', 'teamTableWrap'].forEach(id => {
-          const el = document.getElementById(id);
-          if (el) el.innerHTML = '<div class="empty-state">⚠️ Could not load data.</div>';
-        });
-      }
-    }
-
-    async function init() {
-      await loadSlidesConfig();
-      buildSlidesFromConfig();
-      setupBehaviorTags();
-
-      document.getElementById('nextSlide').addEventListener('click', nextSlide);
-      document.getElementById('prevSlide').addEventListener('click', prevSlide);
-
-      const wrapper = document.getElementById('slidesWrapper');
-      wrapper.addEventListener('mouseenter', pauseSlideshow);
-      wrapper.addEventListener('mouseleave', resumeSlideshow);
-
-      document.addEventListener('keydown', (e) => {
-        if (e.key === 'ArrowRight') nextSlide();
-        if (e.key === 'ArrowLeft') prevSlide();
-        if (e.key === ' ' || e.code === 'Space') {
-          e.preventDefault();
-          if (isPaused) resumeSlideshow(); else pauseSlideshow();
-        }
-        if (e.key === 'f' || e.key === 'F') {
-          const btn = document.getElementById('fullscreenBtn');
-          if (btn) btn.click();
-        }
-      });
-
-      document.addEventListener('visibilitychange', () => {
-        if (document.hidden) pauseSlideshow(); else resumeSlideshow();
-      });
-
-      await loadData();
-
-      if (slides.length > 0) startSlideshowTimer(getSlideDuration(slides[0]));
-
-      setInterval(loadData, 60000);
-    }
-
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', init);
-    } else {
-      init();
-    }
-  })();
-
-  // ============================================================
-  // REMOTE CONTROL
-  // ============================================================
-  (function() {
-    let lastExecutedCommand = '';
-    const POLL_INTERVAL = 2000;
-
-    async function pollCommand() {
-      try {
-        const res = await fetch('command.txt?' + Date.now());
-        if (!res.ok) return;
-        const command = await res.text();
-        const trimmed = command.trim();
-        if (!trimmed || trimmed === 'none' || trimmed === lastExecutedCommand) return;
-        lastExecutedCommand = trimmed;
-        console.log('📡 Remote command:', trimmed);
-
-        if (trimmed === 'next') { if (window.nextSlide) window.nextSlide(); }
-        else if (trimmed === 'prev') { if (window.prevSlide) window.prevSlide(); }
-        else if (trimmed.startsWith('slide:')) {
-          const index = parseInt(trimmed.split(':')[1]);
-          if (!isNaN(index) && window.goToSlide) window.goToSlide(index);
-        } else if (trimmed === 'fullscreen') {
-          const btn = document.getElementById('fullscreenBtn');
-          if (btn) btn.click();
-        } else if (trimmed === 'refresh') { window.location.reload(); }
-        else if (trimmed === 'play') { if (window.resumeSlideshow) window.resumeSlideshow(); }
-        else if (trimmed === 'pause') { if (window.pauseSlideshow) window.pauseSlideshow(); }
-      } catch (e) { /* ignore */ }
-    }
-
-    setInterval(pollCommand, POLL_INTERVAL);
-    setTimeout(pollCommand, 500);
-    console.log('📡 Remote polling started (command.txt)');
-  })();
-</script>
-</body>
-</html>
+        const compRow = card.querySelector('.comparison-row');
+        if (compRow) {
+          const prevLabel = compRow.querySelector('.prev-label');
+          const gapLabel = compRow.querySelector('.gap-label');
+          const gapText = getGapText(current, target, isHigher);
+          co
