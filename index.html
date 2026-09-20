@@ -245,7 +245,7 @@
 
 <script>
   // ============================================================
-  // ADMIN ACCESS  (NOTE: password intentionally left client-side)
+  // ADMIN ACCESS
   // ============================================================
   (function() {
     const ADMIN_PASSWORD = 'delta2026';
@@ -322,22 +322,11 @@
     let elapsedTime = 0;
     let scrollAnimFrames = [];
     let slideAnimInitialized = [];
-    let userHovering = false;
-    let pendingSlideIndex = null;
 
-    // ============================================================
-    // HELPERS
-    // ============================================================
+    // FIX #7 helper: parse a score string that may contain "%", arrows, or whitespace.
     function parseScore(raw) {
       if (raw === null || raw === undefined) return NaN;
-      const cleaned = String(raw).replace(/[%\s↑↓→]/g, '');
-      return parseFloat(cleaned);
-    }
-
-    function formatScore(score) {
-      const num = typeof score === 'number' ? score : parseScore(score);
-      if (isNaN(num)) return '–';
-      return num.toFixed(2) + '%';
+      return parseFloat(String(raw).replace(/[%\s↑↓→]/g, ''));
     }
 
     function animateTags(container) {
@@ -347,23 +336,19 @@
         setTimeout(() => tag.classList.add('visible'), delay + 300);
       });
     }
-
-    // Fix: only animate the *active* slide's tags, not every slide's
-    function refreshActiveTags() {
-      const active = document.querySelector('.slide.active .behavior-tags');
-      if (!active) return;
-      active.querySelectorAll('.tag').forEach(t => t.classList.remove('visible'));
-      setTimeout(() => animateTags(active), 300);
-    }
-
     function setupBehaviorTags() {
-      document.querySelectorAll('.slide.active .behavior-tags').forEach(tags => animateTags(tags));
-      // No MutationObserver — tags are refreshed explicitly on slide change.
+      document.querySelectorAll('.behavior-tags').forEach(tags => animateTags(tags));
+      const observer = new MutationObserver(() => {
+        document.querySelectorAll('.slide.active .behavior-tags').forEach(tags => {
+          tags.querySelectorAll('.tag').forEach(t => t.classList.remove('visible'));
+          setTimeout(() => animateTags(tags), 300);
+        });
+      });
+      document.querySelectorAll('.slide').forEach(slide => {
+        observer.observe(slide, { attributes: true, attributeFilter: ['class'] });
+      });
     }
 
-    // ============================================================
-    // SLIDE TEMPLATES
-    // ============================================================
     function buildTableSlide(counter, opts) {
       const isAgent = opts.dataType === 'agents';
       const tableId = isAgent ? 'agentTableWrap' : 'teamTableWrap';
@@ -427,7 +412,8 @@
     }
 
     function buildSummarySlide(counter) {
-      // Rows are built with data-centre attributes so we can match by name.
+      // FIX #15: rows now carry data-centre="TP"/"WNS" and cards carry data-metric
+      // so updateSummarySlides can match by name instead of by index.
       return `
         ${counter}
         <div class="comp-slide-wrapper">
@@ -463,6 +449,7 @@
         slides: [
           { id: 0, type: 'title', name: 'SIS Title', bg: 'assets/slides/slide-title.webp.jpg' },
           { id: 1, type: 'data-image', name: 'SIS Data Image', bg: 'assets/slides/slide-data.webp.jpg' },
+          // FIX #12: dataSource paths now match the actual fetch() paths in loadData().
           { id: 2, type: 'table', name: 'Agents - SIS', dataSource: 'data/leaderboard.json', dataType: 'agents', title: 'Top Performing Agents - SIS' },
           { id: 3, type: 'table', name: 'Teams - SIS', dataSource: 'data/leaderboard.json', dataType: 'teams', title: 'Top Performing Teams - SIS' },
           { id: 4, type: 'comparison-detail', name: 'SIS Detail', dataSource: 'data/comparison.json', metric: 'SIS' },
@@ -485,21 +472,6 @@
         console.warn('⚠️ Using default config:', e.message);
         slideConfig = getDefaultConfig();
       }
-    }
-
-    // Resolve data sources from slide config (fallback to defaults)
-    function resolveDataSources() {
-      const lb = new Set();
-      const comp = new Set();
-      (slideConfig.slides || []).forEach(s => {
-        if (!s.dataSource) return;
-        if (s.dataType === 'agents' || s.dataType === 'teams') lb.add(s.dataSource);
-        if (s.type === 'comparison-detail' || s.type === 'summary') comp.add(s.dataSource);
-      });
-      return {
-        leaderboard: Array.from(lb)[0] || 'data/leaderboard.json',
-        comparison: Array.from(comp)[0] || 'data/comparison.json'
-      };
     }
 
     function buildSlidesFromConfig() {
@@ -543,6 +515,7 @@
       slides = Array.from(slidesContainer.querySelectorAll('.slide'));
       slideAnimInitialized = new Array(slides.length).fill(false);
 
+      // FIX: force the first slide to be the active one, reset currentIndex
       currentIndex = 0;
       isTransitioning = false;
       isPaused = false;
@@ -568,7 +541,7 @@
     }
 
     function startProgressBar(duration, startPercent = 0) {
-      const progressBars = document.querySelectorAll('.slide.active .progress-bar');
+      const progressBars = document.querySelectorAll('.progress-bar');
       if (progressInterval) clearInterval(progressInterval);
       const startTime = Date.now();
       progressBars.forEach(bar => { bar.style.width = startPercent + '%'; });
@@ -584,7 +557,7 @@
 
     function stopProgressBar() {
       if (progressInterval) { clearInterval(progressInterval); progressInterval = null; }
-      const progressBars = document.querySelectorAll('.slide.active .progress-bar');
+      const progressBars = document.querySelectorAll('.progress-bar');
       if (progressBars.length > 0) {
         const currentWidth = parseFloat(progressBars[0].style.width) || 0;
         elapsedTime = (currentWidth / 100) * slideDuration;
@@ -604,7 +577,7 @@
       const remaining = slideDuration - elapsedTime;
       if (remaining <= 0) { nextSlide(); return; }
       startProgressBar(slideDuration, (elapsedTime / slideDuration) * 100);
-      timer = setTimeout(() => { if (!isPaused && !userHovering) nextSlide(); }, remaining);
+      timer = setTimeout(() => { if (!isPaused) nextSlide(); }, remaining);
     }
 
     function pauseSlideshow() {
@@ -618,9 +591,8 @@
     function resumeSlideshow() {
       if (!isPaused) return;
       isPaused = false;
-      // Re-check userHovering — if the user is still hovering nav, don't resume.
-      if (userHovering) return;
       startSlideshowTimer(slideDuration, elapsedTime);
+      // FIX #19: only restart scroll if the table hasn't been scrolled yet.
       if (slides[currentIndex]) {
         const slide = slides[currentIndex];
         const wrap = slide.querySelector('.table-grid .scroll-wrapper');
@@ -636,8 +608,8 @@
     function startInfiniteScroll(slide) {
       cancelAllScrollAnimations();
       const durationMs = parseFloat(slide.dataset.duration) || 5500;
-      const wraps = slide.querySelectorAll('.table-grid .scroll-wrapper');
-      wraps.forEach(wrap => {
+      const wrappers = slide.querySelectorAll('.table-grid .scroll-wrapper');
+      wrappers.forEach(wrap => {
         const inner = wrap.querySelector('.scroll-inner');
         if (!inner) return;
         const contentHeight = inner.scrollHeight;
@@ -667,10 +639,9 @@
         row.style.opacity = '0';
         row.style.transform = 'translateY(10px)';
         const scoreCell = row.querySelector('.score-col');
-        if (scoreCell) {
-          // Always refresh the cached target so stale scores don't animate.
-          row.dataset.targetScore = scoreCell.textContent.trim();
-        }
+        // FIX #14: always overwrite targetScore so stale scores don't animate
+        // after a data refresh replaces the table rows.
+        if (scoreCell) row.dataset.targetScore = scoreCell.textContent.trim();
       });
       rows.forEach((row, i) => {
         setTimeout(() => {
@@ -678,10 +649,9 @@
           row.style.opacity = '1';
           row.style.transform = 'translateY(0)';
           const scoreCell = row.querySelector('.score-col');
-          if (scoreCell && row.dataset.targetScore) {
-            animateCounter(scoreCell, row.dataset.targetScore);
-          }
+          if (scoreCell && row.dataset.targetScore) animateCounter(scoreCell, row.dataset.targetScore);
           const arrow = row.querySelector('.trend-arrow');
+          // FIX #6: only reveal arrows that actually carry a direction.
           if (arrow && !arrow.classList.contains('neutral')) {
             setTimeout(() => arrow.classList.add('visible'), 300 + (i * 80));
           }
@@ -691,12 +661,14 @@
       startInfiniteScroll(activeSlide);
     }
 
+    // FIX #7: animateCounter now extracts the numeric portion, animates it,
+    // then restores the FULL original string (including the arrow) at the end.
     function animateCounter(element, fullText) {
-      const match = fullText.match(/(\d+(?:\.\d+)?)/);
+      const match = String(fullText).match(/(\d+(?:\.\d+)?)/);
       if (!match) return;
       const targetValue = parseFloat(match[1]);
       if (isNaN(targetValue)) return;
-      const suffix = fullText.includes('%') ? '%' : '';
+      const suffix = String(fullText).includes('%') ? '%' : '';
       const duration = 1200;
       const startTime = performance.now();
       function updateCounter(currentTime) {
@@ -706,48 +678,28 @@
         const currentValue = eased * targetValue;
         element.textContent = currentValue.toFixed(2) + suffix;
         if (progress < 1) requestAnimationFrame(updateCounter);
-        else element.textContent = fullText;
+        else element.textContent = fullText; // restore arrow
       }
       requestAnimationFrame(updateCounter);
     }
 
     function goToSlide(index) {
-      // Queue a slide change if a transition is in progress
-      if (isTransitioning) {
-        pendingSlideIndex = index;
-        return;
-      }
-      if (index === currentIndex) return;
+      if (isTransitioning || index === currentIndex) return;
       if (index < 0) index = slides.length - 1;
       if (index >= slides.length) index = 0;
-
       isTransitioning = true;
       clearSlideshowTimer();
       cancelAllScrollAnimations();
-
       slides[currentIndex].classList.remove('active');
       dots[currentIndex].classList.remove('active');
-
       currentIndex = index;
       slides[currentIndex].classList.add('active');
       dots[currentIndex].classList.add('active');
-
-      refreshActiveTags();
-
       if (!slideAnimInitialized[currentIndex]) resetEntranceAnimations(currentIndex);
       else startInfiniteScroll(slides[currentIndex]);
-
       startSlideshowTimer(getSlideDuration(slides[currentIndex]));
       isPaused = false;
-
-      setTimeout(() => {
-        isTransitioning = false;
-        if (pendingSlideIndex !== null) {
-          const next = pendingSlideIndex;
-          pendingSlideIndex = null;
-          goToSlide(next);
-        }
-      }, 800);
+      setTimeout(() => { isTransitioning = false; }, 800);
     }
 
     function nextSlide() { goToSlide(currentIndex + 1); }
@@ -758,12 +710,9 @@
     window.goToSlide = goToSlide;
     window.pauseSlideshow = pauseSlideshow;
     window.resumeSlideshow = resumeSlideshow;
-    window.getCurrentIndex = () => currentIndex;
 
     function buildTrendArrow(currentVal, previousVal) {
-      if (previousVal === undefined || previousVal === null || isNaN(previousVal)) {
-        return `<span class="trend-arrow neutral"></span>`;
-      }
+      if (previousVal === undefined || previousVal === null || isNaN(previousVal)) return `<span class="trend-arrow neutral"></span>`;
       const diff = currentVal - previousVal;
       if (diff > 0.01) return `<span class="trend-arrow up">↑</span>`;
       if (diff < -0.01) return `<span class="trend-arrow down">↓</span>`;
@@ -771,8 +720,16 @@
     }
 
     function autoRank(items) {
+      // FIX #4: use parseScore so "%" and arrows don't break numeric sort.
       const sorted = [...items].sort((a, b) => parseScore(b.score) - parseScore(a.score));
       return sorted.map((item, index) => ({ ...item, rank: index + 1 }));
+    }
+
+    // FIX #8: formatScore uses parseScore so a source value like "95.20%" doesn't become "95.20%%".
+    function formatScore(score) {
+      const num = typeof score === 'number' ? score : parseScore(score);
+      if (isNaN(num)) return '–';
+      return num.toFixed(2) + '%';
     }
 
     function renderAgents(containerId, items, previousData) {
@@ -816,8 +773,7 @@
       const agentsSlide = document.querySelector('.slide[data-type="table"][data-datatype="agents"]');
       if (agentsSlide) {
         agentsSlide.dataset.duration = (dur * 1000).toString();
-        // Only restart if this slide is *currently* active and we're not mid-transition
-        if (slides[currentIndex] === agentsSlide && !isTransitioning && !isPaused && !userHovering) {
+        if (slides[currentIndex] === agentsSlide && !isTransitioning) {
           clearSlideshowTimer();
           slideAnimInitialized[currentIndex] = false;
           resetEntranceAnimations(currentIndex);
@@ -833,6 +789,7 @@
       const validItems = items.filter(item => !isNaN(parseScore(item.score)));
       if (validItems.length === 0) { container.innerHTML = `<div class="empty-state">No valid team data.</div>`; return; }
       const ranked = autoRank(validItems);
+      // FIX #5: split teams in half instead of hardcoded 10/rest.
       const half = Math.ceil(ranked.length / 2);
       const firstCol = ranked.slice(0, half);
       const secondCol = ranked.slice(half);
@@ -863,7 +820,7 @@
       const teamsSlide = document.querySelector('.slide[data-type="table"][data-datatype="teams"]');
       if (teamsSlide) {
         teamsSlide.dataset.duration = (dur * 1000).toString();
-        if (slides[currentIndex] === teamsSlide && !isTransitioning && !isPaused && !userHovering) {
+        if (slides[currentIndex] === teamsSlide && !isTransitioning) {
           clearSlideshowTimer();
           slideAnimInitialized[currentIndex] = false;
           resetEntranceAnimations(currentIndex);
@@ -895,7 +852,7 @@
       const pct = (d / Math.abs(p)) * 100;
       const sign = d > 0 ? '+' : '';
       const dir = d > 0 ? (isHigher ? 'improving' : 'declining') : (isHigher ? 'declining' : 'improving');
-      // Emoji reflects metric direction, not raw change direction
+      // FIX #10: emoji should reflect metric direction, not raw change direction.
       const positive = isHigher ? d > 0 : d < 0;
       return (positive ? '📈' : '📉') + ' ' + dir + ' (' + sign + pct.toFixed(1) + '%)';
     }
@@ -957,7 +914,7 @@
           if (canvas) {
             const ctx = canvas.getContext('2d');
             const remaining = isHigher ? Math.max(0, 100 - current) : Math.max(0, current);
-            // Update in place instead of recreating
+            // FIX #7b: update chart in place instead of destroying/recreating every 60s.
             if (canvas._chart) {
               canvas._chart.data.datasets[0].data = [current, remaining];
               canvas._chart.data.datasets[0].backgroundColor = [centre.colour, 'rgba(0,0,0,0.06)'];
@@ -983,19 +940,18 @@
         if (!grid) return;
         const cards = grid.querySelectorAll('.summary-card-vertical');
 
+        // FIX #15: match by data-metric / data-centre attributes instead of array index.
         cards.forEach(card => {
           const metric = card.dataset.metric;
-          if (!metric) return;
+          if (!metric || !data.targets[metric]) return;
           const target = data.targets[metric];
-          if (target === undefined) return;
           const isHigher = metric !== 'CHT';
           const unit = metric === 'CHT' ? 's' : '%';
 
           const titleSpan = card.querySelector('.metric-title .unit');
           if (titleSpan) titleSpan.textContent = `Target: ${target}${unit}`;
 
-          const rows = card.querySelectorAll('.summary-row-vertical');
-          rows.forEach(row => {
+          card.querySelectorAll('.summary-row-vertical').forEach(row => {
             const centreName = row.dataset.centre;
             const centre = data.centres.find(c => c.name === centreName);
             if (!centre) return;
@@ -1024,40 +980,20 @@
       });
     }
 
-    // ============================================================
-    // TREND SNAPSHOT (weekly previous data, not 60-second previous)
-    // ============================================================
-    const WEEK_KEY = 'deltaWeeklySnapshot';
-    const WEEK_ID_KEY = 'deltaWeeklySnapshotWeek';
-
-    function loadWeeklySnapshot(currentWeek) {
-      try {
-        const storedWeek = localStorage.getItem(WEEK_ID_KEY);
-        const raw = localStorage.getItem(WEEK_KEY);
-        if (raw && storedWeek === currentWeek) return JSON.parse(raw);
-      } catch (_) {}
+    function storeSnapshot(data) { try { localStorage.setItem('deltaPreviousData', JSON.stringify(data)); } catch (_) {} }
+    function getPreviousData() {
+      try { const raw = localStorage.getItem('deltaPreviousData'); if (raw) return JSON.parse(raw); } catch (_) {}
       return null;
     }
 
-    function saveWeeklySnapshot(data, currentWeek) {
-      try {
-        localStorage.setItem(WEEK_KEY, JSON.stringify(data));
-        localStorage.setItem(WEEK_ID_KEY, currentWeek);
-      } catch (_) {}
-    }
-
-    // ============================================================
-    // DATA LOADING
-    // ============================================================
     async function loadData() {
-      const sources = resolveDataSources();
       try {
         const [lbRes, compRes] = await Promise.all([
-          fetch(sources.leaderboard + '?' + Date.now()),
-          fetch(sources.comparison + '?' + Date.now())
+          fetch('data/leaderboard.json?' + Date.now()),
+          fetch('data/comparison.json?' + Date.now())
         ]);
-        if (!lbRes.ok) throw new Error('Leaderboard data not found at ' + sources.leaderboard);
-        if (!compRes.ok) throw new Error('Comparison data not found at ' + sources.comparison);
+        if (!lbRes.ok) throw new Error('Leaderboard data not found');
+        if (!compRes.ok) throw new Error('Comparison data not found');
 
         const leaderboardData = await lbRes.json();
         const comparisonData = await compRes.json();
@@ -1065,26 +1001,17 @@
         const weekText = leaderboardData.week || 'Week of Jul 20 – Jul 26, 2026';
         document.querySelectorAll('#agentsWeek, #teamsWeek').forEach(el => el.textContent = weekText);
 
-        // Use the *previous week's* stored snapshot for trend comparison,
-        // not the 60-second-old one.
-        const prevData = loadWeeklySnapshot(weekText);
+        const prevData = getPreviousData();
         renderAgents('agentTableWrap', leaderboardData.agents, prevData);
         renderTeams('teamTableWrap', leaderboardData.teams, prevData);
-
-        // Only store a new snapshot if the week key changed.
-        const storedWeek = localStorage.getItem(WEEK_ID_KEY);
-        if (storedWeek !== weekText) {
-          saveWeeklySnapshot(leaderboardData, weekText);
-          console.log('📅 Stored new weekly snapshot for', weekText);
-        }
+        storeSnapshot(leaderboardData);
 
         if (comparisonData.targets && comparisonData.centres) {
           updateComparisonSlides(comparisonData);
           updateSummarySlides(comparisonData);
         }
 
-        // Only start the timer if we don't already have one running and we're not paused.
-        if (!timer && !isPaused && !userHovering && slides[currentIndex] && slides[currentIndex].classList.contains('active')) {
+        if (!timer && !isPaused && slides[currentIndex] && slides[currentIndex].classList.contains('active')) {
           startSlideshowTimer(getSlideDuration(slides[currentIndex]));
         }
       } catch (e) {
@@ -1100,10 +1027,10 @@
       await loadSlidesConfig();
       buildSlidesFromConfig();
 
+      // FIX: hard reset the slideshow state before starting
       currentIndex = 0;
       isTransitioning = false;
       isPaused = false;
-      userHovering = false;
       slides.forEach((s, i) => s.classList.toggle('active', i === 0));
       dots.forEach((d, i) => d.classList.toggle('active', i === 0));
 
@@ -1112,10 +1039,11 @@
       document.getElementById('nextSlide').addEventListener('click', nextSlide);
       document.getElementById('prevSlide').addEventListener('click', prevSlide);
 
+      // FIX #12: only pause when the user hovers the nav bar, not the whole viewport.
       const navControls = document.querySelector('.nav-controls');
       if (navControls) {
-        navControls.addEventListener('mouseenter', () => { userHovering = true; pauseSlideshow(); });
-        navControls.addEventListener('mouseleave', () => { userHovering = false; resumeSlideshow(); });
+        navControls.addEventListener('mouseenter', pauseSlideshow);
+        navControls.addEventListener('mouseleave', resumeSlideshow);
       }
 
       document.addEventListener('keydown', (e) => {
@@ -1132,26 +1060,19 @@
       });
 
       document.addEventListener('visibilitychange', () => {
-        if (document.hidden) {
-          pauseSlideshow();
-        } else {
-          // Only resume if the user isn't hovering nav
-          if (!userHovering) resumeSlideshow();
-        }
+        if (document.hidden) pauseSlideshow(); else resumeSlideshow();
       });
 
       await loadData();
 
+      // FIX: clear any leftover timer, then start fresh on slide 0
       clearSlideshowTimer();
       currentIndex = 0;
-      isPaused = false;
       if (slides.length > 0) {
         startSlideshowTimer(getSlideDuration(slides[0]));
       }
 
-      // Refresh data every 60 s. Polling reduced from 60s → 5 min to
-      // avoid restarting table animations too often.
-      setInterval(loadData, 300000);
+      setInterval(loadData, 60000);
     }
 
     if (document.readyState === 'loading') {
@@ -1162,13 +1083,14 @@
   })();
 
   // ============================================================
-  // REMOTE CONTROL  (polling reduced from 2s → 5s; resets after use)
+  // REMOTE CONTROL
   // ============================================================
   (function() {
     let lastExecutedCommand = '';
     let lastCommandTime = 0;
-    const POLL_INTERVAL = 5000;
-    const COMMAND_TTL = 30000; // re-allow same command after 30s
+    const POLL_INTERVAL = 2000;
+    // FIX #10: allow the same command to be re-issued after a 30s window.
+    const COMMAND_TTL = 30000;
 
     async function pollCommand() {
       try {
@@ -1200,7 +1122,7 @@
       } catch (e) {}
     }
     setInterval(pollCommand, POLL_INTERVAL);
-    setTimeout(pollCommand, 1000);
+    setTimeout(pollCommand, 500);
     console.log('📡 Remote polling started (command.txt)');
   })();
 </script>
