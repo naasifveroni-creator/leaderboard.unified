@@ -7,7 +7,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <style>
-    /* ===== ALL YOUR ORIGINAL CSS - UNCHANGED ===== */
     * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', 'Segoe UI', Roboto, system-ui, sans-serif; }
     html, body { width: 100%; height: 100%; background: #0b1a33; overflow: hidden; }
     body { display: flex; justify-content: center; align-items: center; padding: 0; }
@@ -23,7 +22,6 @@
     .slide { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; visibility: hidden; transition: opacity 0.8s ease, transform 0.8s ease, visibility 0.8s ease; display: flex; flex-direction: column; transform: scale(0.98); }
     .slide.active { opacity: 1; visibility: visible; position: relative; transform: scale(1); transition: opacity 0.8s ease, transform 0.8s ease, visibility 0.8s ease; }
 
-    /* ===== TYPE-BASED BACKGROUNDS (replaces #slide0 / #slide1 / #slide8-15 backgrounds) ===== */
     .slide[data-type="title"] { background: #0b1a33; }
     .slide[data-type="data-image"] { background: #0b1a33; }
     .slide[data-type="table"] { background: linear-gradient(145deg, #f0f3f8 0%, #e8ecf4 100%); padding: 0; }
@@ -73,7 +71,6 @@
     .table-wrap .rank-col { width: 10%; color: #6b7f96; font-weight: 600; font-size: 2.4vh; }
     .table-wrap .name-col { font-weight: 500; text-align: left; font-size: 2.4vh; }
 
-    /* Type-based score column widths (was #slide2 / #slide3) */
     .slide[data-type="table"][data-datatype="agents"] .table-grid .score-col { width: 45% !important; min-width: 45% !important; max-width: 45% !important; text-align: right; justify-content: flex-end; white-space: nowrap; overflow: visible !important; }
     .slide[data-type="table"][data-datatype="teams"] .table-grid .score-col { width: 55% !important; min-width: 55% !important; max-width: 55% !important; text-align: right !important; justify-content: flex-end !important; white-space: nowrap; padding-right: 0.3vw; overflow: visible !important; }
 
@@ -236,7 +233,6 @@
     <button class="fullscreen-btn" id="fullscreenBtn"><span class="icon">⛶</span> FULL</button>
     <div id="adminAccess"><a href="#" id="adminLink">⚙ ADMIN</a></div>
 
-    <!-- Slides are built from slides-config.json -->
     <div id="slidesContainer"></div>
 
     <div class="nav-controls">
@@ -314,9 +310,19 @@
     const MAX_DISPLAY = 120;
     const TARGET_THRESHOLD = 86.30;
 
-    // ============================================================
-    // BEHAVIOUR TAGS
-    // ============================================================
+    let slideConfig = null;
+    let slides = [];
+    let dots = [];
+    let currentIndex = 0;
+    let timer = null;
+    let progressInterval = null;
+    let isTransitioning = false;
+    let isPaused = false;
+    let slideDuration = 5500;
+    let elapsedTime = 0;
+    let scrollAnimFrames = [];
+    let slideAnimInitialized = [];
+
     function animateTags(container) {
       const tags = container.querySelectorAll('.tag');
       tags.forEach(tag => {
@@ -337,9 +343,6 @@
       });
     }
 
-    // ============================================================
-    // SLIDE TEMPLATES - copied verbatim from your working file
-    // ============================================================
     function buildTableSlide(counter, opts) {
       const isAgent = opts.dataType === 'agents';
       const tableId = isAgent ? 'agentTableWrap' : 'teamTableWrap';
@@ -369,7 +372,6 @@
     }
 
     function buildComparisonSlide(counter, metric) {
-      // Canvas IDs are no longer tied to a slide index. updateComparisonSlides finds them by metric+centre.
       return `
         ${counter}
         <div class="comp-slide-wrapper">
@@ -434,22 +436,6 @@
       `;
     }
 
-    // ============================================================
-    // BUILD SLIDES FROM CONFIG
-    // ============================================================
-    let slideConfig = null;
-    let slides = [];
-    let dots = [];
-    let currentIndex = 0;
-    let timer = null;
-    let progressInterval = null;
-    let isTransitioning = false;
-    let isPaused = false;
-    let slideDuration = 5500;
-    let elapsedTime = 0;
-    let scrollAnimFrames = [];
-    let slideAnimInitialized = [];
-
     function getDefaultConfig() {
       return {
         slides: [
@@ -496,14 +482,12 @@
         const counter = `<div class="slide-counter"><span class="current">${index + 1}</span> / ${total}</div>`;
         const type = slide.type || 'data-image';
 
-        // Backgrounds: title = cover, data-image = contain. Applied on the .slide element.
         if (type === 'title' && slide.bg) {
           div.style.background = `url('${slide.bg}') center/cover no-repeat, #0b1a33`;
         } else if (type === 'data-image' && slide.bg) {
           div.style.background = `#0b1a33 url('${slide.bg}') center/contain no-repeat`;
         }
 
-        // Content
         if (type === 'title' || type === 'data-image') {
           div.innerHTML = counter;
         } else if (type === 'table') {
@@ -522,6 +506,12 @@
       slides = Array.from(slidesContainer.querySelectorAll('.slide'));
       slideAnimInitialized = new Array(slides.length).fill(false);
 
+      // FIX: force the first slide to be the active one, reset currentIndex
+      currentIndex = 0;
+      isTransitioning = false;
+      isPaused = false;
+      slides.forEach((s, i) => s.classList.toggle('active', i === 0));
+
       dotsContainer.innerHTML = '';
       slides.forEach((_, i) => {
         const dot = document.createElement('button');
@@ -535,9 +525,6 @@
       console.log('✅ Built', slides.length, 'slides');
     }
 
-    // ============================================================
-    // SLIDESHOW ENGINE - same logic as your working file
-    // ============================================================
     function getSlideDuration(slide) {
       const custom = parseInt(slide.dataset.duration);
       if (!isNaN(custom) && custom > 0) return custom;
@@ -701,9 +688,6 @@
     window.pauseSlideshow = pauseSlideshow;
     window.resumeSlideshow = resumeSlideshow;
 
-    // ============================================================
-    // DATA RENDERING - same functions as your working file
-    // ============================================================
     function buildTrendArrow(currentVal, previousVal) {
       if (previousVal === undefined || previousVal === null) return `<span class="trend-arrow neutral"></span>`;
       const diff = currentVal - previousVal;
@@ -897,7 +881,6 @@
             }
           }
 
-          // Find canvas inside THIS card by metric+centre data attributes
           const canvas = card.querySelector('canvas');
           if (canvas) {
             const ctx = canvas.getContext('2d');
@@ -1003,12 +986,17 @@
       }
     }
 
-    // ============================================================
-    // INIT
-    // ============================================================
     async function init() {
       await loadSlidesConfig();
       buildSlidesFromConfig();
+
+      // FIX: hard reset the slideshow state before starting
+      currentIndex = 0;
+      isTransitioning = false;
+      isPaused = false;
+      slides.forEach((s, i) => s.classList.toggle('active', i === 0));
+      dots.forEach((d, i) => d.classList.toggle('active', i === 0));
+
       setupBehaviorTags();
 
       document.getElementById('nextSlide').addEventListener('click', nextSlide);
@@ -1035,7 +1023,14 @@
       });
 
       await loadData();
-      if (slides.length > 0) startSlideshowTimer(getSlideDuration(slides[0]));
+
+      // FIX: clear any leftover timer, then start fresh on slide 0
+      clearSlideshowTimer();
+      currentIndex = 0;
+      if (slides.length > 0) {
+        startSlideshowTimer(getSlideDuration(slides[0]));
+      }
+
       setInterval(loadData, 60000);
     }
 
@@ -1047,7 +1042,7 @@
   })();
 
   // ============================================================
-  // REMOTE CONTROL - same as your working file
+  // REMOTE CONTROL
   // ============================================================
   (function() {
     let lastExecutedCommand = '';
