@@ -49,15 +49,6 @@
     .slide { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; visibility: hidden; transition: opacity 0.8s ease, transform 0.8s ease, visibility 0.8s ease; display: flex; flex-direction: column; transform: scale(0.98); }
     .slide.active { opacity: 1; visibility: visible; position: relative; transform: scale(1); z-index: 10; transition: opacity 0.8s ease, transform 0.8s ease, visibility 0.8s ease; }
 
-    /* ============================================================
-       THE FIX:
-       Extra slides live inside #extraSlidesContainer, which is a
-       plain <div> with no position/height. When a slide becomes
-       .active (position: relative), its height: 100% resolves
-       against that un-positioned wrapper — which has auto height —
-       and collapses to 0px. Making the wrapper an absolute
-       full-viewport box fixes this so extra slides have real size.
-       ============================================================ */
     #extraSlidesContainer {
       position: absolute;
       top: 0;
@@ -302,16 +293,16 @@
     <button class="fullscreen-btn" id="fullscreenBtn"><span class="icon">⛶</span> FULL</button>
     <div id="adminAccess"><a href="#" id="adminLink">⚙ ADMIN</a></div>
 
-    <div class="slide active" id="slide0" data-index="0" data-duration="6000">
-      <div class="slide-counter"><span class="current">1</span> / 8</div>
+    <div class="slide active" id="slide0" data-index="0">
+      <div class="slide-counter"><span class="current">1</span> / 17</div>
     </div>
 
-    <div class="slide" id="slide1" data-index="1" data-duration="8000">
-      <div class="slide-counter"><span class="current">2</span> / 8</div>
+    <div class="slide" id="slide1" data-index="1">
+      <div class="slide-counter"><span class="current">2</span> / 17</div>
     </div>
 
-    <div class="slide" id="slide2" data-index="2" data-duration="40000">
-      <div class="slide-counter"><span class="current">3</span> / 8</div>
+    <div class="slide" id="slide2" data-index="2">
+      <div class="slide-counter"><span class="current">3</span> / 17</div>
       <div class="slide-header">
         <div class="logo-area"><img src="assets/logos/delta-logo-ribbon.png?v=36" alt="Delta" /><h1><span>DELTA</span> · SIS</h1></div>
         <div class="behavior-tags" id="tags1">
@@ -332,8 +323,8 @@
       <div class="progress-container"><div class="progress-bar" id="progressBar"></div></div>
     </div>
 
-    <div class="slide" id="slide3" data-index="3" data-duration="45000">
-      <div class="slide-counter"><span class="current">4</span> / 8</div>
+    <div class="slide" id="slide3" data-index="3">
+      <div class="slide-counter"><span class="current">4</span> / 17</div>
       <div class="slide-header">
         <div class="logo-area"><img src="assets/logos/delta-logo-ribbon.png?v=36" alt="Delta" /><h1><span>DELTA</span> · SIS</h1></div>
         <div class="behavior-tags" id="tags2">
@@ -355,7 +346,7 @@
     </div>
 
     <div class="slide" id="slide4" data-index="4" data-duration="12000">
-      <div class="slide-counter"><span class="current">5</span> / 8</div>
+      <div class="slide-counter"><span class="current">5</span> / 17</div>
       <div class="comp-slide-wrapper" id="compSlide4">
         <div class="metric-header">
           <img src="assets/logos/delta-logo.png" alt="Delta" class="comp-delta-logo" onerror="this.style.display='none'" />
@@ -387,7 +378,7 @@
     </div>
 
     <div class="slide" id="slide5" data-index="5" data-duration="12000">
-      <div class="slide-counter"><span class="current">6</span> / 8</div>
+      <div class="slide-counter"><span class="current">6</span> / 17</div>
       <div class="comp-slide-wrapper" id="compSlide5">
         <div class="metric-header">
           <img src="assets/logos/delta-logo.png" alt="Delta" class="comp-delta-logo" onerror="this.style.display='none'" />
@@ -419,7 +410,7 @@
     </div>
 
     <div class="slide" id="slide6" data-index="6" data-duration="12000">
-      <div class="slide-counter"><span class="current">7</span> / 8</div>
+      <div class="slide-counter"><span class="current">7</span> / 17</div>
       <div class="comp-slide-wrapper" id="compSlide6">
         <div class="metric-header">
           <img src="assets/logos/delta-logo.png" alt="Delta" class="comp-delta-logo" onerror="this.style.display='none'" />
@@ -451,7 +442,7 @@
     </div>
 
     <div class="slide" id="slide7" data-index="7" data-duration="15000">
-      <div class="slide-counter"><span class="current">8</span> / 8</div>
+      <div class="slide-counter"><span class="current">8</span> / 17</div>
       <div class="comp-slide-wrapper" id="compSlide7">
         <div class="metric-header">
           <img src="assets/logos/delta-logo.png" alt="Delta" class="comp-delta-logo" onerror="this.style.display='none'" />
@@ -602,7 +593,6 @@
         div.id = 'slide' + index;
         div.dataset.index = index;
         div.dataset.type = slide.type || 'data-image';
-        div.dataset.duration = slide.duration || 6000;
         div.dataset.extra = 'true';
         if (slide.dataType) div.dataset.datatype = slide.dataType;
         if (slide.metric) div.dataset.metric = slide.metric;
@@ -631,11 +621,28 @@
     const progressBars = document.querySelectorAll('.progress-bar');
     const wrapper = document.getElementById('slidesWrapper');
 
+    // ============================================================
+    // SIS-STYLE TIMING CONSTANTS
+    // ============================================================
     const AGENTS_TIME_PER_ROW = 0.6;
-    const TEAMS_TIME_PER_ROW = 0.8;
-    const AGENTS_MIN_DISPLAY = 40;
-    const TEAMS_MIN_DISPLAY = 45;
-    const MAX_DISPLAY = 120;
+    const TEAMS_TIME_PER_ROW  = 0.8;
+    const AGENTS_MIN_DISPLAY  = 40;
+    const TEAMS_MIN_DISPLAY   = 45;
+    const MAX_DISPLAY         = 120;
+
+    // SIS-style SANAS_DURATIONS map — keyed by slide INDEX.
+    // Extra IEX slides start at index 8, so they occupy 8..16.
+    const SANAS_DURATIONS = {
+      8:  10000,
+      9:  10000,
+      10: 12000,
+      11: 10000,
+      12: 10000,
+      13: 10000,
+      14: 10000,
+      15: 10000,
+      16: 10000
+    };
 
     let currentIndex = 0;
     let timer = null;
@@ -661,6 +668,16 @@
       const allSlides = document.querySelectorAll('.slide');
       slideAnimInitialized = new Array(allSlides.length).fill(false);
 
+      updateCounters();
+      buildDots();
+
+      loadData();
+      setInterval(loadData, 60000);
+      startSlideshowTimer(getSlideDuration(allSlides[0]));
+    }
+
+    function updateCounters() {
+      const allSlides = document.querySelectorAll('.slide');
       const total = allSlides.length;
       allSlides.forEach((s, i) => {
         const parent = s.querySelector('.slide-counter');
@@ -668,19 +685,18 @@
           parent.innerHTML = `<span class="current">${i + 1}</span> / ${total}`;
         }
       });
+    }
 
+    function buildDots() {
+      const allSlides = document.querySelectorAll('.slide');
       dotsContainer.innerHTML = '';
       allSlides.forEach((_, i) => {
         const dot = document.createElement('button');
-        dot.className = 'dot' + (i === 0 ? ' active' : '');
+        dot.className = 'dot' + (i === currentIndex ? ' active' : '');
         dot.dataset.index = i;
         dot.addEventListener('click', () => goToSlide(i));
         dotsContainer.appendChild(dot);
       });
-
-      loadData();
-      setInterval(loadData, 60000);
-      startSlideshowTimer(getSlideDuration(allSlides[0]));
     }
 
     function rebuildDotsAndCounters() {
@@ -691,27 +707,16 @@
       }
       slideAnimInitialized = newFlags;
 
-      const total = allSlides.length;
-      allSlides.forEach((s, i) => {
-        const parent = s.querySelector('.slide-counter');
-        if (parent) {
-          parent.innerHTML = `<span class="current">${i + 1}</span> / ${total}`;
-        }
-      });
+      updateCounters();
+      buildDots();
 
-      dotsContainer.innerHTML = '';
-      allSlides.forEach((_, i) => {
-        const dot = document.createElement('button');
-        dot.className = 'dot' + (i === currentIndex ? ' active' : '');
-        dot.dataset.index = i;
-        dot.addEventListener('click', () => goToSlide(i));
-        dotsContainer.appendChild(dot);
-      });
-
-      console.log('🔄 Rebuilt dots + counters for', total, 'slides');
+      console.log('🔄 Rebuilt dots + counters for', allSlides.length, 'slides');
     }
 
+    // SIS-style getSlideDuration: map → data-duration → 5500 default
     function getSlideDuration(slide) {
+      const idx = parseInt(slide.dataset.index);
+      if (!isNaN(idx) && SANAS_DURATIONS[idx]) return SANAS_DURATIONS[idx];
       const custom = parseInt(slide.dataset.duration);
       if (!isNaN(custom) && custom > 0) return custom;
       return 5500;
@@ -776,9 +781,10 @@
       scrollAnimFrames = [];
     }
 
+    // SIS-style startInfiniteScroll — rAF loop with half-height snap-back
     function startInfiniteScroll(slide) {
       cancelAllScrollAnimations();
-      const durationMs = parseFloat(slide.dataset.duration) || 5500;
+      const durationMs = parseFloat(slide.dataset.duration) || getSlideDuration(slide);
       const wrappers = slide.querySelectorAll('.table-grid .scroll-wrapper');
       wrappers.forEach(wrap => {
         const inner = wrap.querySelector('.scroll-inner');
@@ -789,7 +795,6 @@
         wrap.scrollTop = 0;
         const pixelsPerMs = half / durationMs;
         let lastTime = performance.now();
-
         function step(now) {
           if (isPaused) return;
           const dt = now - lastTime;
@@ -807,13 +812,19 @@
     function resetEntranceAnimations(index) {
       const allSlides = document.querySelectorAll('.slide');
       const activeSlide = allSlides[index];
-      if (index < 2) { slideAnimInitialized[index] = true; return; }
+      if (index < 2 || index > 3) {
+        slideAnimInitialized[index] = true;
+        return;
+      }
+
       const rows = activeSlide.querySelectorAll('tbody tr');
       rows.forEach(row => {
         row.style.opacity = '0';
         row.style.transform = 'translateY(10px)';
         const scoreCell = row.querySelector('.score-col');
-        if (scoreCell && !row.dataset.targetScore) row.dataset.targetScore = scoreCell.textContent.trim();
+        if (scoreCell && !row.dataset.targetScore) {
+          row.dataset.targetScore = scoreCell.textContent.trim();
+        }
       });
       rows.forEach((row, i) => {
         setTimeout(() => {
@@ -985,7 +996,7 @@
       const agentsSlide = document.getElementById('slide2');
       if (agentsSlide) {
         agentsSlide.dataset.duration = (computedDurationSec * 1000).toString();
-        if (currentIndex === 2 && !isTransitioning && !slideAnimInitialized[2]) {
+        if (currentIndex === 2 && !isTransitioning) {
           clearSlideshowTimer();
           slideAnimInitialized[2] = false;
           resetEntranceAnimations(2);
@@ -1044,7 +1055,7 @@
       const teamsSlide = document.getElementById('slide3');
       if (teamsSlide) {
         teamsSlide.dataset.duration = (computedDurationSec * 1000).toString();
-        if (currentIndex === 3 && !isTransitioning && !slideAnimInitialized[3]) {
+        if (currentIndex === 3 && !isTransitioning) {
           clearSlideshowTimer();
           slideAnimInitialized[3] = false;
           resetEntranceAnimations(3);
