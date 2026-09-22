@@ -7,11 +7,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 
-  <!-- ============================================================ -->
-  <!-- Early prefetch of extra-slide images.                         -->
-  <!-- Now actually useful because extra slides use <img> tags, and  -->
-  <!-- new Image() shares the same cache path as <img src>.          -->
-  <!-- ============================================================ -->
   <script>
     window.__prefetchedExtraImages = [];
     window.__extraSlidesPrefetch = fetch('slides-config.json?' + Date.now())
@@ -39,7 +34,6 @@
   </script>
 
   <style>
-    /* ===== ALL YOUR ORIGINAL CSS - UNCHANGED ===== */
     * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', 'Segoe UI', Roboto, system-ui, sans-serif; }
     html, body { width: 100%; height: 100%; background: #0b1a33; overflow: hidden; }
     body { display: flex; justify-content: center; align-items: center; padding: 0; }
@@ -53,16 +47,14 @@
     #adminAccess a:hover { color: #fdb913; background: rgba(0,0,0,0.3); border-color: rgba(255,215,0,0.15); }
 
     .slide { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; visibility: hidden; transition: opacity 0.8s ease, transform 0.8s ease, visibility 0.8s ease; display: flex; flex-direction: column; transform: scale(0.98); }
-    .slide.active { opacity: 1; visibility: visible; position: relative; transform: scale(1); transition: opacity 0.8s ease, transform 0.8s ease, visibility 0.8s ease; }
+    /* FIX: z-index: 10 ensures the active slide paints above all inactive siblings.
+       Without this, the previously-active slide can render on top of the new one,
+       which is why the image only "flashes" on the way out. */
+    .slide.active { opacity: 1; visibility: visible; position: relative; transform: scale(1); z-index: 10; transition: opacity 0.8s ease, transform 0.8s ease, visibility 0.8s ease; }
 
-    /* ===== TITLE & DATA SLIDES ===== */
     #slide0 { background: url('assets/slides/slide-title.webp.jpg') center/cover no-repeat, #0b1a33; }
     #slide1 { background: url('assets/slides/slide-data.webp.jpg') center/cover no-repeat, #0b1a33; }
-
-    /* ===== AGENTS & TEAMS SLIDES ===== */
     #slide2, #slide3 { background: linear-gradient(145deg, #f0f3f8 0%, #e8ecf4 100%); padding: 0; }
-
-    /* ===== COMPARISON & SUMMARY SLIDES ===== */
     #slide4, #slide5, #slide6, #slide7 { background: #f2f5f9; padding: 0; }
 
     .slide-header { background: #0b1a33; backdrop-filter: blur(16px) saturate(180%); -webkit-backdrop-filter: blur(16px) saturate(180%); padding: 0.3vh 2vw; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.2vh 1vw; flex-shrink: 0; min-height: 10vh; border-bottom: 2px solid rgba(211,47,47,0.3); position: relative; overflow: hidden; box-shadow: 0 4px 30px rgba(0,0,0,0.3); border-radius: 0 0 12px 12px; margin: 0 0.5vw; }
@@ -200,12 +192,8 @@
     .comp-slide-wrapper .summary-row-vertical .values .gap-badge.below { color: #f59e0b; border-color: #f59e0b; background: rgba(245,158,11,0.08); }
     .comp-slide-wrapper .summary-row-vertical .values .gap-badge.well-below { color: #ef4444; border-color: #ef4444; background: rgba(239,68,68,0.08); }
 
-    /* ===== EXTRA SLIDES (admin-managed) ===== */
     .slide[data-type="data-image"], .slide[data-type="title"] { background: #0b1a33; }
 
-    /* FIX 3: Extra slides use an <img> tag instead of background-image.
-       <img> has its own paint pipeline and doesn't get rasterized into
-       the parent's transitioning layer, so no stale-raster flash. */
     .slide[data-extra="true"] {
       background: #0b1a33;
       padding: 0;
@@ -295,17 +283,14 @@
     <button class="fullscreen-btn" id="fullscreenBtn"><span class="icon">⛶</span> FULL</button>
     <div id="adminAccess"><a href="#" id="adminLink">⚙ ADMIN</a></div>
 
-    <!-- ===== SLIDE 0: TITLE ===== -->
     <div class="slide active" id="slide0" data-index="0" data-duration="6000">
       <div class="slide-counter"><span class="current">1</span> / 8</div>
     </div>
 
-    <!-- ===== SLIDE 1: DATA IMAGE ===== -->
     <div class="slide" id="slide1" data-index="1" data-duration="8000">
       <div class="slide-counter"><span class="current">2</span> / 8</div>
     </div>
 
-    <!-- ===== SLIDE 2: AGENTS ===== -->
     <div class="slide" id="slide2" data-index="2" data-duration="40000">
       <div class="slide-counter"><span class="current">3</span> / 8</div>
       <div class="slide-header">
@@ -328,7 +313,6 @@
       <div class="progress-container"><div class="progress-bar" id="progressBar"></div></div>
     </div>
 
-    <!-- ===== SLIDE 3: TEAMS ===== -->
     <div class="slide" id="slide3" data-index="3" data-duration="45000">
       <div class="slide-counter"><span class="current">4</span> / 8</div>
       <div class="slide-header">
@@ -351,7 +335,6 @@
       <div class="progress-container"><div class="progress-bar" id="progressBar"></div></div>
     </div>
 
-    <!-- ===== SLIDE 4: SIS COMPARISON ===== -->
     <div class="slide" id="slide4" data-index="4" data-duration="12000">
       <div class="slide-counter"><span class="current">5</span> / 8</div>
       <div class="comp-slide-wrapper" id="compSlide4">
@@ -384,7 +367,6 @@
       <div class="progress-container"><div class="progress-bar" id="progressBar"></div></div>
     </div>
 
-    <!-- ===== SLIDE 5: IFSR COMPARISON ===== -->
     <div class="slide" id="slide5" data-index="5" data-duration="12000">
       <div class="slide-counter"><span class="current">6</span> / 8</div>
       <div class="comp-slide-wrapper" id="compSlide5">
@@ -417,7 +399,6 @@
       <div class="progress-container"><div class="progress-bar" id="progressBar"></div></div>
     </div>
 
-    <!-- ===== SLIDE 6: CHT COMPARISON ===== -->
     <div class="slide" id="slide6" data-index="6" data-duration="12000">
       <div class="slide-counter"><span class="current">7</span> / 8</div>
       <div class="comp-slide-wrapper" id="compSlide6">
@@ -450,7 +431,6 @@
       <div class="progress-container"><div class="progress-bar" id="progressBar"></div></div>
     </div>
 
-    <!-- ===== SLIDE 7: SUMMARY ===== -->
     <div class="slide" id="slide7" data-index="7" data-duration="15000">
       <div class="slide-counter"><span class="current">8</span> / 8</div>
       <div class="comp-slide-wrapper" id="compSlide7">
@@ -480,10 +460,8 @@
       <div class="progress-container"><div class="progress-bar" id="progressBar"></div></div>
     </div>
 
-    <!-- ===== EXTRA SLIDES: built from slides-config.json (index 8+) ===== -->
     <div id="extraSlidesContainer"></div>
 
-    <!-- ===== NAVIGATION ===== -->
     <div class="nav-controls">
       <button class="arrow" id="prevSlide">◀</button>
       <div class="dots" id="dotsContainer"></div>
@@ -493,9 +471,6 @@
 </div>
 
 <script>
-  // ============================================================
-  // ADMIN ACCESS
-  // ============================================================
   (function() {
     const ADMIN_PASSWORD = 'delta2026';
     const link = document.getElementById('adminLink');
@@ -515,9 +490,6 @@
     });
   })();
 
-  // ============================================================
-  // FULLSCREEN TOGGLE
-  // ============================================================
   (function() {
     const btn = document.getElementById('fullscreenBtn');
     if (btn) {
@@ -544,9 +516,6 @@
     }
   })();
 
-  // ============================================================
-  // BEHAVIOUR TAGS
-  // ============================================================
   (function() {
     function animateTags(container) {
       const tags = container.querySelectorAll('.tag');
@@ -570,9 +539,6 @@
     });
   })();
 
-  // ============================================================
-  // EXTRA SLIDES LOADER
-  // ============================================================
   (function() {
     const extraContainer = document.getElementById('extraSlidesContainer');
 
@@ -624,7 +590,6 @@
 
         const counter = `<div class="slide-counter"><span class="current">--</span> / --</div>`;
 
-        // FIX 3: use an <img> tag instead of background-image.
         if (slide.type === 'title' && slide.bg) {
           div.innerHTML = `${counter}<img class="slide-img slide-img-cover" src="${slide.bg}" alt="" draggable="false" />`;
         } else if (slide.bg) {
@@ -642,9 +607,6 @@
     window.__loadExtraSlides = loadExtraSlides;
   })();
 
-  // ============================================================
-  // SLIDESHOW ENGINE
-  // ============================================================
   (function() {
     const dotsContainer = document.getElementById('dotsContainer');
     const progressBars = document.querySelectorAll('.progress-bar');
@@ -897,9 +859,6 @@
 
     window.getCurrentIndex = () => currentIndex;
 
-    // ============================================================
-    // DATA RENDERING
-    // ============================================================
     const TARGET_THRESHOLD = 86.30;
 
     function buildTrendArrow(currentVal, previousVal) {
@@ -1257,9 +1216,6 @@
     bootstrap();
   })();
 
-  // ============================================================
-  // REMOTE CONTROL
-  // ============================================================
   (function() {
     let lastExecutedCommand = '';
     const POLL_INTERVAL = 2000;
@@ -1285,7 +1241,7 @@
         } else if (trimmed === 'refresh') { window.location.reload(); }
         else if (trimmed === 'play') { if (window.resumeSlideshow) window.resumeSlideshow(); }
         else if (trimmed === 'pause') { if (window.pauseSlideshow) window.pauseSlideshow(); }
-      } catch (e) { /* ignore */ }
+      } catch (e) {}
     }
 
     setInterval(pollCommand, POLL_INTERVAL);
