@@ -169,29 +169,15 @@
     .comp-slide-wrapper .summary-row-vertical .values .gap-badge.well-below { color: #ef4444; border-color: #ef4444; background: rgba(239,68,68,0.08); }
 
     /* ===== EXTRA SLIDES (admin-managed) ===== */
-    /* Container holds the image as an <img> tag, sized to match the slide */
-    .slide[data-type="data-image"] { background: #0b1a33; padding: 0; }
-    .slide[data-type="title"] { background: #0b1a33; padding: 0; }
+    .slide[data-type="data-image"], .slide[data-type="title"] { background: #0b1a33; }
 
-    .extra-slide-img {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-      object-position: center;
-      display: block;
-      pointer-events: none;
-    }
-
-    .extra-slide-img.cover {
-      object-fit: cover;
-    }
-
-    /* Counter sits above the image */
-    .slide[data-extra="true"] .slide-counter {
-      z-index: 6;
+    /* FIX: force extra slides onto their own GPU layer so the image is composited and ready */
+    .slide[data-extra="true"] {
+      transform: translateZ(0);
+      will-change: transform, opacity;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+      perspective: 1000px;
     }
 
     @media (max-aspect-ratio: 16/9) {
@@ -543,7 +529,6 @@
   // ============================================================
   // EXTRA SLIDES LOADER
   // Loads slides-config.json and appends slides after slide7.
-  // Uses <img> tags instead of background-image.
   // ============================================================
   (function() {
     const extraContainer = document.getElementById('extraSlidesContainer');
@@ -565,7 +550,8 @@
 
       if (slides.length === 0) return;
 
-      // ===== Prefetch + decode each image so it's ready before its slide shows =====
+      // ===== PREFETCH + DECODE =====
+      // Prefetch (network) and decode (CPU) so the image is ready to paint.
       window.__prefetchedExtraImages = slides
         .filter(s => s.bg)
         .map(s => {
@@ -586,26 +572,21 @@
         div.dataset.index = index;
         div.dataset.type = slide.type || 'data-image';
         div.dataset.duration = slide.duration || 6000;
-        div.dataset.extra = 'true';
+        div.dataset.extra = 'true';     // ← triggers the GPU-layer CSS rule
         if (slide.dataType) div.dataset.datatype = slide.dataType;
         if (slide.metric) div.dataset.metric = slide.metric;
 
-        if (slide.bg) {
-          // <img> tag instead of background-image — image is painted as part of DOM,
-          // not as a layered background, so no dark parent shows through during fade.
-          const img = document.createElement('img');
-          img.className = 'extra-slide-img' + (slide.type === 'title' ? ' cover' : '');
-          img.src = slide.bg;
-          img.alt = slide.name || '';
-          img.decoding = 'sync';   // ask the browser to decode synchronously when painted
-          img.loading = 'eager';
-          div.appendChild(img);
-        }
+        const counter = `<div class="slide-counter"><span class="current">--</span> / --</div>`;
 
-        const counter = document.createElement('div');
-        counter.className = 'slide-counter';
-        counter.innerHTML = `<span class="current">--</span> / --`;
-        div.appendChild(counter);
+        if (slide.type === 'title' && slide.bg) {
+          div.style.background = `url('${slide.bg}') center/cover no-repeat, #0b1a33`;
+          div.innerHTML = counter;
+        } else if (slide.bg) {
+          div.style.background = `#0b1a33 url('${slide.bg}') center/contain no-repeat`;
+          div.innerHTML = counter;
+        } else {
+          div.innerHTML = counter;
+        }
 
         extraContainer.appendChild(div);
       });
