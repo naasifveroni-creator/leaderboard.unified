@@ -594,9 +594,6 @@
         div.dataset.index = index;
         div.dataset.type = slide.type || 'data-image';
         div.dataset.extra = 'true';
-        // FIX: duration comes from slides-config.json (in ms).
-        // If the config doesn't specify one, we leave data-duration unset
-        // and getSlideDuration will fall back to the 5500ms default.
         if (slide.duration && !isNaN(parseInt(slide.duration))) {
           div.dataset.duration = parseInt(slide.duration).toString();
         }
@@ -627,11 +624,13 @@
     const progressBars = document.querySelectorAll('.progress-bar');
     const wrapper = document.getElementById('slidesWrapper');
 
+    // FIX 2: cap the max slide duration at 45s instead of 120s,
+    // so a large agent list doesn't sit on screen for 82 seconds.
     const AGENTS_TIME_PER_ROW = 0.6;
     const TEAMS_TIME_PER_ROW  = 0.8;
     const AGENTS_MIN_DISPLAY  = 40;
     const TEAMS_MIN_DISPLAY   = 45;
-    const MAX_DISPLAY         = 120;
+    const MAX_DISPLAY         = 45;
 
     let currentIndex = 0;
     let timer = null;
@@ -642,6 +641,11 @@
     let elapsedTime = 0;
     let scrollAnimFrames = [];
     let slideAnimInitialized = [];
+
+    // FIX 1: track the last data hash so loadData can skip a re-render
+    // (and therefore skip resetting the slideshow timer / scroll position)
+    // when the data hasn't actually changed.
+    let lastDataHash = '';
 
     async function bootstrap() {
       startEngine();
@@ -702,9 +706,6 @@
       console.log('🔄 Rebuilt dots + counters for', allSlides.length, 'slides');
     }
 
-    // Option 1: durations come from dataset.duration (set by loadExtraSlides
-    // from slides-config.json) or fall back to the 5500ms default.
-    // The hardcoded SANAS_DURATIONS map is gone — no more index-based mapping.
     function getSlideDuration(slide) {
       const custom = parseInt(slide.dataset.duration);
       if (!isNaN(custom) && custom > 0) return custom;
@@ -770,9 +771,10 @@
       scrollAnimFrames = [];
     }
 
+    // FIX 3: match SIS — fall back to 5500, not getSlideDuration.
     function startInfiniteScroll(slide) {
       cancelAllScrollAnimations();
-      const durationMs = parseFloat(slide.dataset.duration) || getSlideDuration(slide);
+      const durationMs = parseFloat(slide.dataset.duration) || 5500;
       const wrappers = slide.querySelectorAll('.table-grid .scroll-wrapper');
       wrappers.forEach(wrap => {
         const inner = wrap.querySelector('.scroll-inner');
@@ -1218,6 +1220,9 @@
       return null;
     }
 
+    // FIX 1 (applied): skip the whole render if the data hasn't changed.
+    // That prevents renderAgents/renderTeams from resetting the timer and
+    // scroll position on every 60s poll.
     async function loadData() {
       try {
         const [lbRes, compRes] = await Promise.all([
@@ -1230,6 +1235,23 @@
 
         const leaderboardData = await lbRes.json();
         const comparisonData = await compRes.json();
+
+        // Hash only the leaderboard, since that's what drives the
+        // timer-reset behaviour on slides 2 and 3.
+        const newHash = JSON.stringify(leaderboardData);
+        if (newHash === lastDataHash) {
+          // Data unchanged — do NOT re-render agents/teams.
+          // Still safe to update comparison slides since they don't
+          // reset the timer.
+          if (comparisonData.targets && comparisonData.centres) {
+            updateComparisonSlide(comparisonData, 'SIS', 'compSlide4');
+            updateComparisonSlide(comparisonData, 'IFSR', 'compSlide5');
+            updateComparisonSlide(comparisonData, 'CHT', 'compSlide6');
+            updateSummarySlide(comparisonData);
+          }
+          return;
+        }
+        lastDataHash = newHash;
 
         const weekText = leaderboardData.week || 'Week of Jul 20 – Jul 26, 2026';
         document.getElementById('agentsWeek').textContent = weekText;
