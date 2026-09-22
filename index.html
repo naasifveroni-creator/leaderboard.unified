@@ -115,13 +115,11 @@
     .dot { width: 1vh; height: 1vh; border-radius: 50%; background: rgba(255,255,255,0.2); border: none; cursor: pointer; transition: all 0.3s ease; padding: 0; }
     .dot.active { background: #d32f2f; transform: scale(1.4); box-shadow: 0 0 20px rgba(211,47,47,0.5); }
 
-    /* FIX #3: flex: 1 1 auto, no height: 100% — this stops the half-blue comparison slide */
     .comp-slide-wrapper { flex: 1 1 auto; width: 100%; padding: 1vh 3vw 2vh 3vw; display: flex; flex-direction: column; gap: 2vh; min-height: 0; background: #f2f5f9; }
     .comp-slide-wrapper .metric-header { display: flex; align-items: center; gap: 1.2vw; flex-shrink: 0; flex-wrap: wrap; }
     .comp-delta-logo { height: 18vh; width: auto; object-fit: contain; margin-right: 0.5vw; filter: drop-shadow(0 0 20px rgba(211,47,47,0.15)); }
     .comp-slide-wrapper .metric-header h2 { font-size: 4.2vh; font-weight: 600; color: #0b1a33; letter-spacing: -0.02em; margin: 0; }
     .comp-slide-wrapper .metric-header .unit-badge { font-size: 2vh; font-weight: 500; color: #475569; background: #f1f5f9; padding: 0.2vh 1.2vw; border-radius: 40px; border: 1px solid #e2e8f0; }
-    /* FIX #4: flex: 1 1 auto, no height: 70% */
     .comp-slide-wrapper .card-row { flex: 1 1 auto; display: flex; flex-direction: row; gap: 1.5vw; min-height: 0; }
     .comp-slide-wrapper .centre-card { flex: 1; background: rgba(255,255,255,0.85); backdrop-filter: blur(8px); border-radius: 2.8vh; border: 1px solid rgba(255,255,255,0.9); box-shadow: 0 8px 32px rgba(0,0,0,0.04); display: flex; flex-direction: row; align-items: center; padding: 1.5vh 0.5vw 1.5vh 0.5vw; position: relative; overflow: hidden; }
     .comp-slide-wrapper .centre-card::before { content: ''; position: absolute; left: 0; top: 15%; height: 70%; width: 0.6vh; border-radius: 0 6px 6px 0; background: var(--brand-colour); }
@@ -296,11 +294,12 @@
     const dotsContainer = document.getElementById('dotsContainer');
     const wrapper = document.getElementById('slidesWrapper');
 
+    // ===== ORIGINAL TIMING RULES (restored) =====
     const AGENTS_TIME_PER_ROW = 0.6;
     const TEAMS_TIME_PER_ROW = 0.8;
-    const AGENTS_MIN_DISPLAY = 15;
-    const TEAMS_MIN_DISPLAY = 15;
-    const MAX_DISPLAY = 25;
+    const AGENTS_MIN_DISPLAY = 40;
+    const TEAMS_MIN_DISPLAY = 45;
+    const MAX_DISPLAY = 120;
     const TARGET_THRESHOLD = 86.30;
 
     let slideConfig = null;
@@ -469,7 +468,6 @@
       }
     }
 
-    // Preload all background images so slides don't flash dark-blue on transition.
     function preloadBackgrounds() {
       const bgSlides = slideConfig.slides.filter(s => s.bg);
       return Promise.all(bgSlides.map(s => new Promise(res => {
@@ -759,10 +757,12 @@
       `;
 
       const rowCount = left.length;
-      let dur = Math.max(AGENTS_MIN_DISPLAY, Math.min(MAX_DISPLAY, rowCount * AGENTS_TIME_PER_ROW));
+      const dur = Math.max(AGENTS_MIN_DISPLAY, Math.min(MAX_DISPLAY, rowCount * AGENTS_TIME_PER_ROW));
       const agentsSlide = document.querySelector('.slide[data-type="table"][data-datatype="agents"]');
       if (agentsSlide) {
         agentsSlide.dataset.duration = (dur * 1000).toString();
+        // FIX: don't interrupt a slide that's already been shown.
+        // Only reset timer if this slide hasn't animated yet AND it's the current slide.
         if (slides[currentIndex] === agentsSlide && !isTransitioning && !slideAnimInitialized[currentIndex]) {
           clearSlideshowTimer();
           resetEntranceAnimations(currentIndex);
@@ -804,10 +804,11 @@
       `;
 
       const rowCount = firstCol.length;
-      let dur = Math.max(TEAMS_MIN_DISPLAY, Math.min(MAX_DISPLAY, rowCount * TEAMS_TIME_PER_ROW));
+      const dur = Math.max(TEAMS_MIN_DISPLAY, Math.min(MAX_DISPLAY, rowCount * TEAMS_TIME_PER_ROW));
       const teamsSlide = document.querySelector('.slide[data-type="table"][data-datatype="teams"]');
       if (teamsSlide) {
         teamsSlide.dataset.duration = (dur * 1000).toString();
+        // FIX: don't interrupt a slide that's already been shown.
         if (slides[currentIndex] === teamsSlide && !isTransitioning && !slideAnimInitialized[currentIndex]) {
           clearSlideshowTimer();
           resetEntranceAnimations(currentIndex);
@@ -1009,10 +1010,7 @@
 
     async function init() {
       await loadSlidesConfig();
-
-      // Preload every background image BEFORE building slides.
       await preloadBackgrounds();
-
       buildSlidesFromConfig();
 
       currentIndex = 0;
