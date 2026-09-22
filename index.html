@@ -624,13 +624,16 @@
     const progressBars = document.querySelectorAll('.progress-bar');
     const wrapper = document.getElementById('slidesWrapper');
 
-    // FIX 2: cap the max slide duration at 45s instead of 120s,
-    // so a large agent list doesn't sit on screen for 82 seconds.
     const AGENTS_TIME_PER_ROW = 0.6;
     const TEAMS_TIME_PER_ROW  = 0.8;
     const AGENTS_MIN_DISPLAY  = 40;
     const TEAMS_MIN_DISPLAY   = 45;
     const MAX_DISPLAY         = 45;
+
+    // FIX (Option 3): fixed scroll speed, independent of content height.
+    // Both columns move at the same visual rate regardless of how
+    // many rows they contain.
+    const SCROLL_PIXELS_PER_SEC = 40;
 
     let currentIndex = 0;
     let timer = null;
@@ -641,10 +644,6 @@
     let elapsedTime = 0;
     let scrollAnimFrames = [];
     let slideAnimInitialized = [];
-
-    // FIX 1: track the last data hash so loadData can skip a re-render
-    // (and therefore skip resetting the slideshow timer / scroll position)
-    // when the data hasn't actually changed.
     let lastDataHash = '';
 
     async function bootstrap() {
@@ -771,10 +770,10 @@
       scrollAnimFrames = [];
     }
 
-    // FIX 3: match SIS — fall back to 5500, not getSlideDuration.
+    // FIX (Option 3): fixed scroll speed, independent of content height.
     function startInfiniteScroll(slide) {
       cancelAllScrollAnimations();
-      const durationMs = parseFloat(slide.dataset.duration) || 5500;
+      const pixelsPerMs = SCROLL_PIXELS_PER_SEC / 1000;
       const wrappers = slide.querySelectorAll('.table-grid .scroll-wrapper');
       wrappers.forEach(wrap => {
         const inner = wrap.querySelector('.scroll-inner');
@@ -783,7 +782,6 @@
         const half = contentHeight / 2;
         if (half <= 0) return;
         wrap.scrollTop = 0;
-        const pixelsPerMs = half / durationMs;
         let lastTime = performance.now();
         function step(now) {
           if (isPaused) return;
@@ -995,6 +993,7 @@
       }
     }
 
+    // FIX (Option 1): balanced split — same row count on both sides.
     function renderTeams(containerId, items, previousData) {
       const container = document.getElementById(containerId);
       if (!items || items.length === 0) {
@@ -1007,8 +1006,9 @@
         return;
       }
       const ranked = autoRank(validItems);
-      const firstCol = ranked.slice(0, 10);
-      const secondCol = ranked.slice(10);
+      const half = Math.ceil(ranked.length / 2);
+      const firstCol = ranked.slice(0, half);
+      const secondCol = ranked.slice(half);
 
       function buildTable(dataArray) {
         const doubled = [...dataArray, ...dataArray];
@@ -1220,9 +1220,6 @@
       return null;
     }
 
-    // FIX 1 (applied): skip the whole render if the data hasn't changed.
-    // That prevents renderAgents/renderTeams from resetting the timer and
-    // scroll position on every 60s poll.
     async function loadData() {
       try {
         const [lbRes, compRes] = await Promise.all([
@@ -1236,13 +1233,8 @@
         const leaderboardData = await lbRes.json();
         const comparisonData = await compRes.json();
 
-        // Hash only the leaderboard, since that's what drives the
-        // timer-reset behaviour on slides 2 and 3.
         const newHash = JSON.stringify(leaderboardData);
         if (newHash === lastDataHash) {
-          // Data unchanged — do NOT re-render agents/teams.
-          // Still safe to update comparison slides since they don't
-          // reset the timer.
           if (comparisonData.targets && comparisonData.centres) {
             updateComparisonSlide(comparisonData, 'SIS', 'compSlide4');
             updateComparisonSlide(comparisonData, 'IFSR', 'compSlide5');
