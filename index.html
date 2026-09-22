@@ -20,9 +20,8 @@
     #adminAccess a { color: rgba(255,255,255,0.4); text-decoration: none; font-size: 1.4vh; font-weight: 400; letter-spacing: 0.05em; font-family: 'Inter', sans-serif; transition: all 0.3s ease; padding: 0.3vh 0.6vw; border-radius: 4px; background: rgba(0,0,0,0.15); backdrop-filter: blur(4px); border: 1px solid rgba(255,255,255,0.04); }
     #adminAccess a:hover { color: #fdb913; background: rgba(0,0,0,0.3); border-color: rgba(255,215,0,0.15); }
 
-    /* FIX: opacity removed from transition — slides now appear instantly, no dark-blue flash during fade */
-    .slide { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; visibility: hidden; transition: transform 0.8s ease, visibility 0.8s ease; display: flex; flex-direction: column; transform: scale(0.98); }
-    .slide.active { opacity: 1; visibility: visible; position: relative; transform: scale(1); transition: transform 0.8s ease, visibility 0.8s ease; }
+    .slide { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; visibility: hidden; transition: opacity 0.8s ease, transform 0.8s ease, visibility 0.8s ease; display: flex; flex-direction: column; transform: scale(0.98); }
+    .slide.active { opacity: 1; visibility: visible; position: relative; transform: scale(1); transition: opacity 0.8s ease, transform 0.8s ease, visibility 0.8s ease; }
 
     /* ===== TITLE & DATA SLIDES ===== */
     #slide0 { background: url('assets/slides/slide-title.webp.jpg') center/cover no-repeat, #0b1a33; }
@@ -170,7 +169,30 @@
     .comp-slide-wrapper .summary-row-vertical .values .gap-badge.well-below { color: #ef4444; border-color: #ef4444; background: rgba(239,68,68,0.08); }
 
     /* ===== EXTRA SLIDES (admin-managed) ===== */
-    .slide[data-type="data-image"], .slide[data-type="title"] { background: #0b1a33; }
+    /* Container holds the image as an <img> tag, sized to match the slide */
+    .slide[data-type="data-image"] { background: #0b1a33; padding: 0; }
+    .slide[data-type="title"] { background: #0b1a33; padding: 0; }
+
+    .extra-slide-img {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      object-position: center;
+      display: block;
+      pointer-events: none;
+    }
+
+    .extra-slide-img.cover {
+      object-fit: cover;
+    }
+
+    /* Counter sits above the image */
+    .slide[data-extra="true"] .slide-counter {
+      z-index: 6;
+    }
 
     @media (max-aspect-ratio: 16/9) {
       .slide-header .logo-area h1 { font-size: 2vh; }
@@ -521,7 +543,7 @@
   // ============================================================
   // EXTRA SLIDES LOADER
   // Loads slides-config.json and appends slides after slide7.
-  // Slides 0-7 stay hardcoded and are unaffected.
+  // Uses <img> tags instead of background-image.
   // ============================================================
   (function() {
     const extraContainer = document.getElementById('extraSlidesContainer');
@@ -543,23 +565,7 @@
 
       if (slides.length === 0) return;
 
-      // ===== PREFETCH (three methods for maximum reliability) =====
-
-      // Method 1: <link rel="prefetch"> — highest priority, network-layer caching
-      slides.forEach(s => {
-        if (s.bg) {
-          const link = document.createElement('link');
-          link.rel = 'prefetch';
-          link.as = 'image';
-          link.href = s.bg;
-          document.head.appendChild(link);
-        }
-      });
-
-      // Method 2 + 3: JS Image() with persistent refs AND forced decode.
-      //   - Persistent refs: prevent garbage collection mid-fetch.
-      //   - decode(): forces the browser to decompress the image into pixels ahead of
-      //     time, so there's no dark-blue flash when the slide first appears.
+      // ===== Prefetch + decode each image so it's ready before its slide shows =====
       window.__prefetchedExtraImages = slides
         .filter(s => s.bg)
         .map(s => {
@@ -573,27 +579,33 @@
 
       // ===== BUILD THE SLIDES =====
       slides.forEach((slide, i) => {
-        const index = 8 + i;  // Extra slides start at index 8
+        const index = 8 + i;
         const div = document.createElement('div');
         div.className = 'slide';
         div.id = 'slide' + index;
         div.dataset.index = index;
         div.dataset.type = slide.type || 'data-image';
         div.dataset.duration = slide.duration || 6000;
+        div.dataset.extra = 'true';
         if (slide.dataType) div.dataset.datatype = slide.dataType;
         if (slide.metric) div.dataset.metric = slide.metric;
 
-        const counter = `<div class="slide-counter"><span class="current">--</span> / --</div>`;
-
-        if (slide.type === 'title' && slide.bg) {
-          div.style.background = `url('${slide.bg}') center/cover no-repeat, #0b1a33`;
-          div.innerHTML = counter;
-        } else if (slide.bg) {
-          div.style.background = `#0b1a33 url('${slide.bg}') center/contain no-repeat`;
-          div.innerHTML = counter;
-        } else {
-          div.innerHTML = counter;
+        if (slide.bg) {
+          // <img> tag instead of background-image — image is painted as part of DOM,
+          // not as a layered background, so no dark parent shows through during fade.
+          const img = document.createElement('img');
+          img.className = 'extra-slide-img' + (slide.type === 'title' ? ' cover' : '');
+          img.src = slide.bg;
+          img.alt = slide.name || '';
+          img.decoding = 'sync';   // ask the browser to decode synchronously when painted
+          img.loading = 'eager';
+          div.appendChild(img);
         }
+
+        const counter = document.createElement('div');
+        counter.className = 'slide-counter';
+        counter.innerHTML = `<span class="current">--</span> / --`;
+        div.appendChild(counter);
 
         extraContainer.appendChild(div);
       });
@@ -605,7 +617,7 @@
   })();
 
   // ============================================================
-  // SLIDESHOW ENGINE - same as your original
+  // SLIDESHOW ENGINE
   // ============================================================
   (function() {
     const slides = document.querySelectorAll('.slide');
@@ -861,7 +873,7 @@
     window.getCurrentIndex = () => currentIndex;
 
     // ============================================================
-    // DATA RENDERING - YOUR ORIGINAL FUNCTIONS (unchanged)
+    // DATA RENDERING
     // ============================================================
     const TARGET_THRESHOLD = 86.30;
 
