@@ -542,7 +542,7 @@
 
       if (slides.length === 0) return;
 
-      // ===== PREFETCH (two methods for maximum reliability) =====
+      // ===== PREFETCH (three methods for maximum reliability) =====
 
       // Method 1: <link rel="prefetch"> — highest priority, network-layer caching
       slides.forEach(s => {
@@ -555,12 +555,18 @@
         }
       });
 
-      // Method 2: JS Image() with persistent refs so they aren't GC'd
+      // Method 2 + 3: JS Image() with persistent refs AND forced decode.
+      //   - Persistent refs: prevent garbage collection mid-fetch.
+      //   - decode(): forces the browser to decompress the image into pixels ahead of
+      //     time, so there's no dark-blue flash when the slide first appears.
       window.__prefetchedExtraImages = slides
         .filter(s => s.bg)
         .map(s => {
           const img = new Image();
           img.src = s.bg;
+          if (img.decode) {
+            img.decode().catch(() => {});
+          }
           return img;
         });
 
