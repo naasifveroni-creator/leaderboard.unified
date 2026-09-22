@@ -6,6 +6,38 @@
   <title>Δ Unified Dashboard</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+  <!-- ============================================================ -->
+  <!-- FIX: Early prefetch of extra-slide images.                    -->
+  <!-- Starts fetching slides-config.json + decoding all bg images   -->
+  <!-- as soon as the <head> is parsed, long before DOMContentLoaded. -->
+  <!-- ============================================================ -->
+  <script>
+    window.__prefetchedExtraImages = [];
+    window.__extraSlidesPrefetch = fetch('slides-config.json?' + Date.now())
+      .then(r => r.ok ? r.json() : null)
+      .then(cfg => {
+        if (!cfg || !Array.isArray(cfg.slides)) return null;
+        const promises = cfg.slides
+          .filter(s => s.bg)
+          .map(s => new Promise(resolve => {
+            const img = new Image();
+            img.onload = () => {
+              if (img.decode) {
+                img.decode().then(resolve).catch(resolve);
+              } else {
+                resolve();
+              }
+            };
+            img.onerror = resolve;
+            img.src = s.bg;
+            window.__prefetchedExtraImages.push(img);
+          }));
+        return Promise.all(promises).then(() => cfg);
+      })
+      .catch(() => null);
+  </script>
+
   <style>
     /* ===== ALL YOUR ORIGINAL CSS - UNCHANGED ===== */
     * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', 'Segoe UI', Roboto, system-ui, sans-serif; }
@@ -528,43 +560,51 @@
 
   // ============================================================
   // EXTRA SLIDES LOADER
-  // Loads slides-config.json and appends slides after slide7.
+  // Consumes the prefetch promise started in <head> so the images
+  // are already downloaded + decoded by the time we build slides.
   // ============================================================
   (function() {
     const extraContainer = document.getElementById('extraSlidesContainer');
 
-    // Persistent refs so prefetched images aren't garbage-collected
-    window.__prefetchedExtraImages = [];
-
     async function loadExtraSlides() {
-      let slides = [];
+      // FIX: use the config that was already fetched + decoded in <head>.
+      let cfg = null;
       try {
-        const res = await fetch('slides-config.json?' + Date.now());
-        if (!res.ok) throw new Error('Config not found');
-        const cfg = await res.json();
-        if (cfg && Array.isArray(cfg.slides)) slides = cfg.slides;
+        cfg = await window.__extraSlidesPrefetch;
       } catch (e) {
-        console.log('📋 No extra slides config found (or failed to load)');
-        return;
+        cfg = null;
       }
 
-      if (slides.length === 0) return;
-
-      // ===== PREFETCH + DECODE =====
-      // Prefetch (network) and decode (CPU) so the image is ready to paint.
-      window.__prefetchedExtraImages = slides
-        .filter(s => s.bg)
-        .map(s => {
-          const img = new Image();
-          img.src = s.bg;
-          if (img.decode) {
-            img.decode().catch(() => {});
+      // Fallback: if the early prefetch failed (e.g. file added after page load),
+      // try a fresh fetch + await decode here.
+      if (!cfg || !Array.isArray(cfg.slides)) {
+        try {
+          const res = await fetch('slides-config.json?' + Date.now());
+          if (!res.ok) throw new Error('Config not found');
+          const freshCfg = await res.json();
+          if (freshCfg && Array.isArray(freshCfg.slides)) {
+            const prefetchPromises = freshCfg.slides
+              .filter(s => s.bg)
+              .map(s => new Promise(resolve => {
+                const img = new Image();
+                img.onload = () => (img.decode ? img.decode().then(resolve).catch(resolve) : resolve());
+                img.onerror = resolve;
+                img.src = s.bg;
+                window.__prefetchedExtraImages.push(img);
+              }));
+            await Promise.all(prefetchPromises);
+            cfg = freshCfg;
           }
-          return img;
-        });
+        } catch (e) {
+          console.log('📋 No extra slides config found (or failed to load)');
+          return;
+        }
+      }
+
+      if (!cfg || !Array.isArray(cfg.slides) || cfg.slides.length === 0) return;
 
       // ===== BUILD THE SLIDES =====
-      slides.forEach((slide, i) => {
+      cfg.slides.forEach((slide, i) => {
         const index = 8 + i;
         const div = document.createElement('div');
         div.className = 'slide';
@@ -572,7 +612,7 @@
         div.dataset.index = index;
         div.dataset.type = slide.type || 'data-image';
         div.dataset.duration = slide.duration || 6000;
-        div.dataset.extra = 'true';     // ← triggers the GPU-layer CSS rule
+        div.dataset.extra = 'true';
         if (slide.dataType) div.dataset.datatype = slide.dataType;
         if (slide.metric) div.dataset.metric = slide.metric;
 
@@ -591,7 +631,7 @@
         extraContainer.appendChild(div);
       });
 
-      console.log('📋 Loaded', slides.length, 'extra slides from config');
+      console.log('📋 Loaded', cfg.slides.length, 'extra slides from config');
     }
 
     window.__loadExtraSlides = loadExtraSlides;
@@ -601,7 +641,6 @@
   // SLIDESHOW ENGINE
   // ============================================================
   (function() {
-    const slides = document.querySelectorAll('.slide');
     const dotsContainer = document.getElementById('dotsContainer');
     const progressBars = document.querySelectorAll('.progress-bar');
     const wrapper = document.getElementById('slidesWrapper');
@@ -623,6 +662,7 @@
     let slideAnimInitialized = [];
 
     async function bootstrap() {
+      // FIX: await the extra-slides loader which itself awaits image decode.
       if (window.__loadExtraSlides) {
         await window.__loadExtraSlides();
       }
