@@ -115,12 +115,14 @@
     .dot { width: 1vh; height: 1vh; border-radius: 50%; background: rgba(255,255,255,0.2); border: none; cursor: pointer; transition: all 0.3s ease; padding: 0; }
     .dot.active { background: #d32f2f; transform: scale(1.4); box-shadow: 0 0 20px rgba(211,47,47,0.5); }
 
-    .comp-slide-wrapper { flex: 1; width: 100%; padding: 1vh 3vw 2vh 3vw; display: flex; flex-direction: column; gap: 2vh; min-height: 0; height: 100%; background: #f2f5f9; }
+    /* FIX #3: flex: 1 1 auto, no height: 100% — this stops the half-blue comparison slide */
+    .comp-slide-wrapper { flex: 1 1 auto; width: 100%; padding: 1vh 3vw 2vh 3vw; display: flex; flex-direction: column; gap: 2vh; min-height: 0; background: #f2f5f9; }
     .comp-slide-wrapper .metric-header { display: flex; align-items: center; gap: 1.2vw; flex-shrink: 0; flex-wrap: wrap; }
     .comp-delta-logo { height: 18vh; width: auto; object-fit: contain; margin-right: 0.5vw; filter: drop-shadow(0 0 20px rgba(211,47,47,0.15)); }
     .comp-slide-wrapper .metric-header h2 { font-size: 4.2vh; font-weight: 600; color: #0b1a33; letter-spacing: -0.02em; margin: 0; }
     .comp-slide-wrapper .metric-header .unit-badge { font-size: 2vh; font-weight: 500; color: #475569; background: #f1f5f9; padding: 0.2vh 1.2vw; border-radius: 40px; border: 1px solid #e2e8f0; }
-    .comp-slide-wrapper .card-row { flex: 1; display: flex; flex-direction: row; gap: 1.5vw; min-height: 0; height: 70%; }
+    /* FIX #4: flex: 1 1 auto, no height: 70% */
+    .comp-slide-wrapper .card-row { flex: 1 1 auto; display: flex; flex-direction: row; gap: 1.5vw; min-height: 0; }
     .comp-slide-wrapper .centre-card { flex: 1; background: rgba(255,255,255,0.85); backdrop-filter: blur(8px); border-radius: 2.8vh; border: 1px solid rgba(255,255,255,0.9); box-shadow: 0 8px 32px rgba(0,0,0,0.04); display: flex; flex-direction: row; align-items: center; padding: 1.5vh 0.5vw 1.5vh 0.5vw; position: relative; overflow: hidden; }
     .comp-slide-wrapper .centre-card::before { content: ''; position: absolute; left: 0; top: 15%; height: 70%; width: 0.6vh; border-radius: 0 6px 6px 0; background: var(--brand-colour); }
     .comp-slide-wrapper .centre-card.tp { --brand-colour: #3b82f6; }
@@ -244,9 +246,6 @@
 </div>
 
 <script>
-  // ============================================================
-  // ADMIN ACCESS
-  // ============================================================
   (function() {
     const ADMIN_PASSWORD = 'delta2026';
     const link = document.getElementById('adminLink');
@@ -266,9 +265,6 @@
     });
   })();
 
-  // ============================================================
-  // FULLSCREEN TOGGLE
-  // ============================================================
   (function() {
     const btn = document.getElementById('fullscreenBtn');
     if (btn) {
@@ -295,9 +291,6 @@
     }
   })();
 
-  // ============================================================
-  // MAIN APP
-  // ============================================================
   (function() {
     const slidesContainer = document.getElementById('slidesContainer');
     const dotsContainer = document.getElementById('dotsContainer');
@@ -305,9 +298,9 @@
 
     const AGENTS_TIME_PER_ROW = 0.6;
     const TEAMS_TIME_PER_ROW = 0.8;
-    const AGENTS_MIN_DISPLAY = 40;
-    const TEAMS_MIN_DISPLAY = 45;
-    const MAX_DISPLAY = 120;
+    const AGENTS_MIN_DISPLAY = 15;
+    const TEAMS_MIN_DISPLAY = 15;
+    const MAX_DISPLAY = 25;
     const TARGET_THRESHOLD = 86.30;
 
     let slideConfig = null;
@@ -323,10 +316,15 @@
     let scrollAnimFrames = [];
     let slideAnimInitialized = [];
 
-    // FIX #7 helper: parse a score string that may contain "%", arrows, or whitespace.
     function parseScore(raw) {
       if (raw === null || raw === undefined) return NaN;
       return parseFloat(String(raw).replace(/[%\s↑↓→]/g, ''));
+    }
+
+    function formatScore(score) {
+      const num = typeof score === 'number' ? score : parseScore(score);
+      if (isNaN(num)) return '–';
+      return num.toFixed(2) + '%';
     }
 
     function animateTags(container) {
@@ -412,8 +410,6 @@
     }
 
     function buildSummarySlide(counter) {
-      // FIX #15: rows now carry data-centre="TP"/"WNS" and cards carry data-metric
-      // so updateSummarySlides can match by name instead of by index.
       return `
         ${counter}
         <div class="comp-slide-wrapper">
@@ -449,7 +445,6 @@
         slides: [
           { id: 0, type: 'title', name: 'SIS Title', bg: 'assets/slides/slide-title.webp.jpg' },
           { id: 1, type: 'data-image', name: 'SIS Data Image', bg: 'assets/slides/slide-data.webp.jpg' },
-          // FIX #12: dataSource paths now match the actual fetch() paths in loadData().
           { id: 2, type: 'table', name: 'Agents - SIS', dataSource: 'data/leaderboard.json', dataType: 'agents', title: 'Top Performing Agents - SIS' },
           { id: 3, type: 'table', name: 'Teams - SIS', dataSource: 'data/leaderboard.json', dataType: 'teams', title: 'Top Performing Teams - SIS' },
           { id: 4, type: 'comparison-detail', name: 'SIS Detail', dataSource: 'data/comparison.json', metric: 'SIS' },
@@ -472,6 +467,16 @@
         console.warn('⚠️ Using default config:', e.message);
         slideConfig = getDefaultConfig();
       }
+    }
+
+    // Preload all background images so slides don't flash dark-blue on transition.
+    function preloadBackgrounds() {
+      const bgSlides = slideConfig.slides.filter(s => s.bg);
+      return Promise.all(bgSlides.map(s => new Promise(res => {
+        const img = new Image();
+        img.onload = img.onerror = () => res();
+        img.src = s.bg;
+      })));
     }
 
     function buildSlidesFromConfig() {
@@ -515,7 +520,6 @@
       slides = Array.from(slidesContainer.querySelectorAll('.slide'));
       slideAnimInitialized = new Array(slides.length).fill(false);
 
-      // FIX: force the first slide to be the active one, reset currentIndex
       currentIndex = 0;
       isTransitioning = false;
       isPaused = false;
@@ -592,7 +596,6 @@
       if (!isPaused) return;
       isPaused = false;
       startSlideshowTimer(slideDuration, elapsedTime);
-      // FIX #19: only restart scroll if the table hasn't been scrolled yet.
       if (slides[currentIndex]) {
         const slide = slides[currentIndex];
         const wrap = slide.querySelector('.table-grid .scroll-wrapper');
@@ -639,8 +642,6 @@
         row.style.opacity = '0';
         row.style.transform = 'translateY(10px)';
         const scoreCell = row.querySelector('.score-col');
-        // FIX #14: always overwrite targetScore so stale scores don't animate
-        // after a data refresh replaces the table rows.
         if (scoreCell) row.dataset.targetScore = scoreCell.textContent.trim();
       });
       rows.forEach((row, i) => {
@@ -651,7 +652,6 @@
           const scoreCell = row.querySelector('.score-col');
           if (scoreCell && row.dataset.targetScore) animateCounter(scoreCell, row.dataset.targetScore);
           const arrow = row.querySelector('.trend-arrow');
-          // FIX #6: only reveal arrows that actually carry a direction.
           if (arrow && !arrow.classList.contains('neutral')) {
             setTimeout(() => arrow.classList.add('visible'), 300 + (i * 80));
           }
@@ -661,8 +661,6 @@
       startInfiniteScroll(activeSlide);
     }
 
-    // FIX #7: animateCounter now extracts the numeric portion, animates it,
-    // then restores the FULL original string (including the arrow) at the end.
     function animateCounter(element, fullText) {
       const match = String(fullText).match(/(\d+(?:\.\d+)?)/);
       if (!match) return;
@@ -678,7 +676,7 @@
         const currentValue = eased * targetValue;
         element.textContent = currentValue.toFixed(2) + suffix;
         if (progress < 1) requestAnimationFrame(updateCounter);
-        else element.textContent = fullText; // restore arrow
+        else element.textContent = fullText;
       }
       requestAnimationFrame(updateCounter);
     }
@@ -720,16 +718,8 @@
     }
 
     function autoRank(items) {
-      // FIX #4: use parseScore so "%" and arrows don't break numeric sort.
       const sorted = [...items].sort((a, b) => parseScore(b.score) - parseScore(a.score));
       return sorted.map((item, index) => ({ ...item, rank: index + 1 }));
-    }
-
-    // FIX #8: formatScore uses parseScore so a source value like "95.20%" doesn't become "95.20%%".
-    function formatScore(score) {
-      const num = typeof score === 'number' ? score : parseScore(score);
-      if (isNaN(num)) return '–';
-      return num.toFixed(2) + '%';
     }
 
     function renderAgents(containerId, items, previousData) {
@@ -773,9 +763,8 @@
       const agentsSlide = document.querySelector('.slide[data-type="table"][data-datatype="agents"]');
       if (agentsSlide) {
         agentsSlide.dataset.duration = (dur * 1000).toString();
-        if (slides[currentIndex] === agentsSlide && !isTransitioning) {
+        if (slides[currentIndex] === agentsSlide && !isTransitioning && !slideAnimInitialized[currentIndex]) {
           clearSlideshowTimer();
-          slideAnimInitialized[currentIndex] = false;
           resetEntranceAnimations(currentIndex);
           startSlideshowTimer(dur * 1000);
         }
@@ -789,7 +778,6 @@
       const validItems = items.filter(item => !isNaN(parseScore(item.score)));
       if (validItems.length === 0) { container.innerHTML = `<div class="empty-state">No valid team data.</div>`; return; }
       const ranked = autoRank(validItems);
-      // FIX #5: split teams in half instead of hardcoded 10/rest.
       const half = Math.ceil(ranked.length / 2);
       const firstCol = ranked.slice(0, half);
       const secondCol = ranked.slice(half);
@@ -820,9 +808,8 @@
       const teamsSlide = document.querySelector('.slide[data-type="table"][data-datatype="teams"]');
       if (teamsSlide) {
         teamsSlide.dataset.duration = (dur * 1000).toString();
-        if (slides[currentIndex] === teamsSlide && !isTransitioning) {
+        if (slides[currentIndex] === teamsSlide && !isTransitioning && !slideAnimInitialized[currentIndex]) {
           clearSlideshowTimer();
-          slideAnimInitialized[currentIndex] = false;
           resetEntranceAnimations(currentIndex);
           startSlideshowTimer(dur * 1000);
         }
@@ -852,7 +839,6 @@
       const pct = (d / Math.abs(p)) * 100;
       const sign = d > 0 ? '+' : '';
       const dir = d > 0 ? (isHigher ? 'improving' : 'declining') : (isHigher ? 'declining' : 'improving');
-      // FIX #10: emoji should reflect metric direction, not raw change direction.
       const positive = isHigher ? d > 0 : d < 0;
       return (positive ? '📈' : '📉') + ' ' + dir + ' (' + sign + pct.toFixed(1) + '%)';
     }
@@ -914,7 +900,6 @@
           if (canvas) {
             const ctx = canvas.getContext('2d');
             const remaining = isHigher ? Math.max(0, 100 - current) : Math.max(0, current);
-            // FIX #7b: update chart in place instead of destroying/recreating every 60s.
             if (canvas._chart) {
               canvas._chart.data.datasets[0].data = [current, remaining];
               canvas._chart.data.datasets[0].backgroundColor = [centre.colour, 'rgba(0,0,0,0.06)'];
@@ -940,7 +925,6 @@
         if (!grid) return;
         const cards = grid.querySelectorAll('.summary-card-vertical');
 
-        // FIX #15: match by data-metric / data-centre attributes instead of array index.
         cards.forEach(card => {
           const metric = card.dataset.metric;
           if (!metric || !data.targets[metric]) return;
@@ -1025,9 +1009,12 @@
 
     async function init() {
       await loadSlidesConfig();
+
+      // Preload every background image BEFORE building slides.
+      await preloadBackgrounds();
+
       buildSlidesFromConfig();
 
-      // FIX: hard reset the slideshow state before starting
       currentIndex = 0;
       isTransitioning = false;
       isPaused = false;
@@ -1039,7 +1026,6 @@
       document.getElementById('nextSlide').addEventListener('click', nextSlide);
       document.getElementById('prevSlide').addEventListener('click', prevSlide);
 
-      // FIX #12: only pause when the user hovers the nav bar, not the whole viewport.
       const navControls = document.querySelector('.nav-controls');
       if (navControls) {
         navControls.addEventListener('mouseenter', pauseSlideshow);
@@ -1065,7 +1051,6 @@
 
       await loadData();
 
-      // FIX: clear any leftover timer, then start fresh on slide 0
       clearSlideshowTimer();
       currentIndex = 0;
       if (slides.length > 0) {
@@ -1082,14 +1067,10 @@
     }
   })();
 
-  // ============================================================
-  // REMOTE CONTROL
-  // ============================================================
   (function() {
     let lastExecutedCommand = '';
     let lastCommandTime = 0;
     const POLL_INTERVAL = 2000;
-    // FIX #10: allow the same command to be re-issued after a 30s window.
     const COMMAND_TTL = 30000;
 
     async function pollCommand() {
