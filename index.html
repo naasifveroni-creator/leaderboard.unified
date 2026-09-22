@@ -594,6 +594,12 @@
         div.dataset.index = index;
         div.dataset.type = slide.type || 'data-image';
         div.dataset.extra = 'true';
+        // FIX: duration comes from slides-config.json (in ms).
+        // If the config doesn't specify one, we leave data-duration unset
+        // and getSlideDuration will fall back to the 5500ms default.
+        if (slide.duration && !isNaN(parseInt(slide.duration))) {
+          div.dataset.duration = parseInt(slide.duration).toString();
+        }
         if (slide.dataType) div.dataset.datatype = slide.dataType;
         if (slide.metric) div.dataset.metric = slide.metric;
 
@@ -621,28 +627,11 @@
     const progressBars = document.querySelectorAll('.progress-bar');
     const wrapper = document.getElementById('slidesWrapper');
 
-    // ============================================================
-    // SIS-STYLE TIMING CONSTANTS
-    // ============================================================
     const AGENTS_TIME_PER_ROW = 0.6;
     const TEAMS_TIME_PER_ROW  = 0.8;
     const AGENTS_MIN_DISPLAY  = 40;
     const TEAMS_MIN_DISPLAY   = 45;
     const MAX_DISPLAY         = 120;
-
-    // SIS-style SANAS_DURATIONS map — keyed by slide INDEX.
-    // Extra IEX slides start at index 8, so they occupy 8..16.
-    const SANAS_DURATIONS = {
-      8:  10000,
-      9:  10000,
-      10: 12000,
-      11: 10000,
-      12: 10000,
-      13: 10000,
-      14: 10000,
-      15: 10000,
-      16: 10000
-    };
 
     let currentIndex = 0;
     let timer = null;
@@ -713,10 +702,10 @@
       console.log('🔄 Rebuilt dots + counters for', allSlides.length, 'slides');
     }
 
-    // SIS-style getSlideDuration: map → data-duration → 5500 default
+    // Option 1: durations come from dataset.duration (set by loadExtraSlides
+    // from slides-config.json) or fall back to the 5500ms default.
+    // The hardcoded SANAS_DURATIONS map is gone — no more index-based mapping.
     function getSlideDuration(slide) {
-      const idx = parseInt(slide.dataset.index);
-      if (!isNaN(idx) && SANAS_DURATIONS[idx]) return SANAS_DURATIONS[idx];
       const custom = parseInt(slide.dataset.duration);
       if (!isNaN(custom) && custom > 0) return custom;
       return 5500;
@@ -781,7 +770,6 @@
       scrollAnimFrames = [];
     }
 
-    // SIS-style startInfiniteScroll — rAF loop with half-height snap-back
     function startInfiniteScroll(slide) {
       cancelAllScrollAnimations();
       const durationMs = parseFloat(slide.dataset.duration) || getSlideDuration(slide);
