@@ -49,6 +49,28 @@
     .slide { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; visibility: hidden; transition: opacity 0.8s ease, transform 0.8s ease, visibility 0.8s ease; display: flex; flex-direction: column; transform: scale(0.98); }
     .slide.active { opacity: 1; visibility: visible; position: relative; transform: scale(1); z-index: 10; transition: opacity 0.8s ease, transform 0.8s ease, visibility 0.8s ease; }
 
+    /* ============================================================
+       THE FIX:
+       Extra slides live inside #extraSlidesContainer, which is a
+       plain <div> with no position/height. When a slide becomes
+       .active (position: relative), its height: 100% resolves
+       against that un-positioned wrapper — which has auto height —
+       and collapses to 0px. Making the wrapper an absolute
+       full-viewport box fixes this so extra slides have real size.
+       ============================================================ */
+    #extraSlidesContainer {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+      pointer-events: none;
+    }
+    #extraSlidesContainer .slide {
+      pointer-events: auto;
+    }
+
     #slide0 { background: url('assets/slides/slide-title.webp.jpg') center/cover no-repeat, #0b1a33; }
     #slide1 { background: url('assets/slides/slide-data.webp.jpg') center/cover no-repeat, #0b1a33; }
     #slide2, #slide3 { background: linear-gradient(145deg, #f0f3f8 0%, #e8ecf4 100%); padding: 0; }
@@ -625,13 +647,9 @@
     let scrollAnimFrames = [];
     let slideAnimInitialized = [];
 
-    // FIX: start the slideshow immediately, load extra slides in the background.
     async function bootstrap() {
-      // 1. Start the slideshow right now — don't wait for anything.
       startEngine();
 
-      // 2. Load extra slides in the background. When they arrive,
-      //    rebuild the dots + counters so they include the new slides.
       if (window.__loadExtraSlides) {
         window.__loadExtraSlides().then(() => {
           rebuildDotsAndCounters();
@@ -665,10 +683,8 @@
       startSlideshowTimer(getSlideDuration(allSlides[0]));
     }
 
-    // Rebuild dots + counters after extra slides are appended.
     function rebuildDotsAndCounters() {
       const allSlides = document.querySelectorAll('.slide');
-      // Rebuild the initialization flags array so new slides are marked uninitialized
       const newFlags = new Array(allSlides.length).fill(false);
       for (let i = 0; i < Math.min(slideAnimInitialized.length, newFlags.length); i++) {
         newFlags[i] = slideAnimInitialized[i];
