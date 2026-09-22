@@ -525,6 +525,9 @@
   (function() {
     const extraContainer = document.getElementById('extraSlidesContainer');
 
+    // Persistent refs so prefetched images aren't garbage-collected
+    window.__prefetchedExtraImages = [];
+
     async function loadExtraSlides() {
       let slides = [];
       try {
@@ -539,14 +542,29 @@
 
       if (slides.length === 0) return;
 
-      // Prefetch every extra-slide background so there's no delay when the slide appears
-      slides.forEach(slide => {
-        if (slide.bg) {
-          const img = new Image();
-          img.src = slide.bg;
+      // ===== PREFETCH (two methods for maximum reliability) =====
+
+      // Method 1: <link rel="prefetch"> — highest priority, network-layer caching
+      slides.forEach(s => {
+        if (s.bg) {
+          const link = document.createElement('link');
+          link.rel = 'prefetch';
+          link.as = 'image';
+          link.href = s.bg;
+          document.head.appendChild(link);
         }
       });
 
+      // Method 2: JS Image() with persistent refs so they aren't GC'd
+      window.__prefetchedExtraImages = slides
+        .filter(s => s.bg)
+        .map(s => {
+          const img = new Image();
+          img.src = s.bg;
+          return img;
+        });
+
+      // ===== BUILD THE SLIDES =====
       slides.forEach((slide, i) => {
         const index = 8 + i;  // Extra slides start at index 8
         const div = document.createElement('div');
