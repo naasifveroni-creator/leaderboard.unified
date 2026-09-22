@@ -8,7 +8,7 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 
   <!-- ============================================================ -->
-  <!-- FIX: Early prefetch of extra-slide images.                    -->
+  <!-- Early prefetch of extra-slide images.                         -->
   <!-- Starts fetching slides-config.json + decoding all bg images   -->
   <!-- as soon as the <head> is parsed, long before DOMContentLoaded. -->
   <!-- ============================================================ -->
@@ -203,13 +203,15 @@
     /* ===== EXTRA SLIDES (admin-managed) ===== */
     .slide[data-type="data-image"], .slide[data-type="title"] { background: #0b1a33; }
 
-    /* FIX: force extra slides onto their own GPU layer so the image is composited and ready */
+    /* FIX 1: Don't force a GPU layer before activation. Let Chrome decide. */
     .slide[data-extra="true"] {
-      transform: translateZ(0);
-      will-change: transform, opacity;
       backface-visibility: hidden;
       -webkit-backface-visibility: hidden;
-      perspective: 1000px;
+    }
+
+    /* FIX 1: When active, explicitly clear will-change so Chrome doesn't hold a stale raster. */
+    .slide.active[data-extra="true"] {
+      will-change: auto;
     }
 
     @media (max-aspect-ratio: 16/9) {
@@ -560,14 +562,11 @@
 
   // ============================================================
   // EXTRA SLIDES LOADER
-  // Consumes the prefetch promise started in <head> so the images
-  // are already downloaded + decoded by the time we build slides.
   // ============================================================
   (function() {
     const extraContainer = document.getElementById('extraSlidesContainer');
 
     async function loadExtraSlides() {
-      // FIX: use the config that was already fetched + decoded in <head>.
       let cfg = null;
       try {
         cfg = await window.__extraSlidesPrefetch;
@@ -575,8 +574,6 @@
         cfg = null;
       }
 
-      // Fallback: if the early prefetch failed (e.g. file added after page load),
-      // try a fresh fetch + await decode here.
       if (!cfg || !Array.isArray(cfg.slides)) {
         try {
           const res = await fetch('slides-config.json?' + Date.now());
@@ -603,7 +600,6 @@
 
       if (!cfg || !Array.isArray(cfg.slides) || cfg.slides.length === 0) return;
 
-      // ===== BUILD THE SLIDES =====
       cfg.slides.forEach((slide, i) => {
         const index = 8 + i;
         const div = document.createElement('div');
@@ -662,7 +658,6 @@
     let slideAnimInitialized = [];
 
     async function bootstrap() {
-      // FIX: await the extra-slides loader which itself awaits image decode.
       if (window.__loadExtraSlides) {
         await window.__loadExtraSlides();
       }
