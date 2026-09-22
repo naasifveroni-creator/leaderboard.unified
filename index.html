@@ -47,9 +47,6 @@
     #adminAccess a:hover { color: #fdb913; background: rgba(0,0,0,0.3); border-color: rgba(255,215,0,0.15); }
 
     .slide { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; visibility: hidden; transition: opacity 0.8s ease, transform 0.8s ease, visibility 0.8s ease; display: flex; flex-direction: column; transform: scale(0.98); }
-    /* FIX: z-index: 10 ensures the active slide paints above all inactive siblings.
-       Without this, the previously-active slide can render on top of the new one,
-       which is why the image only "flashes" on the way out. */
     .slide.active { opacity: 1; visibility: visible; position: relative; transform: scale(1); z-index: 10; transition: opacity 0.8s ease, transform 0.8s ease, visibility 0.8s ease; }
 
     #slide0 { background: url('assets/slides/slide-title.webp.jpg') center/cover no-repeat, #0b1a33; }
@@ -628,11 +625,18 @@
     let scrollAnimFrames = [];
     let slideAnimInitialized = [];
 
+    // FIX: start the slideshow immediately, load extra slides in the background.
     async function bootstrap() {
-      if (window.__loadExtraSlides) {
-        await window.__loadExtraSlides();
-      }
+      // 1. Start the slideshow right now — don't wait for anything.
       startEngine();
+
+      // 2. Load extra slides in the background. When they arrive,
+      //    rebuild the dots + counters so they include the new slides.
+      if (window.__loadExtraSlides) {
+        window.__loadExtraSlides().then(() => {
+          rebuildDotsAndCounters();
+        }).catch(() => {});
+      }
     }
 
     function startEngine() {
@@ -659,6 +663,36 @@
       loadData();
       setInterval(loadData, 60000);
       startSlideshowTimer(getSlideDuration(allSlides[0]));
+    }
+
+    // Rebuild dots + counters after extra slides are appended.
+    function rebuildDotsAndCounters() {
+      const allSlides = document.querySelectorAll('.slide');
+      // Rebuild the initialization flags array so new slides are marked uninitialized
+      const newFlags = new Array(allSlides.length).fill(false);
+      for (let i = 0; i < Math.min(slideAnimInitialized.length, newFlags.length); i++) {
+        newFlags[i] = slideAnimInitialized[i];
+      }
+      slideAnimInitialized = newFlags;
+
+      const total = allSlides.length;
+      allSlides.forEach((s, i) => {
+        const parent = s.querySelector('.slide-counter');
+        if (parent) {
+          parent.innerHTML = `<span class="current">${i + 1}</span> / ${total}`;
+        }
+      });
+
+      dotsContainer.innerHTML = '';
+      allSlides.forEach((_, i) => {
+        const dot = document.createElement('button');
+        dot.className = 'dot' + (i === currentIndex ? ' active' : '');
+        dot.dataset.index = i;
+        dot.addEventListener('click', () => goToSlide(i));
+        dotsContainer.appendChild(dot);
+      });
+
+      console.log('🔄 Rebuilt dots + counters for', total, 'slides');
     }
 
     function getSlideDuration(slide) {
