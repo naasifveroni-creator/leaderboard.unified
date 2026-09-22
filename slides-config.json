@@ -4,55 +4,64 @@
       "id": 0,
       "type": "title",
       "name": "IE Slide 1",
-      "bg": "assets/slides/iex1.webp.png"
+      "bg": "assets/slides/iex1.webp.png",
+      "duration": 10000
     },
     {
       "id": 1,
       "type": "data-image",
       "name": "IE Slide 2",
-      "bg": "assets/slides/iex2.webp.png"
+      "bg": "assets/slides/iex2.webp.png",
+      "duration": 10000
     },
     {
       "id": 2,
       "type": "data-image",
       "name": "IE Slide 3",
-      "bg": "assets/slides/iex3.webp.png"
+      "bg": "assets/slides/iex3.webp.png",
+      "duration": 12000
     },
     {
       "id": 3,
       "type": "data-image",
       "name": "IE Slide 4",
-      "bg": "assets/slides/iex4.webp.png"
+      "bg": "assets/slides/iex4.webp.png",
+      "duration": 10000
     },
     {
       "id": 4,
       "type": "data-image",
       "name": "IE Slide 5",
-      "bg": "assets/slides/iex5.webp.png"
+      "bg": "assets/slides/iex5.webp.png",
+      "duration": 10000
     },
     {
       "id": 5,
       "type": "data-image",
       "name": "IE Slide 6",
-      "bg": "assets/slides/iex6.webp.png"
+      "bg": "assets/slides/iex6.webp.png",
+      "duration": 10000
     },
     {
       "id": 6,
       "type": "data-image",
       "name": "IE Slide 7",
-      "bg": "assets/slides/iex7.webp.png"
+      "bg": "assets/slides/iex7.webp.png",
+      "duration": 10000
     },
     {
       "id": 7,
       "type": "data-image",
       "name": "IE Slide 8",
-      "bg": "assets/slides/iex8.webp.png"
+      "bg": "assets/slides/iex8.webp.png",
+      "duration": 10000
     },
     {
       "id": 8,
       "type": "data-image",
       "name": "IE Slide 1",
-      "bg": "assets/slides/iex1.webp.png"
+      "bg": "assets/slides/iex1.webp.png",
+      "duration": 10000
     }
   ]
 }
