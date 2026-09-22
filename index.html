@@ -171,6 +171,9 @@
     /* ===== EXTRA SLIDES (admin-managed) ===== */
     .slide[data-type="data-image"], .slide[data-type="title"] { background: #0b1a33; }
 
+    /* Extra slides appear instantly — no fade, no dark flash */
+    .slide[data-extra="true"] { transition: none; }
+
     @media (max-aspect-ratio: 16/9) {
       .slide-header .logo-area h1 { font-size: 2vh; }
       .slide-header .logo-area img { height: 6vh; }
@@ -578,6 +581,7 @@
         div.id = 'slide' + index;
         div.dataset.index = index;
         div.dataset.type = slide.type || 'data-image';
+        div.dataset.extra = 'true';
         div.dataset.duration = slide.duration || 6000;
         if (slide.dataType) div.dataset.datatype = slide.dataType;
         if (slide.metric) div.dataset.metric = slide.metric;
