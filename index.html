@@ -168,7 +168,7 @@
     .comp-slide-wrapper .summary-row-vertical .values .gap-badge.below { color: #f59e0b; border-color: #f59e0b; background: rgba(245,158,11,0.08); }
     .comp-slide-wrapper .summary-row-vertical .values .gap-badge.well-below { color: #ef4444; border-color: #ef4444; background: rgba(239,68,68,0.08); }
 
-    /* ===== EXTRA SLIDES (admin-managed) — no CSS rules needed beyond data-image / title above ===== */
+    /* ===== EXTRA SLIDES (admin-managed) ===== */
     .slide[data-type="data-image"], .slide[data-type="title"] { background: #0b1a33; }
 
     @media (max-aspect-ratio: 16/9) {
@@ -539,6 +539,14 @@
 
       if (slides.length === 0) return;
 
+      // Prefetch every extra-slide background so there's no delay when the slide appears
+      slides.forEach(slide => {
+        if (slide.bg) {
+          const img = new Image();
+          img.src = slide.bg;
+        }
+      });
+
       slides.forEach((slide, i) => {
         const index = 8 + i;  // Extra slides start at index 8
         const div = document.createElement('div');
@@ -556,7 +564,6 @@
           div.style.background = `url('${slide.bg}') center/cover no-repeat, #0b1a33`;
           div.innerHTML = counter;
         } else if (slide.bg) {
-          // Default: data-image treatment (contain)
           div.style.background = `#0b1a33 url('${slide.bg}') center/contain no-repeat`;
           div.innerHTML = counter;
         } else {
@@ -569,7 +576,6 @@
       console.log('📋 Loaded', slides.length, 'extra slides from config');
     }
 
-    // Expose so slideshow engine can await it before init
     window.__loadExtraSlides = loadExtraSlides;
   })();
 
@@ -598,7 +604,6 @@
     let scrollAnimFrames = [];
     let slideAnimInitialized = [];
 
-    // Wait for extra slides to load before building dots and starting
     async function bootstrap() {
       if (window.__loadExtraSlides) {
         await window.__loadExtraSlides();
@@ -610,17 +615,14 @@
       const allSlides = document.querySelectorAll('.slide');
       slideAnimInitialized = new Array(allSlides.length).fill(false);
 
-      // Update counter denominators on ALL slides
       const total = allSlides.length;
       allSlides.forEach((s, i) => {
-        const c = s.querySelector('.slide-counter .current');
         const parent = s.querySelector('.slide-counter');
         if (parent) {
           parent.innerHTML = `<span class="current">${i + 1}</span> / ${total}`;
         }
       });
 
-      // Build dots
       dotsContainer.innerHTML = '';
       allSlides.forEach((_, i) => {
         const dot = document.createElement('button');
@@ -629,12 +631,6 @@
         dot.addEventListener('click', () => goToSlide(i));
         dotsContainer.appendChild(dot);
       });
-
-      getSlideDuration = function(slide) {
-        const custom = parseInt(slide.dataset.duration);
-        if (!isNaN(custom) && custom > 0) return custom;
-        return 5500;
-      };
 
       loadData();
       setInterval(loadData, 60000);
@@ -1196,7 +1192,6 @@
       }
     }
 
-    // Start
     bootstrap();
   })();
 
