@@ -9,8 +9,8 @@
 
   <!-- ============================================================ -->
   <!-- Early prefetch of extra-slide images.                         -->
-  <!-- Starts fetching slides-config.json + decoding all bg images   -->
-  <!-- as soon as the <head> is parsed, long before DOMContentLoaded. -->
+  <!-- Now actually useful because extra slides use <img> tags, and  -->
+  <!-- new Image() shares the same cache path as <img src>.          -->
   <!-- ============================================================ -->
   <script>
     window.__prefetchedExtraImages = [];
@@ -203,16 +203,26 @@
     /* ===== EXTRA SLIDES (admin-managed) ===== */
     .slide[data-type="data-image"], .slide[data-type="title"] { background: #0b1a33; }
 
-    /* FIX 1: Don't force a GPU layer before activation. Let Chrome decide. */
+    /* FIX 3: Extra slides use an <img> tag instead of background-image.
+       <img> has its own paint pipeline and doesn't get rasterized into
+       the parent's transitioning layer, so no stale-raster flash. */
     .slide[data-extra="true"] {
-      backface-visibility: hidden;
-      -webkit-backface-visibility: hidden;
+      background: #0b1a33;
+      padding: 0;
+      overflow: hidden;
     }
-
-    /* FIX 1: When active, explicitly clear will-change so Chrome doesn't hold a stale raster. */
-    .slide.active[data-extra="true"] {
-      will-change: auto;
+    .slide-img {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+      pointer-events: none;
+      user-select: none;
     }
+    .slide-img-cover { object-fit: cover; }
+    .slide-img-contain { object-fit: contain; background: #0b1a33; }
 
     @media (max-aspect-ratio: 16/9) {
       .slide-header .logo-area h1 { font-size: 2vh; }
@@ -614,12 +624,11 @@
 
         const counter = `<div class="slide-counter"><span class="current">--</span> / --</div>`;
 
+        // FIX 3: use an <img> tag instead of background-image.
         if (slide.type === 'title' && slide.bg) {
-          div.style.background = `url('${slide.bg}') center/cover no-repeat, #0b1a33`;
-          div.innerHTML = counter;
+          div.innerHTML = `${counter}<img class="slide-img slide-img-cover" src="${slide.bg}" alt="" draggable="false" />`;
         } else if (slide.bg) {
-          div.style.background = `#0b1a33 url('${slide.bg}') center/contain no-repeat`;
-          div.innerHTML = counter;
+          div.innerHTML = `${counter}<img class="slide-img slide-img-contain" src="${slide.bg}" alt="" draggable="false" />`;
         } else {
           div.innerHTML = counter;
         }
