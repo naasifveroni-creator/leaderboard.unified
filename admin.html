@@ -7,7 +7,6 @@
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <style>
-    /* ===== ALL ORIGINAL STYLES – KEPT INTACT ===== */
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, sans-serif; }
     body { background: #f1f5f9; padding: 1.5rem; max-width: 1300px; margin: 0 auto; }
     h1 { font-size: 2rem; color: #0f172a; margin-bottom: 0.2rem; display: flex; align-items: center; gap: 0.8rem; }
@@ -90,6 +89,7 @@
     .slide-item .slide-type.title { background: #10b981; }
     .slide-item .slide-type.data-image { background: #ef4444; }
     .slide-item .slide-name { flex: 1; font-weight: 500; color: #0f172a; }
+    .slide-item .slide-duration { font-size: 0.75rem; color: #64748b; background: #e9edf4; padding: 0.15rem 0.6rem; border-radius: 12px; font-weight: 600; }
     .slide-item .slide-actions { display: flex; gap: 0.3rem; }
     .slide-item .slide-actions button { background: none; border: 1px solid #e2e8f0; border-radius: 6px; padding: 0.2rem 0.5rem; cursor: pointer; font-size: 0.9rem; transition: 0.2s; color: #64748b; }
     .slide-item .slide-actions button:hover { background: #e2e8f0; }
@@ -239,7 +239,7 @@
   <div class="tab-content" id="tab-slides">
     <div class="card">
       <h2>📋 Manage Slides</h2>
-      <p class="desc">Add, edit, delete, or reorder slides. Changes are saved to <code>slides-config.json</code>.</p>
+      <p class="desc">Add, edit, delete, or reorder slides. Changes are saved to <code>slides-config.json</code>. <strong>Note:</strong> slides 0–7 are hardcoded in the dashboard; this list is for the extra slides only.</p>
       <div class="slide-list" id="slideListContainer">
         <p style="color:#94a3b8;text-align:center;padding:2rem;">Loading slides...</p>
       </div>
@@ -284,12 +284,17 @@
       <label for="slideName">Slide Name (for admin list)</label>
       <input type="text" id="slideName" placeholder="e.g., Top Performing Agents – SIS" />
     </div>
+    <div class="form-group">
+      <label for="slideDuration">Duration (seconds)</label>
+      <input type="number" id="slideDuration" step="0.5" min="1" placeholder="e.g., 10" />
+      <div class="hint">Leave blank to use the 5.5s default (or auto-compute for table slides)</div>
+    </div>
     <div id="tableFields" style="display:none;">
       <div class="form-group">
         <label for="slideDataSource">Data Source</label>
         <select id="slideDataSource">
-          <option value="leaderboard.json">leaderboard.json</option>
-          <option value="comparison.json">comparison.json</option>
+          <option value="data/leaderboard.json">data/leaderboard.json</option>
+          <option value="data/comparison.json">data/comparison.json</option>
         </select>
       </div>
       <div class="form-group">
@@ -312,7 +317,7 @@
     <div id="bgFields" style="display:none;">
       <div class="form-group">
         <label for="slideBg">Background Image Path</label>
-        <input type="text" id="slideBg" placeholder="e.g., assets/slides/slide-title.webp.jpg" />
+        <input type="text" id="slideBg" placeholder="e.g., assets/slides/iex1.webp.png" />
         <div class="hint">Path to the background image</div>
       </div>
     </div>
@@ -332,10 +337,9 @@
   // ============================================================
   // REPO SETTINGS – CHANGE THESE TO YOUR ACTUAL REPO
   // ============================================================
-  let REPO_OWNER = 'YOUR_USERNAME';   // <-- CHANGE THIS
-  let REPO_NAME = 'YOUR_REPO_NAME';   // <-- CHANGE THIS
+  let REPO_OWNER = 'YOUR_USERNAME';
+  let REPO_NAME = 'YOUR_REPO_NAME';
 
-  // Optional auto-detect for GitHub Pages – works if hosted on username.github.io/repo
   try {
     const hostParts = window.location.hostname.split('.');
     const pathParts = window.location.pathname.split('/').filter(p => p);
@@ -420,7 +424,7 @@
   }
 
   // ============================================================
-  // LEADERBOARD (SIS) – UNCHANGED
+  // LEADERBOARD (SIS)
   // ============================================================
   function sisSetCurrentWeek() {
     const now = new Date();
@@ -612,7 +616,7 @@
   });
 
   // ============================================================
-  // COMPARISON – UNCHANGED
+  // COMPARISON
   // ============================================================
   let compCurrentData = null;
 
@@ -828,30 +832,18 @@
   });
 
   // ============================================================
-  // SLIDES – FULLY FIXED WITH PROPER SHA HANDLING
+  // SLIDES — FIXED
   // ============================================================
   let slideConfig = null;
   let slideConfigSha = '';
 
+  // FIX 2: Default config now only contains EXTRA slides (not the 8 hardcoded ones)
+  // so saving from admin doesn't duplicate the hardcoded slides in the dashboard.
   function getDefaultConfig() {
     return {
       slides: [
-        { id: 0, type: 'title', name: 'SIS Title', bg: 'assets/slides/slide-title.webp.jpg' },
-        { id: 1, type: 'data-image', name: 'SIS Data Image', bg: 'assets/slides/slide-data.webp.jpg' },
-        { id: 2, type: 'table', name: 'Agents – SIS', dataSource: 'leaderboard.json', dataType: 'agents', title: 'Top Performing Agents – SIS' },
-        { id: 3, type: 'table', name: 'Teams – SIS', dataSource: 'leaderboard.json', dataType: 'teams', title: 'Top Performing Teams – SIS' },
-        { id: 4, type: 'comparison-detail', name: 'SIS Detail', dataSource: 'comparison.json', metric: 'SIS' },
-        { id: 5, type: 'comparison-detail', name: 'IFSR Detail', dataSource: 'comparison.json', metric: 'IFSR' },
-        { id: 6, type: 'comparison-detail', name: 'CHT Detail', dataSource: 'comparison.json', metric: 'CHT' },
-        { id: 7, type: 'summary', name: 'Summary Report', dataSource: 'comparison.json' },
-        { id: 8, type: 'data-image', name: 'IE Slide 1', bg: 'assets/slides/iex1.webp.png' },
-        { id: 9, type: 'data-image', name: 'IE Slide 2', bg: 'assets/slides/iex2.webp.png' },
-        { id: 10, type: 'data-image', name: 'IE Slide 3', bg: 'assets/slides/iex3.webp.png' },
-        { id: 11, type: 'data-image', name: 'IE Slide 4', bg: 'assets/slides/iex4.webp.png' },
-        { id: 12, type: 'data-image', name: 'IE Slide 5', bg: 'assets/slides/iex5.webp.png' },
-        { id: 13, type: 'data-image', name: 'IE Slide 6', bg: 'assets/slides/iex6.webp.png' },
-        { id: 14, type: 'data-image', name: 'IE Slide 7', bg: 'assets/slides/iex7.webp.png' },
-        { id: 15, type: 'data-image', name: 'IE Slide 8', bg: 'assets/slides/iex8.webp.png' }
+        // These are EXTRAS only. Slides 0–7 are hardcoded in index.html.
+        // Add extra image slides or table slides here as needed.
       ]
     };
   }
@@ -859,9 +851,8 @@
   async function loadSlides() {
     try {
       const token = getToken();
-      
+
       if (!token) {
-        // Try to load from local if no token
         try {
           const res = await fetch('slides-config.json?t=' + Date.now());
           if (res.ok) {
@@ -871,8 +862,7 @@
             return;
           }
         } catch(e) {}
-        
-        // Fallback to default
+
         slideConfig = getDefaultConfig();
         setStatus('slidesStatus', '📄 Using default config (no token)', true);
         renderSlideList();
@@ -894,7 +884,6 @@
         slideConfigSha = data.sha || '';
         setStatus('slidesStatus', '✅ Slides loaded from GitHub');
       } else if (res.status === 404) {
-        // File doesn't exist - use default
         slideConfig = getDefaultConfig();
         slideConfigSha = '';
         setStatus('slidesStatus', '📄 No config file - using defaults');
@@ -904,7 +893,6 @@
       renderSlideList();
     } catch(e) {
       console.error('Load slides error:', e);
-      // Use default config as fallback
       slideConfig = getDefaultConfig();
       slideConfigSha = '';
       setStatus('slidesStatus', '⚠️ Using default config (error loading)', true);
@@ -915,7 +903,7 @@
   function renderSlideList() {
     const container = document.getElementById('slideListContainer');
     if (!slideConfig || !slideConfig.slides || slideConfig.slides.length === 0) {
-      container.innerHTML = '<p style="color:#94a3b8;text-align:center;padding:2rem;">No slides configured. Add one!</p>';
+      container.innerHTML = '<p style="color:#94a3b8;text-align:center;padding:2rem;">No extra slides configured. Click "Add Slide" to create one.</p>';
       return;
     }
 
@@ -932,11 +920,21 @@
       const typeClass = slide.type || 'unknown';
       const typeLabel = typeLabels[slide.type] || slide.type;
       const name = slide.name || slide.title || slide.metric || 'Unnamed';
+
+      // Show duration badge
+      let durationHtml = '';
+      if (slide.duration) {
+        durationHtml = `<span class="slide-duration">${(slide.duration / 1000).toFixed(1)}s</span>`;
+      } else {
+        durationHtml = `<span class="slide-duration" style="opacity:0.5;">default</span>`;
+      }
+
       html += `
         <div class="slide-item">
           <span class="slide-index">${idx + 1}.</span>
           <span class="slide-type ${typeClass}">${typeLabel}</span>
           <span class="slide-name">${name}</span>
+          ${durationHtml}
           <div class="slide-actions">
             <button class="move-up" data-idx="${idx}" title="Move Up">↑</button>
             <button class="move-down" data-idx="${idx}" title="Move Down">↓</button>
@@ -1010,11 +1008,17 @@
 
     document.getElementById('slideType').value = slide.type || 'title';
     document.getElementById('slideName').value = slide.name || '';
+    // FIX 1: Populate duration field (convert ms → seconds for display)
+    if (slide.duration && !isNaN(parseInt(slide.duration))) {
+      document.getElementById('slideDuration').value = (parseInt(slide.duration) / 1000).toString();
+    } else {
+      document.getElementById('slideDuration').value = '';
+    }
 
     toggleFields(slide.type || 'title');
 
     if (slide.type === 'table') {
-      document.getElementById('slideDataSource').value = slide.dataSource || 'leaderboard.json';
+      document.getElementById('slideDataSource').value = slide.dataSource || 'data/leaderboard.json';
       document.getElementById('slideDataType').value = slide.dataType || '';
       document.getElementById('slideTableTitle').value = slide.title || '';
     } else if (slide.type === 'comparison-detail') {
@@ -1032,7 +1036,9 @@
 
     document.getElementById('slideType').value = 'title';
     document.getElementById('slideName').value = '';
-    document.getElementById('slideDataSource').value = 'leaderboard.json';
+    // FIX 1: Default duration field is blank (means "use default")
+    document.getElementById('slideDuration').value = '';
+    document.getElementById('slideDataSource').value = 'data/leaderboard.json';
     document.getElementById('slideDataType').value = '';
     document.getElementById('slideTableTitle').value = '';
     document.getElementById('slideMetric').value = '';
@@ -1066,21 +1072,28 @@
     const idx = parseInt(slideEditIndex.value);
     const type = document.getElementById('slideType').value;
     const name = document.getElementById('slideName').value.trim() || 'Unnamed';
+    // FIX 1: Read duration from the new input field (seconds → ms)
+    const durationSec = parseFloat(document.getElementById('slideDuration').value);
 
     const newSlide = { id: idx >= 0 ? idx : slideConfig.slides.length, type, name };
+
+    // FIX 1: Save duration only if a valid number was entered
+    if (!isNaN(durationSec) && durationSec > 0) {
+      newSlide.duration = Math.round(durationSec * 1000);
+    }
 
     if (type === 'table') {
       newSlide.dataSource = document.getElementById('slideDataSource').value;
       newSlide.dataType = document.getElementById('slideDataType').value.trim();
       newSlide.title = document.getElementById('slideTableTitle').value.trim() || 'Table';
     } else if (type === 'comparison-detail') {
-      newSlide.dataSource = 'comparison.json';
+      newSlide.dataSource = 'data/comparison.json';
       newSlide.metric = document.getElementById('slideMetric').value.trim();
       if (!newSlide.metric) { alert('Please enter a metric name (e.g., SIS, IFSR, CHT)'); return; }
     } else if (type === 'title' || type === 'data-image') {
       newSlide.bg = document.getElementById('slideBg').value.trim() || 'assets/slides/default.jpg';
     } else if (type === 'summary') {
-      newSlide.dataSource = 'comparison.json';
+      newSlide.dataSource = 'data/comparison.json';
     }
 
     if (idx >= 0 && idx < slideConfig.slides.length) {
@@ -1097,7 +1110,7 @@
 
   document.getElementById('addSlideBtn').addEventListener('click', openAddModal);
 
-  // ---- SAVE TO GITHUB – COMPLETELY FIXED WITH PROPER SHA HANDLING ----
+  // ---- SAVE TO GITHUB ----
   document.getElementById('saveSlidesBtn').addEventListener('click', async function() {
     const token = getToken();
     if (!token) {
@@ -1114,10 +1127,9 @@
     const payload = JSON.stringify(slideConfig, null, 2);
 
     try {
-      // Step 1: Get the current file to check if it exists and get SHA
       let sha = null;
       let fileExists = false;
-      
+
       try {
         const getRes = await fetch(url, {
           headers: {
@@ -1125,7 +1137,7 @@
             'Accept': 'application/vnd.github.v3+json'
           }
         });
-        
+
         if (getRes.ok) {
           const existing = await getRes.json();
           sha = existing.sha;
@@ -1142,17 +1154,14 @@
         }
       } catch (e) {
         console.warn('⚠️ Could not check file existence:', e);
-        // Continue anyway - will try to create
       }
 
-      // Step 2: Build the request body
       const body = {
         message: 'Update slides configuration via admin',
         content: btoa(unescape(encodeURIComponent(payload))),
         branch: 'main'
       };
-      
-      // Only include SHA if the file exists (for updates)
+
       if (fileExists && sha) {
         body.sha = sha;
         console.log('🔑 Using SHA for update:', sha);
@@ -1160,7 +1169,6 @@
         console.log('📝 Creating new file (no SHA)');
       }
 
-      // Step 3: Send the PUT request
       const res = await fetch(url, {
         method: 'PUT',
         headers: {
@@ -1175,19 +1183,16 @@
         const data = await res.json();
         console.log('✅ Save successful:', data);
         setStatus('slidesStatus', '✅ Slides published to GitHub successfully!');
-        
-        // Update the SHA for future saves
+
         if (data.content && data.content.sha) {
           slideConfigSha = data.content.sha;
         }
-        
-        // Reload to get fresh state
+
         await loadSlides();
       } else {
         const err = await res.json();
         console.error('❌ Publish error:', err);
-        
-        // Handle specific error cases
+
         if (err.message && err.message.includes('sha')) {
           setStatus('slidesStatus', '❌ SHA mismatch - file was changed elsewhere. Reload and try again.', true);
         } else if (err.message && err.message.includes('permission')) {
