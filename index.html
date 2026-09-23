@@ -624,16 +624,12 @@
     const progressBars = document.querySelectorAll('.progress-bar');
     const wrapper = document.getElementById('slidesWrapper');
 
+    // SIS timing constants — unchanged
     const AGENTS_TIME_PER_ROW = 0.6;
     const TEAMS_TIME_PER_ROW  = 0.8;
     const AGENTS_MIN_DISPLAY  = 40;
     const TEAMS_MIN_DISPLAY   = 45;
-    const MAX_DISPLAY         = 45;
-
-    // FIX (Option 3): fixed scroll speed, independent of content height.
-    // Both columns move at the same visual rate regardless of how
-    // many rows they contain.
-    const SCROLL_PIXELS_PER_SEC = 40;
+    const MAX_DISPLAY         = 120;   // SIS default cap
 
     let currentIndex = 0;
     let timer = null;
@@ -770,10 +766,11 @@
       scrollAnimFrames = [];
     }
 
-    // FIX (Option 3): fixed scroll speed, independent of content height.
+    // SIS-style scroll: speed derived from duration, so one full loop
+    // of the doubled content = exactly one slide duration.
     function startInfiniteScroll(slide) {
       cancelAllScrollAnimations();
-      const pixelsPerMs = SCROLL_PIXELS_PER_SEC / 1000;
+      const durationMs = parseFloat(slide.dataset.duration) || 5500;
       const wrappers = slide.querySelectorAll('.table-grid .scroll-wrapper');
       wrappers.forEach(wrap => {
         const inner = wrap.querySelector('.scroll-inner');
@@ -782,6 +779,7 @@
         const half = contentHeight / 2;
         if (half <= 0) return;
         wrap.scrollTop = 0;
+        const pixelsPerMs = half / durationMs;
         let lastTime = performance.now();
         function step(now) {
           if (isPaused) return;
@@ -993,7 +991,6 @@
       }
     }
 
-    // FIX (Option 1): balanced split — same row count on both sides.
     function renderTeams(containerId, items, previousData) {
       const container = document.getElementById(containerId);
       if (!items || items.length === 0) {
@@ -1006,6 +1003,7 @@
         return;
       }
       const ranked = autoRank(validItems);
+      // Balanced split — both columns same row count
       const half = Math.ceil(ranked.length / 2);
       const firstCol = ranked.slice(0, half);
       const secondCol = ranked.slice(half);
